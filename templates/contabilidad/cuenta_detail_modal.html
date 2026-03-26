@@ -1,0 +1,117 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="if(event.target === this) document.getElementById('modal-container').innerHTML = ''">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold">Detalle de Cuenta</h2>
+            <button onclick="document.getElementById('modal-container').innerHTML = ''" class="text-white hover:text-gray-300">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-gray-500">Código</p>
+                    <p class="text-lg font-mono font-semibold">{{ cuenta.codigo }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Tipo</p>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        {% if cuenta.tipo == 'activo' %}bg-blue-100 text-blue-800
+                        {% elif cuenta.tipo == 'pasivo' %}bg-red-100 text-red-800
+                        {% elif cuenta.tipo == 'patrimonio' %}bg-purple-100 text-purple-800
+                        {% elif cuenta.tipo == 'ingreso' %}bg-green-100 text-green-800
+                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ cuenta.get_tipo_display }}
+                    </span>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-500">Nombre</p>
+                    <p class="text-lg font-semibold">{{ cuenta.nombre }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Cuenta Padre</p>
+                    <p class="font-mono">{% if cuenta.padre %}{{ cuenta.padre.codigo }} - {{ cuenta.padre.nombre }}{% else %}—{% endif %}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Estado</p>
+                    <span class="px-2 inline-flex text-xs font-semibold rounded-full {% if cuenta.activa %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-500{% endif %}">
+                        {% if cuenta.activa %}Activa{% else %}Inactiva{% endif %}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Acepta Movimientos</p>
+                    <span class="px-2 inline-flex text-xs font-semibold rounded-full {% if cuenta.acepta_movimientos %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-500{% endif %}">
+                        {% if cuenta.acepta_movimientos %}Sí{% else %}No{% endif %}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Saldo Actual</p>
+                    <p class="text-xl font-bold {% if saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        ${{ saldo|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+            
+            {% if cuenta.hijos.exists %}
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">Cuentas Hijas</h3>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Código</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for hijo in cuenta.hijos.all %}
+                        <tr>
+                            <td class="px-3 py-2 font-mono text-sm">{{ hijo.codigo }}</td>
+                            <td class="px-3 py-2 text-sm">{{ hijo.nombre }}</td>
+                            <td class="px-3 py-2 text-sm">{{ hijo.get_tipo_display }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-2">Últimos Movimientos</h3>
+                {% if lineas %}
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Fecha</th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Asiento</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Debe</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Haber</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for linea in lineas %}
+                        <tr>
+                            <td class="px-3 py-2 text-sm">{{ linea.asiento.fecha|date:"d/m/Y" }}</td>
+                            <td class="px-3 py-2 text-sm font-mono">{{ linea.asiento.numero }}</td>
+                            <td class="px-3 py-2 text-right text-sm text-green-600">{% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% endif %}</td>
+                            <td class="px-3 py-2 text-right text-sm text-red-600">{% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-gray-500 text-sm">No hay movimientos registrados</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 px-6 py-3 flex justify-end gap-2">
+            <a href="{% url 'contabilidad:cuenta_edit' cuenta.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                <i class="fas fa-edit mr-1"></i>Editar
+            </a>
+            <button onclick="document.getElementById('modal-container').innerHTML = ''" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Movimiento{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'tesoreria:movimientos' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver a movimientos
+    </a>
+</div>
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">{{ action }} Movimiento de Tesorería</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta</label>
+                    {{ form.cuenta }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    {{ form.tipo }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Importe</label>
+                    {{ form.importe }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    {{ form.fecha }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contacto</label>
+                    {{ form.contacto }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+            
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'tesoreria:movimientos' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

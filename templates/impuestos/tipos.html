@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Tipos de Impuesto{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Tipos de Impuesto</h1>
+        <p class="text-gray-600">IVA, IIBB, Retenciones, Percepciones</p>
+    </div>
+    <a href="{% url 'impuestos:tipo_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i>Nuevo Tipo
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for tipo in tipos %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-mono">{{ tipo.codigo }}</td>
+                <td class="px-6 py-4">{{ tipo.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {{ tipo.get_tipo_display }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-gray-500">
+                    {% if tipo.cuenta_contable %}
+                        {{ tipo.cuenta_contable.codigo }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {% if tipo.activo %}
+                    <span class="text-green-600"><i class="fas fa-check"></i> Activo</span>
+                    {% else %}
+                    <span class="text-gray-400"><i class="fas fa-times"></i> Inactivo</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{% url 'impuestos:tipo_edit' tipo.pk %}" class="text-yellow-600 hover:text-yellow-900 mr-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'impuestos:tipo_delete' tipo.pk %}" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay tipos de impuesto configurados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

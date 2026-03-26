@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Alícuotas{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Alícuotas</h1>
+        <p class="text-gray-600">Porcentajes de impuesto</p>
+    </div>
+    <a href="{% url 'impuestos:alicuota_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i>Nueva Alícuota
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Porcentaje</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jurisdicción</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vigencia</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for alicuota in alicuotas %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">{{ alicuota.tipo_impuesto.nombre }}</td>
+                <td class="px-6 py-4">{{ alicuota.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap font-semibold">{{ alicuota.porcentaje }}%</td>
+                <td class="px-6 py-4 text-gray-500">{{ alicuota.jurisdiccion }}</td>
+                <td class="px-6 py-4 text-gray-500">
+                    {{ alicuota.fecha_desde }}
+                    {% if alicuota.fecha_hasta %}
+                        - {{ alicuota.fecha_hasta }}
+                    {% else %}
+                        - actual
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{% url 'impuestos:alicuota_edit' alicuota.pk %}" class="text-yellow-600 hover:text-yellow-900 mr-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'impuestos:alicuota_delete' alicuota.pk %}" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay alícuotas configuradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

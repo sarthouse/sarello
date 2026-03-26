@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Asiento{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'contabilidad:asientos' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver a asientos
+    </a>
+</div>
+
+<div class="max-w-6xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h1 class="text-2xl font-bold mb-6">{{ action }} Asiento Contable</h1>
+        
+        <form method="post" id="asiento-form">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio</label>
+                    {{ form.ejercicio }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                    {{ form.numero }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    {{ form.fecha }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Origen</label>
+                    {{ form.origen }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    {{ form.estado }}
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+            
+            <h2 class="text-lg font-semibold mb-4">Líneas del Asiento</h2>
+            
+            <div class="overflow-x-auto mb-4">
+                <table class="min-w-full border rounded-lg" id="lineas-table">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700 w-1/4">Cuenta</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700 w-1/4">Debe</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700 w-1/4">Haber</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Descripción</th>
+                            <th class="px-4 py-2 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lineas-body">
+                        {% for linea in lineas_data %}
+                        <tr class="linea-row border-t">
+                            <td class="px-2 py-2">
+                                <select name="cuenta_id" class="w-full border rounded px-2 py-1 text-sm">
+                                    <option value="">-- Seleccionar cuenta --</option>
+                                    {% for cuenta in cuentas %}
+                                    <option value="{{ cuenta.pk }}" {% if linea.cuenta_id == cuenta.pk %}selected{% endif %}>
+                                        {{ cuenta.codigo }} - {{ cuenta.nombre }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% if linea.pk %}<input type="hidden" name="linea_pk" value="{{ linea.pk }}">{% endif %}
+                            </td>
+                            <td class="px-2 py-2">
+                                <input type="number" name="debe" value="{{ linea.debe }}" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-sm text-right debe-input">
+                            </td>
+                            <td class="px-2 py-2">
+                                <input type="number" name="haber" value="{{ linea.haber }}" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-right haber-input">
+                            </td>
+                            <td class="px-2 py-2">
+                                <input type="text" name="linea_descripcion" value="{{ linea.descripcion }}" class="w-full border rounded px-2 py-1 text-sm">
+                            </td>
+                            <td class="px-2 py-2 text-center">
+                                <button type="button" class="text-red-600 hover:text-red-800" onclick="removeLine(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="bg-gray-50 border-t">
+                        <tr>
+                            <td class="px-4 py-2 font-medium text-right">Totales:</td>
+                            <td class="px-4 py-2 text-right font-bold text-red-600" id="total-debe">0.00</td>
+                            <td class="px-4 py-2 text-right font-bold text-green-600" id="total-haber">0.00</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <button type="button" onclick="addLine()" class="mb-6 bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 text-sm">
+                <i class="fas fa-plus mr-1"></i>Agregar línea
+            </button>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'contabilidad:asientos' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const cuentasOptions = `
+    <option value="">-- Seleccionar cuenta --</option>
+    {% for cuenta in cuentas %}<option value="{{ cuenta.pk }}">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>{% endfor %}
+`;
+
+function addLine() {
+    const tbody = document.getElementById('lineas-body');
+    const tr = document.createElement('tr');
+    tr.className = 'linea-row border-t';
+    tr.innerHTML = `
+        <td class="px-2 py-2">
+            <select name="cuenta_id" class="w-full border rounded px-2 py-1 text-sm">
+                ${cuentasOptions}
+            </select>
+        </td>
+        <td class="px-2 py-2">
+            <input type="number" name="debe" value="" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-sm text-right debe-input">
+        </td>
+        <td class="px-2 py-2">
+            <input type="number" name="haber" value="" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-right haber-input">
+        </td>
+        <td class="px-2 py-2">
+            <input type="text" name="linea_descripcion" value="" class="w-full border rounded px-2 py-1 text-sm">
+        </td>
+        <td class="px-2 py-2 text-center">
+            <button type="button" class="text-red-600 hover:text-red-800" onclick="removeLine(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    calculateTotals();
+}
+
+function removeLine(btn) {
+    const rows = document.querySelectorAll('.linea-row');
+    if (rows.length > 1) {
+        btn.closest('tr').remove();
+        calculateTotals();
+    }
+}
+
+function calculateTotals() {
+    let totalDebe = 0;
+    let totalHaber = 0;
+    
+    document.querySelectorAll('.debe-input').forEach(input => {
+        totalDebe += parseFloat(input.value) || 0;
+    });
+    
+    document.querySelectorAll('.haber-input').forEach(input => {
+        totalHaber += parseFloat(input.value) || 0;
+    });
+    
+    document.getElementById('total-debe').textContent = totalDebe.toFixed(2);
+    document.getElementById('total-haber').textContent = totalHaber.toFixed(2);
+    
+    const diff = Math.abs(totalDebe - totalHaber);
+    if (diff > 0.01) {
+        document.getElementById('total-debe').classList.add('text-red-600');
+        document.getElementById('total-haber').classList.add('text-red-600');
+    } else {
+        document.getElementById('total-debe').classList.remove('text-red-600');
+        document.getElementById('total-haber').classList.remove('text-red-600');
+    }
+}
+
+document.addEventListener('input', calculateTotals);
+document.addEventListener('change', calculateTotals);
+
+calculateTotals();
+</script>
+{% endblock %}

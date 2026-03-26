@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}Importar Plan de Cuentas{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Importar Plan de Cuentas</h1>
+        <p class="text-gray-600">Carga un archivo CSV para importar cuentas contables</p>
+    </div>
+    <a href="{% url 'contabilidad:plan_cuentas' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+        <i class="fas fa-arrow-left mr-2"></i>Volver
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">Archivo CSV</h2>
+            
+            <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                <p class="text-gray-600 mb-2">Arrastra y suelta el archivo CSV aquí</p>
+                <p class="text-gray-400 text-sm">o</p>
+                <label class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
+                    Seleccionar archivo
+                    <input type="file" id="csv-file" accept=".csv" class="hidden">
+                </label>
+            </div>
+            
+            <div id="file-info" class="mt-4 hidden">
+                <div class="flex items-center justify-between bg-blue-50 p-3 rounded">
+                    <div class="flex items-center">
+                        <i class="fas fa-file-csv text-green-600 mr-2"></i>
+                        <span id="filename" class="text-sm font-medium"></span>
+                    </div>
+                    <button id="remove-file" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <h3 class="font-semibold text-sm mb-2">Campos requeridos:</h3>
+                <code class="block bg-gray-100 p-2 rounded text-xs">
+                    codigo,nombre,tipo<br>
+                    1,Activo,activo<br>
+                    1.1,Caja,activo
+                </code>
+                <p class="text-xs text-gray-500 mt-2">Los otros campos son opcionales: cuenta_padre, acepta_movimientos</p>
+            </div>
+            
+            <div class="mt-6">
+                <a href="{% url 'contabilidad:descargar_guia' %}" class="flex items-center justify-center text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-download mr-2"></i>Descargar guía CSV
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4">Mapeo de Columnas</h2>
+            <div id="mapping-container" class="space-y-3">
+                <p class="text-sm text-gray-500">Sube un archivo para configurar el mapeo</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4">Errores</h2>
+            <div id="errores-container" class="text-sm text-red-600 max-h-48 overflow-y-auto">
+                <p class="text-gray-400">No hay errores</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Vista Previa</h2>
+                <span id="total-count" class="text-sm text-gray-500">0 cuentas</span>
+            </div>
+            
+            <div id="preview-table" class="overflow-x-auto hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta Padre</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acepta Mov.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-body" class="bg-white divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="empty-preview" class="text-center py-12 text-gray-400">
+                <i class="fas fa-table text-4xl mb-3"></i>
+                <p>Sube un archivo CSV para ver la preview</p>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-end">
+            <button id="import-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fas fa-import mr-2"></i>Importar Cuentas
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const campos = ['codigo', 'nombre', 'tipo', 'cuenta_padre', 'acepta_movimientos'];
+let columnasDetectadas = [];
+let archivoSubido = null;
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('csv-file');
+const fileInfo = document.getElementById('file-info');
+const filenameEl = document.getElementById('filename');
+const removeFile = document.getElementById('remove-file');
+const previewTable = document.getElementById('preview-table');
+const previewBody = document.getElementById('preview-body');
+const emptyPreview = document.getElementById('empty-preview');
+const erroresContainer = document.getElementById('errores-container');
+const totalCount = document.getElementById('total-count');
+const importBtn = document.getElementById('import-btn');
+const mappingContainer = document.getElementById('mapping-container');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-blue-500', 'bg-blue-50');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+        fileInput.files = files;
+        handleFile(files[0]);
+    }
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+    }
+});
+
+removeFile.addEventListener('click', () => {
+    fileInput.value = '';
+    fileInfo.classList.add('hidden');
+    archivoSubido = null;
+    columnasDetectadas = [];
+    previewTable.classList.add('hidden');
+    emptyPreview.classList.remove('hidden');
+    erroresContainer.innerHTML = '<p class="text-gray-400">No hay errores</p>';
+    totalCount.textContent = '0 cuentas';
+    importBtn.disabled = true;
+    mappingContainer.innerHTML = '<p class="text-sm text-gray-500">Sube un archivo para configurar el mapeo</p>';
+});
+
+function handleFile(file) {
+    filenameEl.textContent = file.name;
+    fileInfo.classList.remove('hidden');
+    
+    const formData = new FormData();
+    formData.append('archivo_csv', file);
+    
+    fetch('{% url "contabilidad:importar_cuentas" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        columnasDetectadas = data.columnas || [];
+        renderMapping();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        renderErrors(['Error al procesar el archivo']);
+    });
+}
+
+function renderMapping() {
+    let html = '';
+    
+    campos.forEach(campo => {
+        const columnaMatch = columnasDetectadas.find(c => c.toLowerCase().replace(/[_\s]/g, '') === campo.toLowerCase());
+        
+        html += `
+            <div class="flex items-center justify-between">
+                <label class="text-sm font-medium text-gray-700 w-32">${campo}:</label>
+                <select id="map-${campo}" class="border rounded px-2 py-1 text-sm flex-1" onchange="updatePreview()">
+                    <option value="">-- Seleccionar --</option>
+                    ${columnasDetectadas.map(col => `
+                        <option value="${col}" ${columnaMatch === col ? 'selected' : ''}>${col}</option>
+                    `).join('')}
+                </select>
+            </div>
+        `;
+    });
+    
+    mappingContainer.innerHTML = html;
+    updatePreview();
+}
+
+function getMapping() {
+    const mapping = {};
+    campos.forEach(campo => {
+        const select = document.getElementById(`map-${campo}`);
+        if (select && select.value) {
+            mapping[campo] = select.value;
+        } else {
+            mapping[campo] = campo;
+        }
+    });
+    return mapping;
+}
+
+function updatePreview() {
+    const mapping = getMapping();
+    
+    if (!fileInput.files.length) return;
+    
+    const formData = new FormData();
+    formData.append('archivo_csv', fileInput.files[0]);
+    
+    fetch('{% url "contabilidad:importar_cuentas" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-HX-Mapping': JSON.stringify(mapping)
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        renderPreview(data.cuentas || []);
+        renderErrors(data.errores || []);
+        totalCount.textContent = `${data.total || 0} cuentas`;
+        
+        if ((data.cuentas || []).length > 0 && (data.errores || []).length === 0) {
+            importBtn.disabled = false;
+        } else {
+            importBtn.disabled = true;
+        }
+    });
+}
+
+function renderPreview(cuentas) {
+    previewBody.innerHTML = '';
+    
+    if (cuentas.length === 0) {
+        previewTable.classList.add('hidden');
+        emptyPreview.classList.remove('hidden');
+        return;
+    }
+    
+    previewTable.classList.remove('hidden');
+    emptyPreview.classList.add('hidden');
+    
+    cuentas.slice(0, 20).forEach(cuenta => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="px-4 py-2 font-mono">${cuenta.codigo}</td>
+            <td class="px-4 py-2">${cuenta.nombre}</td>
+            <td class="px-4 py-2">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    ${cuenta.tipo === 'activo' ? 'bg-blue-100 text-blue-800' : ''}
+                    ${cuenta.tipo === 'pasivo' ? 'bg-red-100 text-red-800' : ''}
+                    ${cuenta.tipo === 'patrimonio' ? 'bg-purple-100 text-purple-800' : ''}
+                    ${cuenta.tipo === 'ingreso' ? 'bg-green-100 text-green-800' : ''}
+                    ${cuenta.tipo === 'egreso' ? 'bg-yellow-100 text-yellow-800' : ''}">
+                    ${cuenta.tipo}
+                </span>
+            </td>
+            <td class="px-4 py-2 font-mono text-gray-500">${cuenta.padre ? cuenta.padre.codigo : '-'}</td>
+            <td class="px-4 py-2">
+                ${cuenta.acepta_movimientos ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-gray-400"></i>'}
+            </td>
+        `;
+        previewBody.appendChild(row);
+    });
+    
+    if (cuentas.length > 20) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="5" class="px-4 py-2 text-center text-gray-500">... y ${cuentas.length - 20} más</td>`;
+        previewBody.appendChild(row);
+    }
+}
+
+function renderErrors(errores) {
+    if (errores.length === 0) {
+        erroresContainer.innerHTML = '<p class="text-gray-400">No hay errores</p>';
+        return;
+    }
+    
+    erroresContainer.innerHTML = errores.map(error => 
+        `<p class="mb-1">• ${error}</p>`
+    ).join('');
+}
+
+importBtn.addEventListener('click', () => {
+    if (!fileInput.files.length) return;
+    
+    importBtn.disabled = true;
+    importBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Importando...';
+    
+    const mapping = getMapping();
+    
+    const formData = new FormData();
+    formData.append('archivo_csv', fileInput.files[0]);
+    
+    fetch('{% url "contabilidad:importar_cuentas" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-HX-Mapping': JSON.stringify(mapping)
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        fetch('{% url "contabilidad:importar_cuentas_confirmar" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                mapping: mapping,
+                filename: fileInput.files[0].name
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                window.location.href = '{% url "contabilidad:plan_cuentas" %}';
+            } else {
+                alert('Error al importar: ' + (result.errores || []).join(', '));
+                importBtn.disabled = false;
+                importBtn.innerHTML = '<i class="fas fa-import mr-2"></i>Importar Cuentas';
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al importar');
+        importBtn.disabled = false;
+        importBtn.innerHTML = '<i class="fas fa-import mr-2"></i>Importar Cuentas';
+    });
+});
+</script>
+{% endblock %}

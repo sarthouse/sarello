@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://sarello:sarello123@db:5432/sarello
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=CAMBIAME-POR-UNA-CLAVE-SEGURA-EN-PRODUCCION
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost,127.0.0.1,tu-dominio.com
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./media:/app/media
+
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=sarello
+      - POSTGRES_USER=sarello
+      - POSTGRES_PASSWORD=sarello123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    command: celery -A core worker -l info
+    environment:
+      - DATABASE_URL=postgres://sarello:sarello123@db:5432/sarello
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./media:/app/media
+
+volumes:
+  postgres_data:

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ contacto.nombre }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'contactos:lista' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver a contactos
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-2xl font-bold">{{ contacto.nombre }}</h1>
+                <p class="text-gray-500">Código: {{ contacto.codigo }}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                {% if contacto.tipo == 'cliente' %}bg-green-100 text-green-800
+                {% elif contacto.tipo == 'proveedor' %}bg-orange-100 text-orange-800
+                {% else %}bg-purple-100 text-purple-800{% endif %}">
+                {{ contacto.get_tipo_display }}
+            </span>
+        </div>
+        
+        <div class="flex gap-2 mb-4">
+            {% if contacto.activo %}
+            <span class="text-green-600"><i class="fas fa-check"></i> Activo</span>
+            {% else %}
+            <span class="text-gray-400"><i class="fas fa-times"></i> Inactivo</span>
+            {% endif %}
+        </div>
+        
+        <div class="space-y-3">
+            <div>
+                <p class="text-sm text-gray-500">CUIT/CUIL</p>
+                <p class="font-medium">{{ contacto.cuil|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Condición IVA</p>
+                <p class="font-medium">{{ contacto.get_condicion_iva_display }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Dirección</p>
+                <p class="font-medium">{{ contacto.direccion|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Ciudad</p>
+                <p class="font-medium">{{ contacto.ciudad|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Provincia</p>
+                <p class="font-medium">{{ contacto.provincia|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Información de Contacto</h2>
+        
+        <div class="space-y-3">
+            <div>
+                <p class="text-sm text-gray-500">Teléfono</p>
+                <p class="font-medium">{{ contacto.telefono|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-medium">{{ contacto.email|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Contacto Principal</p>
+                <p class="font-medium">{{ contacto.contacto_principal|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Límite de Crédito</p>
+                <p class="font-medium">${{ contacto.limite_credito|default:"0.00" }}</p>
+            </div>
+            {% if contacto.notas %}
+            <div>
+                <p class="text-sm text-gray-500">Notas</p>
+                <p class="font-medium">{{ contacto.notas }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mt-6 flex gap-2">
+            <a href="{% url 'contactos:contacto_edit' contacto.pk %}" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+                <i class="fas fa-edit mr-2"></i>Editar
+            </a>
+            <a href="{% url 'contactos:contacto_delete' contacto.pk %}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                <i class="fas fa-trash mr-2"></i>Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Saldos de Cuentas{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Saldos de Cuentas</h1>
+        <p class="text-gray-600">Estado actual de tesorería</p>
+    </div>
+    <a href="{% url 'tesoreria:cuenta_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i>Nueva Cuenta
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    {% for cuenta in cuentas %}
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">{{ cuenta.nombre }}</h2>
+                <p class="text-sm text-gray-500">{{ cuenta.get_tipo_display }} - {{ cuenta.get_moneda_display }}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                {% if cuenta.tipo == 'caja' %}bg-yellow-100 text-yellow-800
+                {% elif cuenta.tipo == 'banco' %}bg-blue-100 text-blue-800
+                {% else %}bg-purple-100 text-purple-800{% endif %}">
+                {{ cuenta.get_tipo_display }}
+            </span>
+        </div>
+        
+        <div class="text-3xl font-bold {% if cuenta.saldo_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+            {{ cuenta.moneda }} {{ cuenta.saldo_actual|floatformat:2 }}
+        </div>
+        
+        <div class="mt-4 flex gap-2">
+            <a href="{% url 'tesoreria:ingresos' %}?cuenta={{ cuenta.pk }}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                <i class="fas fa-plus mr-1"></i>Ingreso
+            </a>
+            <a href="{% url 'tesoreria:egresos' %}?cuenta={{ cuenta.pk }}" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+                <i class="fas fa-minus mr-1"></i>Egreso
+            </a>
+            <a href="{% url 'tesoreria:cuenta_edit' cuenta.pk %}" class="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400">
+                <i class="fas fa-edit"></i>
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-2 bg-white rounded-lg shadow p-6 text-center">
+        <p class="text-gray-500">No hay cuentas de tesorería configuradas.</p>
+        <a href="{% url 'tesoreria:cuenta_create' %}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+            Crear primera cuenta
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">Resumen Total</h2>
+    <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+            <p class="text-sm text-gray-500">Cajas</p>
+            <p class="text-2xl font-bold">
+                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'caja' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
+            </p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Bancos</p>
+            <p class="text-2xl font-bold">
+                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'banco' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
+            </p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Digitales</p>
+            <p class="text-2xl font-bold">
+                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'digital' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

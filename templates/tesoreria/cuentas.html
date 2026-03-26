@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Cuentas de Tesorería{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Cuentas de Tesorería</h1>
+        <p class="text-gray-600">Cajas y bancos</p>
+    </div>
+    <a href="{% url 'tesoreria:cuenta_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <i class="fas fa-plus mr-2"></i>Nueva Cuenta
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Moneda</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta Contable</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saldo Inicial</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saldo Actual</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for cuenta in cuentas %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium">{{ cuenta.nombre }}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        {% if cuenta.tipo == 'caja' %}bg-yellow-100 text-yellow-800
+                        {% elif cuenta.tipo == 'banco' %}bg-blue-100 text-blue-800
+                        {% else %}bg-purple-100 text-purple-800{% endif %}">
+                        {{ cuenta.get_tipo_display }}
+                    </span>
+                </td>
+                <td class="px-6 py-4">{{ cuenta.get_moneda_display }}</td>
+                <td class="px-6 py-4 text-gray-500">{{ cuenta.cuenta_contable.codigo|default:"-" }}</td>
+                <td class="px-6 py-4 text-right">{{ cuenta.saldo_inicial }}</td>
+                <td class="px-6 py-4 text-right font-bold {% if cuenta.saldo_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    {{ cuenta.saldo_actual|floatformat:2 }}
+                </td>
+                <td class="px-6 py-4">
+                    {% if cuenta.activa %}<span class="text-green-600">Activa</span>{% else %}<span class="text-gray-400">Inactiva</span>{% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{% url 'tesoreria:cuenta_edit' cuenta.pk %}" class="text-yellow-600 hover:text-yellow-900 mr-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'tesoreria:cuenta_delete' cuenta.pk %}" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-4 text-center text-gray-500">No hay cuentas configuradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

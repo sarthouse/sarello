@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block title %}Estado de Resultados{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Estado de Resultados</h1>
+        <p class="text-gray-600">Ingresos, Egresos y Resultado del ejercicio</p>
+    </div>
+    <a href="{% url 'contabilidad:dashboard' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver
+    </a>
+</div>
+
+<form method="get" class="mb-4 bg-white p-4 rounded-lg shadow">
+    <div class="flex items-center gap-4">
+        <label class="text-gray-700">Ejercicio:</label>
+        <select name="ejercicio" class="border rounded px-3 py-2">
+            <option value="">Seleccionar...</option>
+            {% for ej in ejercicios %}
+            <option value="{{ ej.pk }}" {% if ejercicio.pk == ej.pk %}selected{% endif %}>
+                {{ ej.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+            Generar
+        </button>
+    </div>
+</form>
+
+{% if ejercicio and ejercicio_display %}
+<div class="mb-4 bg-blue-50 rounded-lg p-3 text-sm">
+    <div class="flex gap-6">
+        <span><strong>Trimestre actual:</strong> T{{ ejercicio_display.t_actual }} - {{ ejercicio.ejercicio.nombre }}</span>
+        <span><strong>Trimestre anterior:</strong> T{{ ejercicio_display.t_anterior }} - {{ ejercicio_display.anio_anterior }}</span>
+        {% if ejercicio_display.ejercicio_consolidado %}
+        <span><strong>Último consolidado:</strong> {{ ejercicio_display.ejercicio_consolidado.nombre }}</span>
+        {% else %}
+        <span class="text-gray-500"><strong>Último consolidado:</strong> No configurado</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-green-600 text-white px-4 py-2">
+            <h2 class="font-bold">INGRESOS</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-8"></th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_actual }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_anterior }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Consolidado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="ingreso-body">
+                {% for item in datos %}
+                {% if item.seccion == 'ingreso' and item.cuenta %}
+                <tr class="{% if item.nivel == 0 %}bg-green-50 font-semibold{% elif item.nivel == 1 %}bg-slate-50{% endif %} tree-row" data-codigo="{{ item.cuenta.codigo }}">
+                    <td class="px-2 py-2 text-center">
+                        {% if item.cuenta.hijos.exists %}
+                        <button class="toggle-children text-gray-500 hover:text-gray-700" data-codigo="{{ item.cuenta.codigo }}">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">{{ item.cuenta.codigo }}</td>
+                    <td class="px-4 py-2" style="padding-left: {{ item.nivel|add:1 }}rem;">
+                        {{ item.cuenta.nombre }}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.t_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if item.t_actual >= 0 %}{{ item.t_actual|floatformat:2 }}{% else %}({{ item.t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.t_anterior >= 0 %}{{ item.t_anterior|floatformat:2 }}{% else %}({{ item.t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.consolidado %}{% if item.consolidado >= 0 %}{{ item.consolidado|floatformat:2 }}{% else %}({{ item.consolidado|floatformat:2|slice:"1:" }}){% endif %}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-green-100 font-bold">
+                <tr class="border-t-2 border-green-300">
+                    <td colspan="3" class="px-4 py-3 text-right">Total Ingresos:</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg {% if totales.ingreso_t_actual >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if totales.ingreso_t_actual >= 0 %}{{ totales.ingreso_t_actual|floatformat:2 }}{% else %}({{ totales.ingreso_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.ingreso_t_anterior >= 0 %}{{ totales.ingreso_t_anterior|floatformat:2 }}{% else %}({{ totales.ingreso_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.ingreso_consolidado %}{{ totales.ingreso_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-red-600 text-white px-4 py-2">
+            <h2 class="font-bold">EGRESOS</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-8"></th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_actual }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_anterior }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Consolidado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="egreso-body">
+                {% for item in datos %}
+                {% if item.seccion == 'egreso' and item.cuenta %}
+                <tr class="{% if item.nivel == 0 %}bg-red-50 font-semibold{% elif item.nivel == 1 %}bg-slate-50{% endif %} tree-row" data-codigo="{{ item.cuenta.codigo }}">
+                    <td class="px-2 py-2 text-center">
+                        {% if item.cuenta.hijos.exists %}
+                        <button class="toggle-children text-gray-500 hover:text-gray-700" data-codigo="{{ item.cuenta.codigo }}">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">{{ item.cuenta.codigo }}</td>
+                    <td class="px-4 py-2" style="padding-left: {{ item.nivel|add:1 }}rem;">
+                        {{ item.cuenta.nombre }}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.t_actual >= 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                        {% if item.t_actual >= 0 %}{{ item.t_actual|floatformat:2 }}{% else %}({{ item.t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.t_anterior >= 0 %}{{ item.t_anterior|floatformat:2 }}{% else %}({{ item.t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.consolidado %}{% if item.consolidado >= 0 %}{{ item.consolidado|floatformat:2 }}{% else %}({{ item.consolidado|floatformat:2|slice:"1:" }}){% endif %}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-red-100 font-bold">
+                <tr class="border-t-2 border-red-300">
+                    <td colspan="3" class="px-4 py-3 text-right">Total Egresos:</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg {% if totales.egreso_t_actual >= 0 %}text-red-700{% else %}text-green-700{% endif %}">
+                        {% if totales.egreso_t_actual >= 0 %}{{ totales.egreso_t_actual|floatformat:2 }}{% else %}({{ totales.egreso_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.egreso_t_anterior >= 0 %}{{ totales.egreso_t_anterior|floatformat:2 }}{% else %}({{ totales.egreso_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.egreso_consolidado %}{{ totales.egreso_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-slate-700 text-white px-4 py-2">
+            <h2 class="font-bold">RESULTADO DEL EJERCICIO</h2>
+        </div>
+        <table class="min-w-full">
+            <tbody class="divide-y divide-gray-200">
+                <tr class="bg-gray-50">
+                    <td class="px-4 py-3 font-medium">Total Ingresos</td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.ingreso_t_actual >= 0 %}{{ totales.ingreso_t_actual|floatformat:2 }}{% else %}({{ totales.ingreso_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.ingreso_t_anterior >= 0 %}{{ totales.ingreso_t_anterior|floatformat:2 }}{% else %}({{ totales.ingreso_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.ingreso_consolidado %}{{ totales.ingreso_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-3 font-medium">- Total Egresos</td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.egreso_t_actual >= 0 %}{{ totales.egreso_t_actual|floatformat:2 }}{% else %}({{ totales.egreso_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.egreso_t_anterior >= 0 %}{{ totales.egreso_t_anterior|floatformat:2 }}{% else %}({{ totales.egreso_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.egreso_consolidado %}{{ totales.egreso_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
+                    <td class="px-4 py-3 text-lg">RESULTADO DEL EJERCICIO</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg {% if totales.resultado_t_actual >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if totales.resultado_t_actual >= 0 %}{{ totales.resultado_t_actual|floatformat:2 }}{% else %}({{ totales.resultado_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono {% if totales.resultado_t_anterior >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if totales.resultado_t_anterior >= 0 %}{{ totales.resultado_t_anterior|floatformat:2 }}{% else %}({{ totales.resultado_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono {% if totales.resultado_consolidado >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if totales.resultado_consolidado %}{% if totales.resultado_consolidado >= 0 %}{{ totales.resultado_consolidado|floatformat:2 }}{% else %}({{ totales.resultado_consolidado|floatformat:2|slice:"1:" }}){% endif %}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+{% if ejercicio %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+    <p class="text-yellow-800">No hay datos para el ejercicio seleccionado.</p>
+</div>
+{% else %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+    <p class="text-yellow-800">Seleccione un ejercicio para generar el estado de resultados.</p>
+</div>
+{% endif %}
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const secciones = ['ingreso', 'egreso'];
+    
+    secciones.forEach(seccion => {
+        const body = document.getElementById(seccion + '-body');
+        if (!body) return;
+        
+        const rows = Array.from(body.querySelectorAll('.tree-row'));
+        
+        function getNivel(codigo) {
+            return codigo.split('.').length - 1;
+        }
+        
+        function toggleChildren(parentCode, show) {
+            rows.forEach(row => {
+                const codigo = row.dataset.codigo;
+                if (codigo.startsWith(parentCode + '.')) {
+                    const parentNivel = getNivel(parentCode);
+                    const nivel = getNivel(codigo);
+                    if (nivel === parentNivel + 1) {
+                        row.style.display = show ? '' : 'none';
+                        const btn = row.querySelector('.toggle-children');
+                        if (btn) {
+                            const icon = btn.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-right');
+                            }
+                        }
+                        toggleChildren(codigo, false);
+                    }
+                }
+            });
+        }
+        
+        const toggles = body.querySelectorAll('.toggle-children');
+        toggles.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const codigo = this.dataset.codigo;
+                const icon = this.querySelector('i');
+                const isExpanded = icon.classList.contains('fa-chevron-down');
+                
+                if (isExpanded) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-right');
+                    toggleChildren(codigo, false);
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-down');
+                    toggleChildren(codigo, true);
+                }
+            });
+        });
+        
+        rows.forEach(row => {
+            const nivel = getNivel(row.dataset.codigo);
+            if (nivel > 0) {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

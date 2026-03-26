@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+
+{% block title %}Balance{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Balance</h1>
+        <p class="text-gray-600">Situación Patrimonial - Activo = Pasivo + Patrimonio</p>
+    </div>
+    <a href="{% url 'contabilidad:dashboard' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver
+    </a>
+</div>
+
+<form method="get" class="mb-4 bg-white p-4 rounded-lg shadow">
+    <div class="flex items-center gap-4">
+        <label class="text-gray-700">Ejercicio:</label>
+        <select name="ejercicio" class="border rounded px-3 py-2">
+            <option value="">Seleccionar...</option>
+            {% for ej in ejercicios %}
+            <option value="{{ ej.pk }}" {% if ejercicio.pk == ej.pk %}selected{% endif %}>
+                {{ ej.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+            Generar
+        </button>
+    </div>
+</form>
+
+{% if ejercicio and ejercicio_display %}
+<div class="mb-4 bg-blue-50 rounded-lg p-3 text-sm">
+    <div class="flex gap-6">
+        <span><strong>Trimestre actual:</strong> T{{ ejercicio_display.t_actual }} - {{ ejercicio.ejercicio.nombre }}</span>
+        <span><strong>Trimestre anterior:</strong> T{{ ejercicio_display.t_anterior }} - {{ ejercicio_display.anio_anterior }}</span>
+        {% if ejercicio_display.ejercicio_consolidado %}
+        <span><strong>Último consolidado:</strong> {{ ejercicio_display.ejercicio_consolidado.nombre }}</span>
+        {% else %}
+        <span class="text-gray-500"><strong>Último consolidado:</strong> No configurado</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-blue-600 text-white px-4 py-2">
+            <h2 class="font-bold">ACTIVO</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-8"></th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_actual }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_anterior }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Consolidado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="activo-body">
+                {% for item in datos %}
+                {% if item.seccion == 'activo' and item.cuenta %}
+                <tr class="{% if item.nivel == 0 %}bg-blue-50 font-semibold{% elif item.nivel == 1 %}bg-slate-50{% endif %} tree-row" data-codigo="{{ item.cuenta.codigo }}">
+                    <td class="px-2 py-2 text-center">
+                        {% if item.cuenta.hijos.exists %}
+                        <button class="toggle-children text-gray-500 hover:text-gray-700" data-codigo="{{ item.cuenta.codigo }}">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">{{ item.cuenta.codigo }}</td>
+                    <td class="px-4 py-2" style="padding-left: {{ item.nivel|add:1 }}rem;">
+                        {{ item.cuenta.nombre }}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.saldo_t_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if item.saldo_t_actual >= 0 %}{{ item.saldo_t_actual|floatformat:2 }}{% else %}({{ item.saldo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.saldo_t_anterior >= 0 %}text-gray-600{% else %}text-red-600{% endif %}">
+                        {% if item.saldo_t_anterior >= 0 %}{{ item.saldo_t_anterior|floatformat:2 }}{% else %}({{ item.saldo_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.saldo_consolidado %}{% if item.saldo_consolidado >= 0 %}{{ item.saldo_consolidado|floatformat:2 }}{% else %}({{ item.saldo_consolidado|floatformat:2|slice:"1:" }}){% endif %}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-blue-100 font-bold">
+                <tr class="border-t-2 border-blue-300">
+                    <td colspan="3" class="px-4 py-3 text-right">Total Activo:</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg {% if totales.activo_t_actual >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if totales.activo_t_actual >= 0 %}{{ totales.activo_t_actual|floatformat:2 }}{% else %}({{ totales.activo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.activo_t_anterior >= 0 %}{{ totales.activo_t_anterior|floatformat:2 }}{% else %}({{ totales.activo_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.activo_consolidado %}{{ totales.activo_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-red-600 text-white px-4 py-2">
+            <h2 class="font-bold">PASIVO</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-8"></th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_actual }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_anterior }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Consolidado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="pasivo-body">
+                {% for item in datos %}
+                {% if item.seccion == 'pasivo' and item.cuenta %}
+                <tr class="{% if item.nivel == 0 %}bg-red-50 font-semibold{% elif item.nivel == 1 %}bg-slate-50{% endif %} tree-row" data-codigo="{{ item.cuenta.codigo }}">
+                    <td class="px-2 py-2 text-center">
+                        {% if item.cuenta.hijos.exists %}
+                        <button class="toggle-children text-gray-500 hover:text-gray-700" data-codigo="{{ item.cuenta.codigo }}">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">{{ item.cuenta.codigo }}</td>
+                    <td class="px-4 py-2" style="padding-left: {{ item.nivel|add:1 }}rem;">
+                        {{ item.cuenta.nombre }}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.saldo_t_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if item.saldo_t_actual >= 0 %}{{ item.saldo_t_actual|floatformat:2 }}{% else %}({{ item.saldo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.saldo_t_anterior >= 0 %}{{ item.saldo_t_anterior|floatformat:2 }}{% else %}({{ item.saldo_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.saldo_consolidado %}{{ item.saldo_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-red-100 font-bold">
+                <tr class="border-t-2 border-red-300">
+                    <td colspan="3" class="px-4 py-3 text-right">Total Pasivo:</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg {% if totales.pasivo_t_actual >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if totales.pasivo_t_actual >= 0 %}{{ totales.pasivo_t_actual|floatformat:2 }}{% else %}({{ totales.pasivo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.pasivo_t_anterior >= 0 %}{{ totales.pasivo_t_anterior|floatformat:2 }}{% else %}({{ totales.pasivo_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.pasivo_consolidado %}{{ totales.pasivo_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-purple-600 text-white px-4 py-2">
+            <h2 class="font-bold">PATRIMONIO NETO</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase w-8"></th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_actual }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">T{{ ejercicio_display.t_anterior }}</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Consolidado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="patrimonio-body">
+                {% for item in datos %}
+                {% if item.seccion == 'patrimonio' and item.cuenta %}
+                <tr class="{% if item.nivel == 0 %}bg-purple-50 font-semibold{% elif item.nivel == 1 %}bg-slate-50{% endif %} tree-row" data-codigo="{{ item.cuenta.codigo }}">
+                    <td class="px-2 py-2 text-center">
+                        {% if item.cuenta.hijos.exists %}
+                        <button class="toggle-children text-gray-500 hover:text-gray-700" data-codigo="{{ item.cuenta.codigo }}">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 font-mono text-sm">{{ item.cuenta.codigo }}</td>
+                    <td class="px-4 py-2" style="padding-left: {{ item.nivel|add:1 }}rem;">
+                        {{ item.cuenta.nombre }}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono {% if item.saldo_t_actual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if item.saldo_t_actual >= 0 %}{{ item.saldo_t_actual|floatformat:2 }}{% else %}({{ item.saldo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.saldo_t_anterior >= 0 %}{{ item.saldo_t_anterior|floatformat:2 }}{% else %}({{ item.saldo_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if item.saldo_consolidado %}{{ item.saldo_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-purple-100 font-bold">
+                <tr>
+                    <td colspan="3" class="px-4 py-2 text-right">Total Patrimonio:</td>
+                    <td class="px-4 py-2 text-right font-mono {% if totales.patrimonio_t_actual >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if totales.patrimonio_t_actual >= 0 %}{{ totales.patrimonio_t_actual|floatformat:2 }}{% else %}({{ totales.patrimonio_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if totales.patrimonio_t_anterior >= 0 %}{{ totales.patrimonio_t_anterior|floatformat:2 }}{% else %}({{ totales.patrimonio_t_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if totales.patrimonio_consolidado %}{{ totales.patrimonio_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr class="bg-slate-200 border-t border-slate-300">
+                    <td colspan="3" class="px-4 py-2 text-right font-bold">Resultado del Ejercicio:</td>
+                    <td class="px-4 py-2 text-right font-mono font-bold {% if resultado_ejercicio >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                        {% if resultado_ejercicio >= 0 %}{{ resultado_ejercicio|floatformat:2 }}{% else %}({{ resultado_ejercicio|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if resultado_ejercicio_anterior >= 0 %}{{ resultado_ejercicio_anterior|floatformat:2 }}{% else %}({{ resultado_ejercicio_anterior|floatformat:2|slice:"1:" }}){% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-right font-mono">
+                        {% if resultado_consolidado %}{{ resultado_consolidado|floatformat:2 }}{% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr class="bg-purple-200 border-t-2 border-purple-400">
+                    <td colspan="3" class="px-4 py-3 text-right font-bold">Total Patrimonio Neto:</td>
+                    <td class="px-4 py-3 text-right font-mono text-lg font-bold {% if totales.patrimonio_t_actual|add:resultado_ejercicio >= 0 %}text-green-800{% else %}text-red-800{% endif %}">
+                        {% with total_pn=totales.patrimonio_t_actual|add:resultado_ejercicio %}{% if total_pn >= 0 %}{{ total_pn|floatformat:2 }}{% else %}({{ total_pn|floatformat:2|slice:"1:" }}){% endif %}{% endwith %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% with total_pn_a=totales.patrimonio_t_anterior|add:resultado_ejercicio_anterior %}{% if total_pn_a >= 0 %}{{ total_pn_a|floatformat:2 }}{% else %}({{ total_pn_a|floatformat:2|slice:"1:" }}){% endif %}{% endwith %}
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono">
+                        {% if totales.patrimonio_consolidado %}{% with total_pn_c=totales.patrimonio_consolidado|add:resultado_consolidado %}{% if total_pn_c >= 0 %}{{ total_pn_c|floatformat:2 }}{% else %}({{ total_pn_c|floatformat:2|slice:"1:" }}){% endif %}{% endwith %}{% else %}-{% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-800 text-white px-4 py-3">
+        <h2 class="font-bold">Ecuación Patrimonial</h2>
+    </div>
+    <table class="min-w-full">
+        <tbody class="divide-y divide-gray-200">
+            <tr class="bg-gray-50">
+                <td class="px-4 py-3 font-medium">Total Activo</td>
+                <td class="px-4 py-3 text-right font-bold font-mono text-lg">
+                    {% if totales.activo_t_actual >= 0 %}{{ totales.activo_t_actual|floatformat:2 }}{% else %}({{ totales.activo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="px-4 py-3 font-medium">Total Pasivo</td>
+                <td class="px-4 py-3 text-right font-mono">
+                    {% if totales.pasivo_t_actual >= 0 %}{{ totales.pasivo_t_actual|floatformat:2 }}{% else %}({{ totales.pasivo_t_actual|floatformat:2|slice:"1:" }}){% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="px-4 py-3 font-medium">+ Patrimonio Neto</td>
+                <td class="px-4 py-3 text-right font-mono">
+                    {% with total_pn=totales.patrimonio_t_actual|add:resultado_ejercicio %}{% if total_pn >= 0 %}{{ total_pn|floatformat:2 }}{% else %}({{ total_pn|floatformat:2|slice:"1:" }}){% endif %}{% endwith %}
+                </td>
+            </tr>
+            <tr class="bg-slate-100 font-bold border-t-2 border-slate-300">
+                <td class="px-4 py-3">Total Pasivo + Patrimonio Neto</td>
+                <td class="px-4 py-3 text-right font-mono text-lg">
+                    {% with total_ppr=totales.pasivo_t_actual|add:totales.patrimonio_t_actual|add:resultado_ejercicio %}{% if total_ppr >= 0 %}{{ total_ppr|floatformat:2 }}{% else %}({{ total_ppr|floatformat:2|slice:"1:" }}){% endif %}{% endwith %}
+                </td>
+            </tr>
+            <tr class="{% if diferencia_abs < 100 %}bg-green-50{% else %}bg-red-50{% endif %}">
+                <td class="px-4 py-3 font-bold {% if diferencia_abs < 100 %}text-green-700{% else %}text-red-700{% endif %}">
+                    {% if diferencia_abs < 100 %}✓ Balance cuadra{% else %}⚠ Diferencia{% endif %}
+                </td>
+                <td class="px-4 py-3 text-right font-mono font-bold {% if diferencia_abs < 100 %}text-green-700{% else %}text-red-700{% endif %}">
+                    {% if diferencia >= 0 %}{{ diferencia|floatformat:2 }}{% else %}({{ diferencia|floatformat:2|slice:"1:" }}){% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+{% if ejercicio %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+    <p class="text-yellow-800">No hay datos para el ejercicio seleccionado.</p>
+</div>
+{% else %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+    <p class="text-yellow-800">Seleccione un ejercicio para generar el balance.</p>
+</div>
+{% endif %}
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const secciones = ['activo', 'pasivo', 'patrimonio'];
+    
+    secciones.forEach(seccion => {
+        const body = document.getElementById(seccion + '-body');
+        if (!body) return;
+        
+        const rows = Array.from(body.querySelectorAll('.tree-row'));
+        
+        function getNivel(codigo) {
+            return codigo.split('.').length - 1;
+        }
+        
+        function toggleChildren(parentCode, show) {
+            rows.forEach(row => {
+                const codigo = row.dataset.codigo;
+                if (codigo.startsWith(parentCode + '.')) {
+                    const parentNivel = getNivel(parentCode);
+                    const nivel = getNivel(codigo);
+                    if (nivel === parentNivel + 1) {
+                        row.style.display = show ? '' : 'none';
+                        const btn = row.querySelector('.toggle-children');
+                        if (btn) {
+                            const icon = btn.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-right');
+                            }
+                        }
+                        toggleChildren(codigo, false);
+                    }
+                }
+            });
+        }
+        
+        const toggles = body.querySelectorAll('.toggle-children');
+        toggles.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const codigo = this.dataset.codigo;
+                const icon = this.querySelector('i');
+                const isExpanded = icon.classList.contains('fa-chevron-down');
+                
+                if (isExpanded) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-right');
+                    toggleChildren(codigo, false);
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-down');
+                    toggleChildren(codigo, true);
+                }
+            });
+        });
+        
+        rows.forEach(row => {
+            const nivel = getNivel(row.dataset.codigo);
+            if (nivel > 0) {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

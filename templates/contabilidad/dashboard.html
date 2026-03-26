@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Contabilidad{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Contabilidad</h1>
+    <p class="text-gray-600">Panel de control contable</p>
+</div>
+
+{% if ejercicio_actual %}
+<div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 flex justify-between items-center">
+    <div>
+        <p class="font-semibold">Ejercicio actual: {{ ejercicio_actual.nombre }}</p>
+        <p class="text-sm text-gray-600">{{ ejercicio_actual.fecha_inicio }} - {{ ejercicio_actual.fecha_fin }}</p>
+    </div>
+    <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+        <i class="fas fa-edit mr-1"></i>Editar
+    </a>
+</div>
+{% else %}
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 flex justify-between items-center">
+    <div>
+        <p class="font-semibold text-yellow-800">No hay ejercicio abierto</p>
+        <p class="text-sm text-yellow-600">Debe crear un ejercicio contable para poder registrar asientos.</p>
+    </div>
+    <a href="{% url 'contabilidad:ejercicio_create' %}" class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
+        <i class="fas fa-plus mr-1"></i>Crear Ejercicio
+    </a>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <a href="{% url 'contabilidad:plan_cuentas' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Plan de Cuentas</p>
+                <p class="text-2xl font-bold">{{ cuentas_total }}</p>
+            </div>
+            <i class="fas fa-book text-4xl text-blue-500"></i>
+        </div>
+    </a>
+
+    <a href="{% url 'contabilidad:asientos' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Asientos</p>
+                <p class="text-2xl font-bold">{{ ultimos_asientos|length }}+</p>
+            </div>
+            <i class="fas fa-calculator text-4xl text-green-500"></i>
+        </div>
+    </a>
+
+    <a href="{% url 'contabilidad:libro_diario' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Libro Diario</p>
+                <p class="text-2xl font-bold">Ver</p>
+            </div>
+            <i class="fas fa-book-open text-4xl text-purple-500"></i>
+        </div>
+    </a>
+
+    <a href="{% url 'contabilidad:mayor' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Mayor</p>
+                <p class="text-2xl font-bold">Ver</p>
+            </div>
+            <i class="fas fa-columns text-4xl text-orange-500"></i>
+        </div>
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Estructura del Plan de Cuentas</h2>
+        {% if cuentas_raiz %}
+        <ul class="space-y-2">
+            {% for cuenta in cuentas_raiz %}
+            <li class="border-l-4 border-gray-300 pl-3">
+                <span class="font-mono">{{ cuenta.codigo }}</span> - {{ cuenta.nombre }}
+                <span class="text-xs text-gray-500">({{ cuenta.get_tipo_display }})</span>
+                {% if cuenta.hijos.exists %}
+                <ul class="ml-4 mt-2 space-y-1">
+                    {% for hijo in cuenta.hijos.all %}
+                    <li class="border-l-2 border-gray-200 pl-2">
+                        <span class="font-mono">{{ hijo.codigo }}</span> - {{ hijo.nombre }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-500">No hay cuentas configuradas.</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Últimos Asientos</h2>
+        {% if ultimos_asientos %}
+        <div class="space-y-3">
+            {% for asiento in ultimos_asientos %}
+            <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="block border-b pb-2 hover:bg-gray-50">
+                <div class="flex justify-between">
+                    <span class="font-mono">{{ asiento.numero }}</span>
+                    <span class="text-sm text-gray-500">{{ asiento.fecha }}</span>
+                </div>
+                <p class="text-gray-700">{{ asiento.descripcion }}</p>
+                <p class="text-sm">
+                    <span class="text-green-600">D: {{ asiento.total_debe }}</span> | 
+                    <span class="text-red-600">H: {{ asiento.total_haber }}</span>
+                </p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500">No hay asientos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-6">
+    <a href="{% url 'contabilidad:balance' %}" class="inline-block bg-slate-700 text-white px-6 py-3 rounded-lg hover:bg-slate-600">
+        <i class="fas fa-balance-scale mr-2"></i> Balance de Sumas y Saldos
+    </a>
+</div>
+{% endblock %}

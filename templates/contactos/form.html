@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Contacto{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'contactos:lista' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver a contactos
+    </a>
+</div>
+
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">{{ action }} Contacto</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                    {{ form.codigo }}
+                    {% if form.codigo.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.codigo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    {{ form.tipo }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre / Razón Social</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.nombre.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">CUIT/CUIL</label>
+                    {{ form.cuil }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Condición IVA</label>
+                    {{ form.condicion_iva }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    {{ form.direccion }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                    {{ form.ciudad }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
+                    {{ form.provincia }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Código Postal</label>
+                    {{ form.codigo_postal }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    {{ form.telefono }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    {{ form.email }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contacto Principal</label>
+                    {{ form.contacto_principal }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Límite de Crédito</label>
+                    {{ form.limite_credito }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+                    {{ form.notas }}
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    {{ form.activo }}
+                    <label class="text-sm text-gray-700">Activo</label>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'contactos:lista' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

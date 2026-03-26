@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Ingreso{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'tesoreria:index' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver
+    </a>
+</div>
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">
+            <i class="fas fa-arrow-down text-green-600 mr-2"></i>Registrar Ingreso
+        </h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta</label>
+                    {{ form.cuenta }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Importe</label>
+                    {{ form.importe }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    {{ form.fecha }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cliente/Contacto</label>
+                    {{ form.contacto }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+            
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    <i class="fas fa-save mr-2"></i>Registrar Ingreso
+                </button>
+                <a href="{% url 'tesoreria:index' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

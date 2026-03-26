@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block title %}Registrarse{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Sarello ERP
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Crear una nueva cuenta
+            </p>
+        </div>
+        
+        {% element form form=form method="post" action=signup_url %}
+            {% slot body %}
+                {% csrf_token %}
+                {% element fields form=form %}
+                    {% slot %}
+                    {% endelement %}
+                {% endelement %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                {% endif %}
+            {% endslot %}
+            {% slot actions %}
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                    {% trans "Sign Up" %}
+                </button>
+            {% endslot %}
+        {% endelement %}
+        
+        <div class="text-center mt-4">
+            <p class="text-sm text-gray-600">
+                ¿Ya tiene cuenta? 
+                <a href="{% url 'account_login' %}" class="font-medium text-slate-700 hover:text-slate-500">
+                    Iniciar Sesión
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
