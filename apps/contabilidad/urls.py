@@ -28,4 +28,7 @@ urlpatterns = [
     path('cuentas/importar/guia/', views.descargar_guia_csv, name='descargar_guia'),
     path('cuentas/bulk/delete/', views.cuentas_bulk_delete, name='cuentas_bulk_delete'),
     path('cuenta/<int:pk>/toggle/', views.cuenta_toggle_active, name='cuenta_toggle'),
+    path('ejercicio/<int:pk>/preview-cierre/', views.preview_cierre, name='preview_cierre'),
+    path('ejercicio/<int:pk>/cerrar/', views.cerrar_ejercicio, name='cerrar_ejercicio'),
+    path('ejercicio/<int:pk>/apertura/', views.generar_apertura, name='generar_apertura'),
 ]

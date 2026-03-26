@@ -13,10 +13,25 @@
     <div>
         <p class="font-semibold">Ejercicio actual: {{ ejercicio_actual.nombre }}</p>
         <p class="text-sm text-gray-600">{{ ejercicio_actual.fecha_inicio }} - {{ ejercicio_actual.fecha_fin }}</p>
+        <span class="inline-block mt-1 px-2 py-1 text-xs rounded {% if ejercicio_actual.estado == 'abierto' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ ejercicio_actual.get_estado_display }}
+        </span>
     </div>
-    <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-        <i class="fas fa-edit mr-1"></i>Editar
-    </a>
+    <div class="flex gap-2">
+        {% if ejercicio_actual.estado == 'abierto' %}
+        <a href="{% url 'contabilidad:preview_cierre' ejercicio_actual.pk %}" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+            <i class="fas fa-lock mr-1"></i>Cerrar Ejercicio
+        </a>
+        {% if ejercicio_actual.ejercicio_anterior %}
+        <a href="{% url 'contabilidad:generar_apertura' ejercicio_actual.pk %}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+            <i class="fas fa-arrow-right mr-1"></i>Generar Apertura
+        </a>
+        {% endif %}
+        {% endif %}
+        <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+            <i class="fas fa-edit mr-1"></i>Editar
+        </a>
+    </div>
 </div>
 {% else %}
 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 flex justify-between items-center">

@@ -186,6 +186,9 @@ class Asiento(DocumentoBase):
         ('compra', 'Compra'),
         ('tesoreria', 'Tesorería'),
         ('manufactura', 'Manufactura'),
+        ('apertura', 'Apertura'),
+        ('cierre', 'Cierre'),
+        ('ajuste', 'Ajuste'),
     ]
 
     ejercicio = models.ForeignKey(

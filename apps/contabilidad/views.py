@@ -160,6 +160,7 @@ def ejercicio_edit(request, pk):
     })
 
 
+@login_required
 def dashboard(request):
     ejercicios = Ejercicio.objects.filter(estado='abierto')[:1]
     ejercicio_actual = ejercicios.first()
@@ -178,6 +179,7 @@ def dashboard(request):
     return render(request, 'contabilidad/dashboard.html', contexto)
 
 
+@login_required
 def plan_cuentas(request):
     cuentas = CuentaContable.objects.all().order_by('codigo')
     
@@ -216,6 +218,7 @@ def plan_cuentas(request):
     })
 
 
+@login_required
 def cuenta_detail(request, pk):
     cuenta = get_object_or_404(CuentaContable, pk=pk)
     lineas = LineaAsiento.objects.filter(cuenta=cuenta).select_related('asiento').order_by('-asiento__fecha')[:50]
@@ -240,6 +243,7 @@ def cuenta_detail(request, pk):
     return render(request, 'contabilidad/cuenta_detail.html', context)
 
 
+@login_required
 def lista_asientos(request):
     ejercicio_id = request.GET.get('ejercicio')
     
@@ -269,6 +273,7 @@ def asiento_detail(request, pk):
     })
 
 
+@login_required
 def libro_diario(request):
     ejercicio_id = request.GET.get('ejercicio')
     
@@ -293,6 +298,7 @@ def libro_diario(request):
     })
 
 
+@login_required
 def mayor(request):
     ejercicio_id = request.GET.get('ejercicio')
     cuenta_id = request.GET.get('cuenta')
@@ -343,6 +349,7 @@ def mayor(request):
     })
 
 
+@login_required
 def balance(request):
     ejercicio_id = request.GET.get('ejercicio')
     
@@ -511,6 +518,7 @@ def balance(request):
     })
 
 
+@login_required
 def estado_resultados(request):
     ejercicio_id = request.GET.get('ejercicio')
     
@@ -1063,6 +1071,7 @@ def importar_cuentas_confirmar(request):
     return JsonResponse({'success': False})
 
 
+@login_required
 def descargar_guia_csv(request):
     import csv
     from django.http import HttpResponse
@@ -1089,3 +1098,273 @@ def descargar_guia_csv(request):
     writer.writerow(['5.1', 'Costo de mercadería', 'egreso', '5', '1'])
     
     return response
+
+
+@login_required
+def preview_cierre(request, pk):
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    
+    if ejercicio.estado != 'abierto':
+        messages.error(request, 'El ejercicio ya está cerrado')
+        return redirect('contabilidad:dashboard')
+    
+    cuentas_ingreso = CuentaContable.objects.filter(activa=True, tipo='ingreso').order_by('codigo')
+    cuentas_egreso = CuentaContable.objects.filter(activa=True, tipo='egreso').order_by('codigo')
+    
+    total_ingresos = Decimal('0')
+    total_egresos = Decimal('0')
+    
+    lineas_preview = []
+    
+    def get_saldo(cuenta, ejercicio):
+        from django.db.models import Sum
+        agg = LineaAsiento.objects.filter(
+            asiento__ejercicio=ejercicio,
+            cuenta=cuenta
+        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
+        debe = agg['debe'] or 0
+        haber = agg['haber'] or 0
+        return haber - debe
+    
+    for cuenta in cuentas_ingreso:
+        saldo = get_saldo(cuenta, ejercicio)
+        if saldo > 0:
+            lineas_preview.append({
+                'cuenta': cuenta,
+                'debe': saldo,
+                'haber': 0,
+                'tipo': 'cierre_ingreso'
+            })
+            total_ingresos += saldo
+    
+    for cuenta in cuentas_egreso:
+        saldo = get_saldo(cuenta, ejercicio)
+        if saldo > 0:
+            lineas_preview.append({
+                'cuenta': cuenta,
+                'debe': saldo,
+                'haber': 0,
+                'tipo': 'cierre_egreso'
+            })
+            total_egresos += saldo
+    
+    resultado = total_ingresos - total_egresos
+    
+    cuenta_resultados = CuentaContable.objects.filter(
+        Q(codigo='3.3.02') | Q(nombre__icontains='Resultados acumulados')
+    ).first()
+    
+    if not cuenta_resultados:
+        messages.error(request, 'No se encontró la cuenta de Resultados Acumulados (3.3.02)')
+        return redirect('contabilidad:dashboard')
+    
+    if resultado > 0:
+        lineas_preview.append({
+            'cuenta': cuenta_resultados,
+            'debe': 0,
+            'haber': resultado,
+            'tipo': 'resultado'
+        })
+    elif resultado < 0:
+        lineas_preview.append({
+            'cuenta': cuenta_resultados,
+            'debe': abs(resultado),
+            'haber': 0,
+            'tipo': 'resultado'
+        })
+    
+    return render(request, 'contabilidad/cierre_preview.html', {
+        'ejercicio': ejercicio,
+        'lineas': lineas_preview,
+        'total_ingresos': total_ingresos,
+        'total_egresos': total_egresos,
+        'resultado': resultado,
+    })
+
+
+@login_required
+def cerrar_ejercicio(request, pk):
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    
+    if ejercicio.estado != 'abierto':
+        messages.error(request, 'El ejercicio ya está cerrado')
+        return redirect('contabilidad:dashboard')
+    
+    if request.method != 'POST':
+        return redirect('contabilidad:preview_cierre', pk=pk)
+    
+    cuentas_ingreso = CuentaContable.objects.filter(activa=True, tipo='ingreso').order_by('codigo')
+    cuentas_egreso = CuentaContable.objects.filter(activa=True, tipo='egreso').order_by('codigo')
+    
+    cuenta_resultados = CuentaContable.objects.filter(
+        Q(codigo='3.3.02') | Q(nombre__icontains='Resultados acumulados')
+    ).first()
+    
+    if not cuenta_resultados:
+        messages.error(request, 'No se encontró la cuenta de Resultados Acumulados')
+        return redirect('contabilidad:dashboard')
+    
+    total_ingresos = Decimal('0')
+    total_egresos = Decimal('0')
+    
+    def get_saldo(cuenta, ejercicio):
+        from django.db.models import Sum
+        agg = LineaAsiento.objects.filter(
+            asiento__ejercicio=ejercicio,
+            cuenta=cuenta
+        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
+        debe = agg['debe'] or 0
+        haber = agg['haber'] or 0
+        return haber - debe
+    
+    ultimo_asiento = Asiento.objects.order_by('-numero').first()
+    if ultimo_asiento:
+        try:
+            numero = int(ultimo_asiento.numero) + 1
+        except ValueError:
+            numero = 1
+    else:
+        numero = 1
+    
+    asiento_cierre = Asiento.objects.create(
+        ejercicio=ejercicio,
+        numero=str(numero).zfill(4),
+        fecha=ejercicio.fecha_fin,
+        descripcion=f'Asiento de cierre - Ejercicio {ejercicio.nombre}',
+        origen='cierre',
+        estado='confirmado'
+    )
+    
+    for cuenta in cuentas_ingreso:
+        saldo = get_saldo(cuenta, ejercicio)
+        if saldo > 0:
+            LineaAsiento.objects.create(
+                asiento=asiento_cierre,
+                cuenta=cuenta,
+                debe=saldo,
+                haber=0,
+                descripcion=f'Cierre cuenta {cuenta.codigo}'
+            )
+            total_ingresos += saldo
+    
+    for cuenta in cuentas_egreso:
+        saldo = get_saldo(cuenta, ejercicio)
+        if saldo > 0:
+            LineaAsiento.objects.create(
+                asiento=asiento_cierre,
+                cuenta=cuenta,
+                debe=saldo,
+                haber=0,
+                descripcion=f'Cierre cuenta {cuenta.codigo}'
+            )
+            total_egresos += saldo
+    
+    resultado = total_ingresos - total_egresos
+    
+    if resultado > 0:
+        LineaAsiento.objects.create(
+            asiento=asiento_cierre,
+            cuenta=cuenta_resultados,
+            debe=0,
+            haber=resultado,
+            descripcion=f'Ganancia del ejercicio'
+        )
+    elif resultado < 0:
+        LineaAsiento.objects.create(
+            asiento=asiento_cierre,
+            cuenta=cuenta_resultados,
+            debe=abs(resultado),
+            haber=0,
+            descripcion=f'Pérdida del ejercicio'
+        )
+    
+    ejercicio.estado = 'cerrado'
+    ejercicio.save()
+    
+    messages.success(request, f'Ejercicio {ejercicio.nombre} cerrado correctamente. Asiento de cierre: {asiento_cierre.numero}')
+    return redirect('contabilidad:dashboard')
+
+
+@login_required
+def generar_apertura(request, pk):
+    ejercicio = get_object_or_404(Ejercicio, pk=pk)
+    
+    if ejercicio.estado != 'abierto':
+        messages.error(request, 'El ejercicio debe estar abierto')
+        return redirect('contabilidad:dashboard')
+    
+    if not ejercicio.ejercicio_anterior:
+        messages.error(request, 'El ejercicio no tiene un ejercicio anterior configurado')
+        return redirect('contabilidad:dashboard')
+    
+    ejercicio_anterior = ejercicio.ejercicio_anterior
+    
+    cuentas_activo = CuentaContable.objects.filter(activa=True, tipo='activo').order_by('codigo')
+    cuentas_pasivo = CuentaContable.objects.filter(activa=True, tipo='pasivo').order_by('codigo')
+    
+    def get_saldo(cuenta, ejercicio):
+        from django.db.models import Sum
+        agg = LineaAsiento.objects.filter(
+            asiento__ejercicio=ejercicio,
+            cuenta=cuenta
+        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
+        debe = agg['debe'] or 0
+        haber = agg['haber'] or 0
+        return debe - haber
+    
+    lineas_preview = []
+    
+    for cuenta in cuentas_activo:
+        saldo = get_saldo(cuenta, ejercicio_anterior)
+        if saldo != 0:
+            lineas_preview.append({
+                'cuenta': cuenta,
+                'debe': saldo if saldo > 0 else 0,
+                'haber': abs(saldo) if saldo < 0 else 0
+            })
+    
+    for cuenta in cuentas_pasivo:
+        saldo = get_saldo(cuenta, ejercicio_anterior)
+        if saldo != 0:
+            lineas_preview.append({
+                'cuenta': cuenta,
+                'debe': abs(saldo) if saldo < 0 else 0,
+                'haber': saldo if saldo > 0 else 0
+            })
+    
+    if request.method == 'POST':
+        ultimo_asiento = Asiento.objects.order_by('-numero').first()
+        if ultimo_asiento:
+            try:
+                numero = int(ultimo_asiento.numero) + 1
+            except ValueError:
+                numero = 1
+        else:
+            numero = 1
+        
+        apertura = Asiento.objects.create(
+            ejercicio=ejercicio,
+            numero=str(numero).zfill(4),
+            fecha=ejercicio.fecha_inicio,
+            descripcion=f'Asiento de apertura - Ejercicio {ejercicio.nombre}',
+            origen='apertura',
+            estado='confirmado'
+        )
+        
+        for linea in lineas_preview:
+            LineaAsiento.objects.create(
+                asiento=apertura,
+                cuenta=linea['cuenta'],
+                debe=linea['debe'],
+                haber=linea['haber'],
+                descripcion=f'Apertura desde ejercicio anterior'
+            )
+        
+        messages.success(request, f'Asiento de apertura generado: {apertura.numero}')
+        return redirect('contabilidad:dashboard')
+    
+    return render(request, 'contabilidad/apertura.html', {
+        'ejercicio': ejercicio,
+        'ejercicio_anterior': ejercicio_anterior,
+        'lineas': lineas_preview,
+    })

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Asiento de Apertura{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Asiento de Apertura</h1>
+        <p class="text-gray-600">Generar apertura desde {{ ejercicio_anterior.nombre }}</p>
+    </div>
+    <a href="{% url 'contabilidad:dashboard' %}" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-arrow-left mr-2"></i>Volver
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Datos del Ejercicio</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <p class="text-sm text-gray-500">Ejercicio destino</p>
+            <p class="text-lg font-semibold">{{ ejercicio.nombre }}</p>
+            <p class="text-sm text-gray-600">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Ejercicio origen</p>
+            <p class="text-lg font-semibold">{{ ejercicio_anterior.nombre }}</p>
+            <p class="text-sm text-gray-600">{{ ejercicio_anterior.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio_anterior.fecha_fin|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+    <div class="bg-green-600 text-white px-6 py-3">
+        <h2 class="font-bold">Asiento de Apertura - Preview</h2>
+    </div>
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for linea in lineas %}
+            <tr class="{% if linea.debe > 0 and linea.haber == 0 %}bg-blue-50{% elif linea.haber > 0 %}bg-red-50{% endif %}">
+                <td class="px-6 py-3">
+                    <span class="font-mono">{{ linea.cuenta.codigo }}</span>
+                    <span class="ml-2">{{ linea.cuenta.nombre }}</span>
+                </td>
+                <td class="px-6 py-3 text-sm">
+                    {% if linea.cuenta.tipo == 'activo' %}
+                    <span class="text-blue-600">Activo → Debe</span>
+                    {% else %}
+                    <span class="text-red-600">Pasivo → Haber</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-3 text-right font-mono {% if linea.debe > 0 %}text-green-600 font-medium{% else %}text-gray-300{% endif %}">
+                    {% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% endif %}
+                </td>
+                <td class="px-6 py-3 text-right font-mono {% if linea.haber > 0 %}text-red-600 font-medium{% else %}text-gray-300{% endif %}">
+                    {% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                    No hay saldos para generar apertura. Verifique que el ejercicio anterior tenga movimientos.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot class="bg-slate-100 font-bold">
+            <tr>
+                <td colspan="2" class="px-6 py-3 text-right">TOTALES:</td>
+                <td class="px-6 py-3 text-right font-mono text-lg">
+                    {% with total_debe=0 %}{% for l in lineas %}{% with total_debe=total_debe|add:l.debe %}{% endwith %}{% endfor %}{{ total_debe|floatformat:2 }}{% endwith %}
+                </td>
+                <td class="px-6 py-3 text-right font-mono text-lg">
+                    {% with total_haber=0 %}{% for l in lineas %}{% with total_haber=total_haber|add:l.haber %}{% endwith %}{% endfor %}{{ total_haber|floatformat:2 }}{% endwith %}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+{% if lineas %}
+<form method="post" class="flex gap-4">
+    {% csrf_token %}
+    <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">
+        <i class="fas fa-plus mr-2"></i>Generar Asiento de Apertura
+    </button>
+    <a href="{% url 'contabilidad:dashboard' %}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-semibold">
+        Cancelar
+    </a>
+</form>
+{% else %}
+<a href="{% url 'contabilidad:dashboard' %}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-semibold">
+    Volver
+</a>
+{% endif %}
+{% endblock %}
