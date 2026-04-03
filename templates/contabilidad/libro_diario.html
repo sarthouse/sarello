@@ -3,34 +3,32 @@
 {% block title %}Libro Diario{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-3xl font-bold text-gray-800">Libro Diario</h1>
-        <p class="text-gray-600">Registro cronológico de asientos</p>
-    </div>
-    <a href="{% url 'contabilidad:asiento_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        <i class="fas fa-plus mr-2"></i>Nuevo Asiento
-    </a>
-</div>
+{% include "components/page-header.html" with 
+    title="Libro Diario"
+    subtitle="Registro cronológico de asientos"
+    action_label="Nuevo Asiento"
+    action_url="{% url 'contabilidad:asiento_create' %}"
+    action_icon="fa-plus" %}
 
-<form method="get" class="mb-4 bg-white p-4 rounded-lg shadow">
-    <div class="flex items-center gap-4">
-        <label class="text-gray-700">Ejercicio:</label>
-        <select name="ejercicio" class="border rounded px-3 py-2">
-            <option value="">Todos</option>
-            {% for ej in ejercicios %}
-            <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
-                {{ ej.nombre }}
-            </option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
-            Filtrar
-        </button>
-    </div>
-</form>
+{% include "components/card.html" with title="Filtros" %}
+    <form method="get" class="flex items-center gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
+            <select name="ejercicio" class="select select-bordered">
+                <option value="">Todos</option>
+                {% for ej in ejercicios %}
+                <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ ej.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% include "components/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
+    </form>
+{% endinclude %}
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+{% include "components/card.html" %}
+<div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
@@ -47,9 +45,7 @@
             {% for linea in asiento.lineas.all %}
             <tr class="{% if forloop.first %}bg-blue-50{% endif %}">
                 {% if forloop.first %}
-                <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3 text-gray-500 whitespace-nowrap">
-                    {{ asiento.fecha }}
-                </td>
+                <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ asiento.fecha }}</td>
                 <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3">
                     <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="text-blue-600 hover:text-blue-900 font-mono">
                         {{ asiento.numero }}
@@ -61,12 +57,8 @@
                     <span class="text-gray-500 text-sm ml-2">{{ linea.cuenta.nombre|truncatechars:20 }}</span>
                 </td>
                 <td class="px-4 py-2 text-gray-500 text-sm">{{ linea.descripcion|default:"-"|truncatechars:30 }}</td>
-                <td class="px-4 py-2 text-right {% if linea.debe > 0 %}text-green-600 font-medium{% else %}text-gray-300{% endif %}">
-                    {{ linea.debe|default:"-" }}
-                </td>
-                <td class="px-4 py-2 text-right {% if linea.haber > 0 %}text-red-600 font-medium{% else %}text-gray-300{% endif %}">
-                    {{ linea.haber|default:"-" }}
-                </td>
+                <td class="px-4 py-2 text-right {% if linea.debe > 0 %}text-green-600 font-medium{% else %}text-gray-300{% endif %}">{{ linea.debe|default:"-" }}</td>
+                <td class="px-4 py-2 text-right {% if linea.haber > 0 %}text-red-600 font-medium{% else %}text-gray-300{% endif %}">{{ linea.haber|default:"-" }}</td>
             </tr>
             {% endfor %}
             <tr class="bg-gray-100 font-semibold">
@@ -91,4 +83,5 @@
         {% endif %}
     </table>
 </div>
+{% endinclude %}
 {% endblock %}

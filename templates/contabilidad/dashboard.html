@@ -3,50 +3,51 @@
 {% block title %}Dashboard - Contabilidad{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Contabilidad</h1>
-    <p class="text-gray-600">Panel de control contable</p>
-</div>
+{% include "components/page-header.html" with 
+    title="Contabilidad"
+    subtitle="Panel de control contable" %}
 
 {% if ejercicio_actual %}
-<div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 flex justify-between items-center">
-    <div>
-        <p class="font-semibold">Ejercicio actual: {{ ejercicio_actual.nombre }}</p>
-        <p class="text-sm text-gray-600">{{ ejercicio_actual.fecha_inicio }} - {{ ejercicio_actual.fecha_fin }}</p>
-        <span class="inline-block mt-1 px-2 py-1 text-xs rounded {% if ejercicio_actual.estado == 'abierto' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
-            {{ ejercicio_actual.get_estado_display }}
-        </span>
+    {% include "components/alert.html" with 
+        title="Ejercicio actual: "|add:ejercicio_actual.nombre
+        message=ejercicio_actual.fecha_inicio|add:" - "|add:ejercicio_actual.fecha_fin
+        variant="info" %}
+    <div class="mb-6 flex justify-between items-center bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+        <div>
+            <span class="inline-block {% if ejercicio_actual.estado == 'abierto' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %} px-2 py-1 text-xs rounded">
+                {{ ejercicio_actual.get_estado_display }}
+            </span>
+        </div>
+        <div class="flex gap-2">
+            {% if ejercicio_actual.estado == 'abierto' %}
+            <a href="{% url 'contabilidad:preview_cierre' ejercicio_actual.pk %}" class="btn btn-sm btn-error">
+                <i class="fas fa-lock mr-1"></i>Cerrar Ejercicio
+            </a>
+            {% if ejercicio_actual.ejercicio_anterior %}
+            <a href="{% url 'contabilidad:generar_apertura' ejercicio_actual.pk %}" class="btn btn-sm btn-success">
+                <i class="fas fa-arrow-right mr-1"></i>Generar Apertura
+            </a>
+            {% endif %}
+            {% endif %}
+            <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit mr-1"></i>Editar
+            </a>
+        </div>
     </div>
-    <div class="flex gap-2">
-        {% if ejercicio_actual.estado == 'abierto' %}
-        <a href="{% url 'contabilidad:preview_cierre' ejercicio_actual.pk %}" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
-            <i class="fas fa-lock mr-1"></i>Cerrar Ejercicio
-        </a>
-        {% if ejercicio_actual.ejercicio_anterior %}
-        <a href="{% url 'contabilidad:generar_apertura' ejercicio_actual.pk %}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
-            <i class="fas fa-arrow-right mr-1"></i>Generar Apertura
-        </a>
-        {% endif %}
-        {% endif %}
-        <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
-            <i class="fas fa-edit mr-1"></i>Editar
-        </a>
-    </div>
-</div>
 {% else %}
-<div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 flex justify-between items-center">
-    <div>
-        <p class="font-semibold text-yellow-800">No hay ejercicio abierto</p>
-        <p class="text-sm text-yellow-600">Debe crear un ejercicio contable para poder registrar asientos.</p>
+    {% include "components/alert.html" with 
+        title="No hay ejercicio abierto"
+        message="Debe crear un ejercicio contable para poder registrar asientos."
+        variant="warning" %}
+    <div class="mb-6 flex justify-end">
+        <a href="{% url 'contabilidad:ejercicio_create' %}" class="btn btn-warning btn-sm">
+            <i class="fas fa-plus mr-1"></i>Crear Ejercicio
+        </a>
     </div>
-    <a href="{% url 'contabilidad:ejercicio_create' %}" class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
-        <i class="fas fa-plus mr-1"></i>Crear Ejercicio
-    </a>
-</div>
 {% endif %}
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <a href="{% url 'contabilidad:plan_cuentas' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <a href="{% url 'contabilidad:plan_cuentas' %}" class="dashboard-card">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Plan de Cuentas</p>
@@ -56,7 +57,7 @@
         </div>
     </a>
 
-    <a href="{% url 'contabilidad:asientos' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+    <a href="{% url 'contabilidad:asientos' %}" class="dashboard-card">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Asientos</p>
@@ -66,7 +67,7 @@
         </div>
     </a>
 
-    <a href="{% url 'contabilidad:libro_diario' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+    <a href="{% url 'contabilidad:libro_diario' %}" class="dashboard-card">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Libro Diario</p>
@@ -76,7 +77,7 @@
         </div>
     </a>
 
-    <a href="{% url 'contabilidad:mayor' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+    <a href="{% url 'contabilidad:mayor' %}" class="dashboard-card">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Mayor</p>
@@ -88,19 +89,18 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-4">Estructura del Plan de Cuentas</h2>
+    {% include "components/card.html" with title="Estructura del Plan de Cuentas" %}
         {% if cuentas_raiz %}
         <ul class="space-y-2">
             {% for cuenta in cuentas_raiz %}
             <li class="border-l-4 border-gray-300 pl-3">
-                <span class="font-mono">{{ cuenta.codigo }}</span> - {{ cuenta.nombre }}
+                <span class="font-mono text-sm">{{ cuenta.codigo }}</span> - <span class="text-gray-700">{{ cuenta.nombre }}</span>
                 <span class="text-xs text-gray-500">({{ cuenta.get_tipo_display }})</span>
                 {% if cuenta.hijos.exists %}
                 <ul class="ml-4 mt-2 space-y-1">
                     {% for hijo in cuenta.hijos.all %}
                     <li class="border-l-2 border-gray-200 pl-2">
-                        <span class="font-mono">{{ hijo.codigo }}</span> - {{ hijo.nombre }}
+                        <span class="font-mono text-sm">{{ hijo.codigo }}</span> - {{ hijo.nombre }}
                     </li>
                     {% endfor %}
                 </ul>
@@ -109,22 +109,25 @@
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-gray-500">No hay cuentas configuradas.</p>
+            {% include "components/empty-state.html" with 
+                title="Sin cuentas"
+                description="No hay cuentas configuradas."
+                action_label="Crear cuenta"
+                action_url="{% url 'contabilidad:cuenta_create' %}" %}
         {% endif %}
-    </div>
+    {% endinclude %}
 
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-4">Últimos Asientos</h2>
+    {% include "components/card.html" with title="Últimos Asientos" %}
         {% if ultimos_asientos %}
         <div class="space-y-3">
             {% for asiento in ultimos_asientos %}
             <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="block border-b pb-2 hover:bg-gray-50">
                 <div class="flex justify-between">
-                    <span class="font-mono">{{ asiento.numero }}</span>
+                    <span class="font-mono font-semibold">{{ asiento.numero }}</span>
                     <span class="text-sm text-gray-500">{{ asiento.fecha }}</span>
                 </div>
-                <p class="text-gray-700">{{ asiento.descripcion }}</p>
-                <p class="text-sm">
+                <p class="text-gray-700 text-sm">{{ asiento.descripcion }}</p>
+                <p class="text-sm mt-1">
                     <span class="text-green-600">D: {{ asiento.total_debe }}</span> | 
                     <span class="text-red-600">H: {{ asiento.total_haber }}</span>
                 </p>
@@ -132,14 +135,21 @@
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-gray-500">No hay asientos registrados.</p>
+            {% include "components/empty-state.html" with 
+                title="Sin asientos"
+                description="No hay asientos registrados."
+                action_label="Crear asiento"
+                action_url="{% url 'contabilidad:asiento_create' %}" %}
         {% endif %}
-    </div>
+    {% endinclude %}
 </div>
 
 <div class="mt-6">
-    <a href="{% url 'contabilidad:balance' %}" class="inline-block bg-slate-700 text-white px-6 py-3 rounded-lg hover:bg-slate-600">
-        <i class="fas fa-balance-scale mr-2"></i> Balance de Sumas y Saldos
-    </a>
+    {% include "components/button.html" with 
+        label="Balance de Sumas y Saldos"
+        variant="primary"
+        size="lg"
+        icon="fa-balance-scale"
+        onclick="window.location='{% url 'contabilidad:balance' %}'" %}
 </div>
 {% endblock %}
