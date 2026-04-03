@@ -1,11 +1,3 @@
-{# Textarea Component #}
-{# Usage:
-  {% include "components/textarea.html" with 
-      label="Description" 
-      name="description"
-      value="Some text"
-      rows=4 %}
-#}
 
 {% with rows=rows|default:4 required=required|default:False %}
 <div class="form-field">

@@ -1,12 +1,3 @@
-{# Form Field Component - Input genérico #}
-{# Usage:
-  {% include "components/form-field.html" with 
-      label="Email" 
-      name="email" 
-      type="email" 
-      value="user@example.com"
-      required=True %}
-#}
 
 {% with type=type|default:"text" required=required|default:False error=error|default:"" %}
 <div class="form-field">

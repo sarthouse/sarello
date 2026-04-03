@@ -1,9 +1,3 @@
-{# Modal Component #}
-{# Usage:
-  {% include "components/modal.html" with modal_id="delete-confirm" title="Confirmar eliminación" %}
-    ¿Desea eliminar este elemento?
-  {% endinclude %}
-#}
 
 <div id="{{ modal_id|default:'modal' }}" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50" data-modal>
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4" role="dialog" aria-modal="true">
