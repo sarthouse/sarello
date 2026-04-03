@@ -3,99 +3,99 @@
 {% block title %}Asiento {{ asiento.numero }}{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'contabilidad:asientos' %}" class="text-blue-600 hover:text-blue-800">
-        <i class="fas fa-arrow-left mr-2"></i>Volver a asientos
-    </a>
-</div>
+{% include "components/page-header.html" with 
+    title="Asiento"|add:" "|add:asiento.numero
+    subtitle=asiento.ejercicio.nombre %}
 
-<div class="bg-white rounded-lg shadow p-6 mb-6">
-    <div class="flex justify-between items-start mb-4">
+{% include "components/card.html" with title="Información del Asiento" %}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
         <div>
-            <h1 class="text-2xl font-bold">Asiento {{ asiento.numero }}</h1>
-            <p class="text-gray-600">{{ asiento.ejercicio.nombre }}</p>
-        </div>
-        <span class="px-3 py-1 rounded-full text-sm font-semibold 
-            {% if asiento.estado == 'confirmado' %}bg-green-100 text-green-800
-            {% elif asiento.estado == 'cancelado' %}bg-red-100 text-red-800
-            {% else %}bg-gray-100 text-gray-800{% endif %}">
-            {{ asiento.get_estado_display }}
-        </span>
-    </div>
-    
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div>
-            <p class="text-gray-500">Fecha</p>
+            <p class="text-gray-500 text-xs font-medium uppercase">Fecha</p>
             <p class="font-semibold">{{ asiento.fecha }}</p>
         </div>
         <div>
-            <p class="text-gray-500">Origen</p>
+            <p class="text-gray-500 text-xs font-medium uppercase">Origen</p>
             <p class="font-semibold">{{ asiento.get_origen_display }}</p>
         </div>
         <div>
-            <p class="text-gray-500">Creado</p>
-            <p class="font-semibold">{{ asiento.creado_en }}</p>
+            <p class="text-gray-500 text-xs font-medium uppercase">Creado</p>
+            <p class="font-semibold text-xs">{{ asiento.creado_en|date:"d/m/Y H:i" }}</p>
         </div>
         <div>
-            <p class="text-gray-500">Modificado</p>
-            <p class="font-semibold">{{ asiento.modificado_en }}</p>
+            <p class="text-gray-500 text-xs font-medium uppercase">Modificado</p>
+            <p class="font-semibold text-xs">{{ asiento.modificado_en|date:"d/m/Y H:i" }}</p>
         </div>
     </div>
     
-    <div class="mt-4">
-        <p class="text-gray-500">Descripción</p>
-        <p>{{ asiento.descripcion }}</p>
-    </div>
-    
-    {% if asiento.observaciones %}
-    <div class="mt-4">
-        <p class="text-gray-500">Observaciones</p>
-        <p>{{ asiento.observaciones }}</p>
+    {% if asiento.descripcion %}
+    <div class="mb-4">
+        <p class="text-gray-500 text-sm font-medium uppercase mb-1">Descripción</p>
+        <p class="text-base">{{ asiento.descripcion }}</p>
     </div>
     {% endif %}
-</div>
+    
+    {% if asiento.observaciones %}
+    <div class="mb-4">
+        <p class="text-gray-500 text-sm font-medium uppercase mb-1">Observaciones</p>
+        <p class="text-base">{{ asiento.observaciones }}</p>
+    </div>
+    {% endif %}
+    
+    <div class="flex items-center gap-2">
+        <span class="text-gray-500 text-sm font-medium uppercase">Estado:</span>
+        {% if asiento.estado == 'confirmado' %}
+            {% include "components/badge.html" with label=asiento.get_estado_display variant="success" %}
+        {% elif asiento.estado == 'cancelado' %}
+            {% include "components/badge.html" with label=asiento.get_estado_display variant="error" %}
+        {% else %}
+            {% include "components/badge.html" with label=asiento.get_estado_display variant="neutral" %}
+        {% endif %}
+    </div>
+{% endinclude %}
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-            {% for linea in asiento.lineas.all %}
-            <tr>
-                <td class="px-6 py-4">
-                    <span class="font-mono text-sm">{{ linea.cuenta.codigo }}</span>
-                    <br>
-                    <span class="text-gray-600">{{ linea.cuenta.nombre }}</span>
-                </td>
-                <td class="px-6 py-4 text-gray-500">{{ linea.descripcion|default:"-" }}</td>
-                <td class="px-6 py-4 text-right {% if linea.debe > 0 %}text-green-600 font-semibold{% else %}text-gray-300{% endif %}">
-                    {{ linea.debe|default:"-" }}
-                </td>
-                <td class="px-6 py-4 text-right {% if linea.haber > 0 %}text-red-600 font-semibold{% else %}text-gray-300{% endif %}">
-                    {{ linea.haber|default:"-" }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot class="bg-gray-50 font-semibold">
-            <tr>
-                <td colspan="2" class="px-6 py-3 text-right">Totales:</td>
-                <td class="px-6 py-3 text-right text-green-600">{{ asiento.total_debe }}</td>
-                <td class="px-6 py-3 text-right text-red-600">{{ asiento.total_haber }}</td>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+{% include "components/card.html" with title="Líneas de Asiento" %}
+    {% if asiento.lineas.all %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for linea in asiento.lineas.all %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="font-mono text-sm font-semibold">{{ linea.cuenta.codigo }}</span>
+                        <div class="text-sm text-gray-600">{{ linea.cuenta.nombre }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ linea.descripcion|default:"-" }}</td>
+                    <td class="px-6 py-4 text-right font-semibold {% if linea.debe > 0 %}text-green-600{% else %}text-gray-400{% endif %}">
+                        {{ linea.debe|default:"-" }}
+                    </td>
+                    <td class="px-6 py-4 text-right font-semibold {% if linea.haber > 0 %}text-red-600{% else %}text-gray-400{% endif %}">
+                        {{ linea.haber|default:"-" }}
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr class="bg-gray-50 font-semibold border-t-2">
+                    <td colspan="2" class="px-6 py-3 text-right text-sm">Totales:</td>
+                    <td class="px-6 py-3 text-right text-green-600">{{ asiento.total_debe }}</td>
+                    <td class="px-6 py-3 text-right text-red-600">{{ asiento.total_haber }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    {% include "components/empty-state.html" with message="No hay líneas en este asiento" icon="fa-file" %}
+    {% endif %}
+{% endinclude %}
 
-<div class="mt-4 flex gap-2">
-    <a href="/admin/contabilidad/asiento/{{ asiento.pk }}/change/" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
-        <i class="fas fa-edit mr-2"></i>Editar
-    </a>
+<div class="mt-6 flex gap-2">
+    {% include "components/button.html" with label="Editar" href="/admin/contabilidad/asiento/"|add:asiento.pk|add:"/change/" variant="primary" %}
+    {% include "components/button.html" with label="Volver" onclick="history.back()" variant="secondary" %}
 </div>
 {% endblock %}
