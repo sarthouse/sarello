@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from .models import CuentaContable, Ejercicio, Asiento, LineaAsiento
 
 
@@ -223,8 +224,8 @@ def cuenta_detail(request, pk):
     cuenta = get_object_or_404(CuentaContable, pk=pk)
     lineas = LineaAsiento.objects.filter(cuenta=cuenta).select_related('asiento').order_by('-asiento__fecha')[:50]
     
-    saldo_debe = lineas.aggregate(total=Sum('debe'))['total'] or 0
-    saldo_haber = lineas.aggregate(total=Sum('haber'))['total'] or 0
+    saldo_debe = lineas.aggregate(total=Sum('debe'))['total'] or Decimal('0')
+    saldo_haber = lineas.aggregate(total=Sum('haber'))['total'] or Decimal('0')
     
     if cuenta.tipo in ['activo', 'egreso']:
         saldo = saldo_debe - saldo_haber
@@ -266,6 +267,7 @@ def lista_asientos(request):
     })
 
 
+@login_required
 def asiento_detail(request, pk):
     asiento = get_object_or_404(Asiento, pk=pk)
     return render(request, 'contabilidad/asiento_detail.html', {
@@ -660,53 +662,105 @@ def asiento_create(request):
         descripcion_vals = request.POST.getlist('linea_descripcion')
         
         lineas_data = []
+        errors = []
+        
+        # Validar y procesar líneas
         for i, cuenta_id in enumerate(cuenta_ids):
             if cuenta_id:
-                debe = debe_vals[i] if i < len(debe_vals) else '0'
-                haber = haber_vals[i] if i < len(haber_vals) else '0'
-                desc = descripcion_vals[i] if i < len(descripcion_vals) else ''
-                lineas_data.append({
-                    'cuenta_id': int(cuenta_id),
-                    'debe': Decimal(debe.replace(',', '.')) if debe else Decimal('0'),
-                    'haber': Decimal(haber.replace(',', '.')) if haber else Decimal('0'),
-                    'descripcion': desc
-                })
+                try:
+                    debe = debe_vals[i] if i < len(debe_vals) else '0'
+                    haber = haber_vals[i] if i < len(haber_vals) else '0'
+                    desc = descripcion_vals[i] if i < len(descripcion_vals) else ''
+                    
+                    # Validar que hay movimiento
+                    debe_dec = Decimal(debe.replace(',', '.')) if debe else Decimal('0')
+                    haber_dec = Decimal(haber.replace(',', '.')) if haber else Decimal('0')
+                    
+                    if debe_dec == 0 and haber_dec == 0:
+                        errors.append(f'Línea {i+1}: Debe especificar debe o haber')
+                    elif debe_dec > 0 and haber_dec > 0:
+                        errors.append(f'Línea {i+1}: No puede tener debe y haber simultáneamente')
+                    
+                    lineas_data.append({
+                        'cuenta_id': int(cuenta_id),
+                        'debe': debe_dec,
+                        'haber': haber_dec,
+                        'descripcion': desc
+                    })
+                except (ValueError, ValueError) as e:
+                    errors.append(f'Línea {i+1}: Valor inválido - {str(e)}')
         
-        if form.is_valid():
-            asiento = form.save(commit=False)
-            if not asiento.numero:
-                ultimo = Asiento.objects.filter(ejercicio=asiento.ejercicio).order_by('-numero').first()
-                if ultimo:
-                    try:
-                        ultimo_num = int(ultimo.numero)
-                        asiento.numero = str(ultimo_num + 1).zfill(4)
-                    except:
-                        asiento.numero = str(Asiento.objects.count() + 1).zfill(4)
-                else:
-                    asiento.numero = '0001'
-            asiento.estado = 'confirmado'
-            asiento.save()
-            
-            total_debe = Decimal('0')
-            total_haber = Decimal('0')
-            for ld in lineas_data:
+        # Calcular totales ANTES de guardar
+        total_debe = Decimal('0')
+        total_haber = Decimal('0')
+        for ld in lineas_data:
+            total_debe += ld['debe']
+            total_haber += ld['haber']
+        
+        # CRÍTICO: Validar balance ANTES de guardar asiento
+        if total_debe != total_haber:
+            errors.append(f'Asiento desbalanceado: Debe={total_debe}, Haber={total_haber}')
+        
+        # Si hay errores, mostrar y no guardar nada
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'contabilidad/asiento_form.html', {
+                'form': form,
+                'cuentas': cuentas,
+                'action': 'Crear',
+                'asiento': None,
+                'lineas_data': lineas_data
+            })
+        
+        # Validar form principal
+        if not form.is_valid():
+            return render(request, 'contabilidad/asiento_form.html', {
+                'form': form,
+                'cuentas': cuentas,
+                'action': 'Crear',
+                'asiento': None,
+                'lineas_data': lineas_data
+            })
+        
+        # AHORA sí guardar asiento (después de validaciones)
+        asiento = form.save(commit=False)
+        
+        # Generar número de asiento
+        if not asiento.numero:
+            ultimo = Asiento.objects.filter(ejercicio=asiento.ejercicio).order_by('-numero').first()
+            if ultimo:
+                try:
+                    ultimo_num = int(ultimo.numero)
+                    asiento.numero = str(ultimo_num + 1).zfill(4)
+                except ValueError:
+                    # Si número no es numérico, usar count
+                    asiento.numero = str(Asiento.objects.filter(ejercicio=asiento.ejercicio).count() + 1).zfill(4)
+            else:
+                asiento.numero = '0001'
+        
+        asiento.estado = 'confirmado'
+        asiento.save()
+        
+        # Guardar líneas
+        for ld in lineas_data:
+            try:
                 cuenta = CuentaContable.objects.get(pk=ld['cuenta_id'])
-                LineaAsiento.objects.create(
-                    asiento=asiento,
-                    cuenta=cuenta,
-                    debe=ld['debe'],
-                    haber=ld['haber'],
-                    descripcion=ld['descripcion']
-                )
-                total_debe += ld['debe']
-                total_haber += ld['haber']
+            except ObjectDoesNotExist:
+                messages.error(request, f'Cuenta con ID {ld["cuenta_id"]} no encontrada')
+                asiento.delete()
+                return redirect('contabilidad:asiento_create')
             
-            if total_debe != total_haber:
-                messages.error(request, f'Asiento desbalanceado: Debe={total_debe}, Haber={total_haber}')
-                return redirect('contabilidad:asiento_edit', pk=asiento.pk)
-            
-            messages.success(request, 'Asiento creado correctamente')
-            return redirect('contabilidad:asiento_detail', pk=asiento.pk)
+            LineaAsiento.objects.create(
+                asiento=asiento,
+                cuenta=cuenta,
+                debe=ld['debe'],
+                haber=ld['haber'],
+                descripcion=ld['descripcion']
+            )
+        
+        messages.success(request, 'Asiento creado correctamente')
+        return redirect('contabilidad:asiento_detail', pk=asiento.pk)
     else:
         initial = {}
         if ejercicio:
