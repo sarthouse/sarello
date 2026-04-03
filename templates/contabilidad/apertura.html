@@ -3,26 +3,34 @@
 {% block title %}Asiento de Apertura{% endblock %}
 
 {% block content %}
-{% include "components/page-header.html" with 
-    title="Asiento de Apertura"
-    subtitle="Generar apertura desde "|add:ejercicio_anterior.nombre %}
+{% include "components/page-header.html" with title="Asiento de Apertura" subtitle="Generar apertura desde "|add:ejercicio_anterior.nombre %}
 
-{% include "components/card.html" with title="Datos del Ejercicio" %}
-    <div class="grid grid-cols-2 gap-4">
-        <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Destino</p>
-            <p class="text-lg font-semibold">{{ ejercicio.nombre }}</p>
-            <p class="text-sm text-gray-600">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
-        </div>
-        <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Origen</p>
-            <p class="text-lg font-semibold">{{ ejercicio_anterior.nombre }}</p>
-            <p class="text-sm text-gray-600">{{ ejercicio_anterior.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio_anterior.fecha_fin|date:"d/m/Y" }}</p>
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Datos del Ejercicio</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Destino</p>
+                <p class="text-lg font-semibold">{{ ejercicio.nombre }}</p>
+                <p class="text-sm text-gray-600">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Origen</p>
+                <p class="text-lg font-semibold">{{ ejercicio_anterior.nombre }}</p>
+                <p class="text-sm text-gray-600">{{ ejercicio_anterior.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio_anterior.fecha_fin|date:"d/m/Y" }}</p>
+            </div>
         </div>
     </div>
-{% endinclude %}
+</div>
 
-{% include "components/card.html" with title="Asiento de Apertura - Preview" %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Asiento de Apertura - Preview</h2>
+    </div>
+    <div class="px-6 py-4">
+        {% if lineas %}
     {% if lineas %}
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
@@ -70,10 +78,11 @@
             </tfoot>
         </table>
     </div>
+    </div>
     {% else %}
     {% include "components/empty-state.html" with message="No hay saldos para generar apertura. Verifique que el ejercicio anterior tenga movimientos." icon="fa-inbox" %}
     {% endif %}
-{% endinclude %}
+</div>
 
 <div class="mt-6 flex gap-2">
     {% if lineas %}

@@ -3,55 +3,64 @@
 {% block title %}Libro Mayor{% endblock %}
 
 {% block content %}
-{% include "components/page-header.html" with 
-    title="Libro Mayor"
-    subtitle="Movimientos por cuenta" %}
+{% include "components/page-header.html" with title="Libro Mayor" subtitle="Movimientos por cuenta" %}
 
-{% include "components/card.html" with title="Filtros" %}
-    <form method="get" class="flex flex-col md:flex-row items-end gap-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
-            <select name="ejercicio" class="input input-bordered">
-                <option value="">Seleccionar...</option>
-                {% for ej in ejercicios %}
-                <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ ej.nombre }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta:</label>
-            <select name="cuenta" class="input input-bordered">
-                <option value="">Seleccionar...</option>
-                {% for c in cuentas %}
-                <option value="{{ c.pk }}" {% if cuenta_seleccionada == c.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ c.codigo }} - {{ c.nombre }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        {% include "components/button.html" with label="Consultar" type="submit" variant="primary" icon="fa-search" %}
-    </form>
-{% endinclude %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Filtros</h2>
+    </div>
+    <div class="px-6 py-4">
+        <form method="get" class="flex flex-col md:flex-row items-end gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
+                <select name="ejercicio" class="input input-bordered">
+                    <option value="">Seleccionar...</option>
+                    {% for ej in ejercicios %}
+                    <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ ej.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cuenta:</label>
+                <select name="cuenta" class="input input-bordered">
+                    <option value="">Seleccionar...</option>
+                    {% for c in cuentas %}
+                    <option value="{{ c.pk }}" {% if cuenta_seleccionada == c.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ c.codigo }} - {{ c.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% include "components/button.html" with label="Consultar" type="submit" variant="primary" icon="fa-search" %}
+        </form>
+    </div>
+</div>
 
 {% if cuenta_obj %}
-{% include "components/card.html" with title=cuenta_obj.codigo|add:" - "|add:cuenta_obj.nombre %}
-    <div class="grid grid-cols-2 gap-4">
-        <div>
-            <p class="text-gray-500 text-sm font-medium uppercase">Tipo</p>
-            <p class="font-semibold">{{ cuenta_obj.get_tipo_display }}</p>
-        </div>
-        <div>
-            <p class="text-gray-500 text-sm font-medium uppercase">Saldo Final</p>
-            <p class="font-semibold {% if saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                {% if saldo >= 0 %}{{ saldo|floatformat:2 }}{% else %}({{ saldo|floatformat:2|slice:"1:" }}){% endif %}
-            </p>
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">{{ cuenta_obj.codigo }} - {{ cuenta_obj.nombre }}</h2>
+    </div>
+    <div class="px-6 py-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-500 text-sm font-medium uppercase">Tipo</p>
+                <p class="font-semibold">{{ cuenta_obj.get_tipo_display }}</p>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm font-medium uppercase">Saldo Final</p>
+                <p class="font-semibold {% if saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    {% if saldo >= 0 %}{{ saldo|floatformat:2 }}{% else %}({{ saldo|floatformat:2|slice:"1:" }}){% endif %}
+                </p>
+            </div>
         </div>
     </div>
-{% endinclude %}
+</div>
 
-{% include "components/card.html" %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4">
     {% if lineas %}
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
@@ -91,11 +100,12 @@
     </div>
     
     {% if lineas.has_other_pages %}
-    {% include "components/pagination.html" with page_obj=lineas ejercicio=ejercicio_seleccionado cuenta=cuenta_seleccionada %}
+    {% include "components/pagination.html" with page_obj=lineas ejercicio_seleccionado=ejercicio_seleccionado cuenta_seleccionada=cuenta_seleccionada %}
     {% endif %}
     {% else %}
     {% include "components/empty-state.html" with message="No hay movimientos en esta cuenta" icon="fa-inbox" %}
     {% endif %}
-{% endinclude %}
+    </div>
+</div>
 {% endif %}
 {% endblock %}

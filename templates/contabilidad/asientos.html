@@ -3,31 +3,32 @@
 {% block title %}Asientos Contables{% endblock %}
 
 {% block content %}
-{% include "components/page-header.html" with 
-    title="Asientos Contables"
-    subtitle="Listado de asientos del libro diario"
-    action_label="Nuevo Asiento"
-    action_url="{% url 'contabilidad:asiento_create' %}"
-    action_icon="fa-plus" %}
+{% include "components/page-header.html" with title="Asientos Contables" subtitle="Listado de asientos del libro diario" action_label="Nuevo Asiento" action_url="{% url 'contabilidad:asiento_create' %}" action_icon="fa-plus" %}
 
-{% include "components/card.html" with title="Filtros" %}
-    <form method="get" class="flex items-center gap-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
-            <select name="ejercicio" class="input input-bordered">
-                <option value="">Todos los abiertos</option>
-                {% for ej in ejercicios %}
-                <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
-                    {{ ej.nombre }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        {% include "components/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
-    </form>
-{% endinclude %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Filtros</h2>
+    </div>
+    <div class="px-6 py-4">
+        <form method="get" class="flex items-center gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
+                <select name="ejercicio" class="input input-bordered">
+                    <option value="">Todos los abiertos</option>
+                    {% for ej in ejercicios %}
+                    <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ ej.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% include "components/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
+        </form>
+    </div>
+</div>
 
-{% include "components/card.html" %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -79,9 +80,7 @@
             </tbody>
         </table>
     </div>
-{% endinclude %}
+</div>
 
-{% include "components/pagination.html" with 
-    page_obj=page_obj 
-    query_params="{% if ejercicio_seleccionado %}&ejercicio={{ ejercicio_seleccionado }}{% endif %}" %}
+{% include "components/pagination.html" with page_obj=page_obj query_params="{% if ejercicio_seleccionado %}&ejercicio={{ ejercicio_seleccionado }}{% endif %}" %}
 {% endblock %}

@@ -39,9 +39,15 @@ class CuentaContable(TimeStampedModel):
 
     @property
     def saldo_actual(self):
-        debe = sum(self.movimientos.debe() for _ in [1])
-        haber = sum(self.movimientos.haber() for _ in [1])
-        return debe - haber if self.tipo in ['activo', 'egreso'] else haber - debe
+        from django.db.models import Sum
+        agg = self.lineas.aggregate(debe=Sum('debe'), haber=Sum('haber'))
+        debe = agg['debe'] or Decimal('0.00')
+        haber = agg['haber'] or Decimal('0.00')
+        
+        if self.tipo in ['activo', 'egreso']:
+            return debe - haber
+        else:
+            return haber - debe
 
     @property
     def nivel(self):
