@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Balance{% endblock %}
 
@@ -303,69 +304,7 @@
 {% endif %}
 {% endif %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const secciones = ['activo', 'pasivo', 'patrimonio'];
-    
-    secciones.forEach(seccion => {
-        const body = document.getElementById(seccion + '-body');
-        if (!body) return;
-        
-        const rows = Array.from(body.querySelectorAll('.tree-row'));
-        
-        function getNivel(codigo) {
-            return codigo.split('.').length - 1;
-        }
-        
-        function toggleChildren(parentCode, show) {
-            rows.forEach(row => {
-                const codigo = row.dataset.codigo;
-                if (codigo.startsWith(parentCode + '.')) {
-                    const parentNivel = getNivel(parentCode);
-                    const nivel = getNivel(codigo);
-                    if (nivel === parentNivel + 1) {
-                        row.style.display = show ? '' : 'none';
-                        const btn = row.querySelector('.toggle-children');
-                        if (btn) {
-                            const icon = btn.querySelector('i');
-                            if (icon) {
-                                icon.classList.remove('fa-chevron-down');
-                                icon.classList.add('fa-chevron-right');
-                            }
-                        }
-                        toggleChildren(codigo, false);
-                    }
-                }
-            });
-        }
-        
-        const toggles = body.querySelectorAll('.toggle-children');
-        toggles.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const codigo = this.dataset.codigo;
-                const icon = this.querySelector('i');
-                const isExpanded = icon.classList.contains('fa-chevron-down');
-                
-                if (isExpanded) {
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-right');
-                    toggleChildren(codigo, false);
-                } else {
-                    icon.classList.remove('fa-chevron-right');
-                    icon.classList.add('fa-chevron-down');
-                    toggleChildren(codigo, true);
-                }
-            });
-        });
-        
-        rows.forEach(row => {
-            const nivel = getNivel(row.dataset.codigo);
-            if (nivel > 0) {
-                row.style.display = 'none';
-            }
-        });
-    });
-});
-</script>
+<script defer src="{% static 'js/modules/utils.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/balance.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/index.js' %}"></script>
 {% endblock %}

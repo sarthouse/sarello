@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Plan de Cuentas{% endblock %}
 
@@ -173,58 +174,9 @@
 </div>
 {% endif %}
 
-<script>
-const selectAll = document.getElementById('select-all');
-const checkboxes = document.querySelectorAll('.cuenta-checkbox');
-const bulkAction = document.getElementById('bulk-action');
-const bulkSubmit = document.getElementById('bulk-submit');
-
-selectAll.addEventListener('change', () => {
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    updateBulkUI();
-});
-
-checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-        updateBulkUI();
-    });
-});
-
-function updateBulkUI() {
-    const checked = document.querySelectorAll('.cuenta-checkbox:checked');
-    bulkAction.disabled = checked.length === 0;
-    bulkSubmit.disabled = checked.length === 0;
-    
-    if (bulkAction.value === 'delete') {
-        bulkSubmit.classList.remove('bg-green-600');
-        bulkSubmit.classList.add('bg-red-600', 'hover:bg-red-700');
-    } else {
-        bulkSubmit.classList.remove('bg-red-600', 'hover:bg-red-700');
-        bulkSubmit.classList.add('bg-green-600', 'hover:bg-green-700');
-    }
-}
-
-bulkAction.addEventListener('change', updateBulkUI);
-
-document.getElementById('bulk-form').addEventListener('submit', (e) => {
-    const action = bulkAction.value;
-    const count = document.querySelectorAll('.cuenta-checkbox:checked').length;
-    
-    if (action === 'delete') {
-        if (!confirm(`¿Eliminar ${count} cuentas?`)) {
-            e.preventDefault();
-        }
-    } else if (action === 'activate') {
-        if (!confirm(`¿Activar ${count} cuentas?`)) {
-            e.preventDefault();
-        }
-    } else if (action === 'deactivate') {
-        if (!confirm(`¿Desactivar ${count} cuentas?`)) {
-            e.preventDefault();
-        }
-    }
-});
-</script>
+<script defer src="{% static 'js/modules/utils.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/plan-cuentas.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/index.js' %}"></script>
 
 <div id="modal-container"></div>
 {% endblock %}

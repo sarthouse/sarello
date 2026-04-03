@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ action }} Asiento{% endblock %}
 
@@ -90,7 +91,7 @@
                                 <input type="text" name="linea_descripcion" value="{{ linea.descripcion }}" class="w-full border rounded px-2 py-1 text-sm">
                             </td>
                             <td class="px-2 py-2 text-center">
-                                <button type="button" class="text-red-600 hover:text-red-800" onclick="removeLine(this)">
+                                <button type="button" class="text-red-600 hover:text-red-800 delete-line-btn" data-action="remove-line">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </td>
@@ -108,7 +109,7 @@
                 </table>
             </div>
             
-            <button type="button" onclick="addLine()" class="mb-6 bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 text-sm">
+            <button type="button" data-action="add-line" class="mb-6 bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 text-sm">
                 <i class="fas fa-plus mr-1"></i>Agregar línea
             </button>
             
@@ -124,77 +125,7 @@
     </div>
 </div>
 
-<script>
-const cuentasOptions = `
-    <option value="">-- Seleccionar cuenta --</option>
-    {% for cuenta in cuentas %}<option value="{{ cuenta.pk }}">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>{% endfor %}
-`;
-
-function addLine() {
-    const tbody = document.getElementById('lineas-body');
-    const tr = document.createElement('tr');
-    tr.className = 'linea-row border-t';
-    tr.innerHTML = `
-        <td class="px-2 py-2">
-            <select name="cuenta_id" class="w-full border rounded px-2 py-1 text-sm">
-                ${cuentasOptions}
-            </select>
-        </td>
-        <td class="px-2 py-2">
-            <input type="number" name="debe" value="" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-sm text-right debe-input">
-        </td>
-        <td class="px-2 py-2">
-            <input type="number" name="haber" value="" step="0.01" min="0" class="w-full border rounded px-2 py-1 text-right haber-input">
-        </td>
-        <td class="px-2 py-2">
-            <input type="text" name="linea_descripcion" value="" class="w-full border rounded px-2 py-1 text-sm">
-        </td>
-        <td class="px-2 py-2 text-center">
-            <button type="button" class="text-red-600 hover:text-red-800" onclick="removeLine(this)">
-                <i class="fas fa-times"></i>
-            </button>
-        </td>
-    `;
-    tbody.appendChild(tr);
-    calculateTotals();
-}
-
-function removeLine(btn) {
-    const rows = document.querySelectorAll('.linea-row');
-    if (rows.length > 1) {
-        btn.closest('tr').remove();
-        calculateTotals();
-    }
-}
-
-function calculateTotals() {
-    let totalDebe = 0;
-    let totalHaber = 0;
-    
-    document.querySelectorAll('.debe-input').forEach(input => {
-        totalDebe += parseFloat(input.value) || 0;
-    });
-    
-    document.querySelectorAll('.haber-input').forEach(input => {
-        totalHaber += parseFloat(input.value) || 0;
-    });
-    
-    document.getElementById('total-debe').textContent = totalDebe.toFixed(2);
-    document.getElementById('total-haber').textContent = totalHaber.toFixed(2);
-    
-    const diff = Math.abs(totalDebe - totalHaber);
-    if (diff > 0.01) {
-        document.getElementById('total-debe').classList.add('text-red-600');
-        document.getElementById('total-haber').classList.add('text-red-600');
-    } else {
-        document.getElementById('total-debe').classList.remove('text-red-600');
-        document.getElementById('total-haber').classList.remove('text-red-600');
-    }
-}
-
-document.addEventListener('input', calculateTotals);
-document.addEventListener('change', calculateTotals);
-
-calculateTotals();
-</script>
+<script defer src="{% static 'js/modules/utils.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/asientos.js' %}"></script>
+<script defer src="{% static 'js/modules/accounting/index.js' %}"></script>
 {% endblock %}
