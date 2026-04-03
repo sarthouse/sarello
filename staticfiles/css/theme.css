@@ -1,49 +1,48 @@
 /**
- * Sarello ERP - Theme CSS (IBM Plex Dark)
- * Compilation: npm run build:theme
+ * Sarello ERP - Theme CSS (Unified Dark Theme)
+ * Compilation: npm run build
+ * Development: npm run dev
+ * 
+ * All CSS variables are defined here. No separate theme-output.css needed.
  */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
-:root[data-theme="dark"] {
-  /* Primary - IBM Blue */
-  --p: 217 89% 56%;
-  --pc: 210 40% 98%;
+:root {
+  /* Background colors - Dark blue base */
+  --bg: #2f516a;
+  --surface: #161b27;
+  --surface2: #1e2535;
+  --surface-elevated: #252b42;
+  --border: #2a3347;
 
-  /* Secondary - Teal */
-  --s: 168 100% 42%;
-  --sc: 0 0% 100%;
+  /* Accent - IBM Blue */
+  --accent: #4f9eff;
+  --accent2: #00d4aa;
+  --accent-hover: #5aa3f0;
 
-  /* Accent - Orange */
-  --a: 36 100% 50%;
-  --ac: 0 0% 0%;
-
-  /* Neutral - Dark slate */
-  --n: 222 47% 11%;
-  --nf: 223 47% 17%;
-  --nc: 213 27% 90%;
-
-  /* Base - IBM Dark */
-  --b1: 223 47% 10%;
-  --b2: 223 47% 14%;
-  --b3: 223 47% 20%;
-  --bc: 213 27% 90%;
-
-  /* State colors - Azure blue */
-  --in: 207 100% 60%;
-  --su: 168 100% 42%;
-  --wa: 38 92% 50%;
-  --er: 0 84% 60%;
-
-  /* Status */
+  /* State colors */
+  --warn: #f5a623;
+  --danger: #e05252;
   --success: #4caf82;
-  --warning: #f5a623;
-  --error: #e05252;
   --info: #4f9eff;
 
-  /* Accounting */
+  /* Text colors - WHITE */
+  --text: #ffffff;
+  --text-dim: #6b7a99;
+  --text-bright: #e8edf7;
+
+  /* Typography */
+  --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  /* Accounting colors */
   --accounting-debe: #4caf82;
   --accounting-haber: #e05252;
   --accounting-saldo: #4f9eff;
@@ -54,19 +53,79 @@
   --accounting-egreso: #f5a623;
 }
 
-:root {
-  /* CSS Variables for layout */
-  --bg: #0f1117;
-  --surface: #161b27;
-  --surface2: #1e2535;
-  --border: #2a3347;
-  --accent: #4f9eff;
-  --accent2: #00d4aa;
-  --text: #c8d3e8;
-  --text-dim: #6b7a99;
-  --text-bright: #e8edf7;
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  :root {
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    transition: none;
+  }
 }
 
 html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Selection styles */
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* Focus visible */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Form elements base */
+input, select, textarea {
+  background-color: var(--text);
+  border: 1px solid var(--border);
+  color: var(--surface);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim);
 }

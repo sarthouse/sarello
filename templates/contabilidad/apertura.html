@@ -5,29 +5,29 @@
 {% block content %}
 {% include "components/page-header.html" with title="Asiento de Apertura" subtitle="Generar apertura desde "|add:ejercicio_anterior.nombre %}
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
     <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Datos del Ejercicio</h2>
+        <h2 class="text-lg font-semibold text-base-content900">Datos del Ejercicio</h2>
     </div>
     <div class="px-6 py-4">
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Destino</p>
+                <p class="text-sm font-medium text-base-content500 uppercase">Ejercicio Destino</p>
                 <p class="text-lg font-semibold">{{ ejercicio.nombre }}</p>
-                <p class="text-sm text-gray-600">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
+                <p class="text-sm text-base-content600">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 uppercase">Ejercicio Origen</p>
+                <p class="text-sm font-medium text-base-content500 uppercase">Ejercicio Origen</p>
                 <p class="text-lg font-semibold">{{ ejercicio_anterior.nombre }}</p>
-                <p class="text-sm text-gray-600">{{ ejercicio_anterior.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio_anterior.fecha_fin|date:"d/m/Y" }}</p>
+                <p class="text-sm text-base-content600">{{ ejercicio_anterior.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio_anterior.fecha_fin|date:"d/m/Y" }}</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
     <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Asiento de Apertura - Preview</h2>
+        <h2 class="text-lg font-semibold text-base-content900">Asiento de Apertura - Preview</h2>
     </div>
     <div class="px-6 py-4">
         {% if lineas %}
@@ -36,10 +36,10 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content500 uppercase">Cuenta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content500 uppercase">Tipo</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content500 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content500 uppercase">Haber</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -47,7 +47,7 @@
                 <tr class="{% if linea.debe > 0 and linea.haber == 0 %}bg-blue-50{% elif linea.haber > 0 %}bg-red-50{% endif %}">
                     <td class="px-6 py-3">
                         <span class="font-mono font-semibold">{{ linea.cuenta.codigo }}</span>
-                        <span class="ml-2 text-gray-700">{{ linea.cuenta.nombre }}</span>
+                        <span class="ml-2 text-base-content700">{{ linea.cuenta.nombre }}</span>
                     </td>
                     <td class="px-6 py-3 text-sm">
                         {% if linea.cuenta.tipo == 'activo' %}
@@ -56,10 +56,10 @@
                         <span class="text-red-600">Pasivo → Haber</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-3 text-right font-mono {% if linea.debe > 0 %}text-green-600 font-semibold{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-3 text-right font-mono {% if linea.debe > 0 %}text-green-600 font-semibold{% else %}text-base-content400{% endif %}">
                         {% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% else %}-{% endif %}
                     </td>
-                    <td class="px-6 py-3 text-right font-mono {% if linea.haber > 0 %}text-red-600 font-semibold{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-3 text-right font-mono {% if linea.haber > 0 %}text-red-600 font-semibold{% else %}text-base-content400{% endif %}">
                         {% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% else %}-{% endif %}
                     </td>
                 </tr>

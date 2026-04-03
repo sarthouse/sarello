@@ -5,53 +5,53 @@
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
     <div>
-        <h1 class="text-3xl font-bold text-gray-800">Caja Diaria</h1>
-        <p class="text-gray-600">Movimientos del día por caja</p>
+        <h1 class="text-3xl font-bold text-base-content">Caja Diaria</h1>
+        <p class="text-base-content/60">Movimientos del día por caja</p>
     </div>
     <form method="get" class="flex items-center gap-2">
-        <input type="date" name="fecha" value="{{ fecha }}" class="border rounded px-3 py-2">
-        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+        <input type="date" name="fecha" value="{{ fecha }}" class="border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+        <button type="submit" class="bg-neutral text-neutral-content px-4 py-2 rounded hover:bg-neutral-focus">
             <i class="fas fa-search"></i>
         </button>
     </form>
 </div>
 
-<div class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-lg font-semibold mb-4">Resumen del {{ fecha }}</h2>
+<div class="bg-base-200 rounded-lg shadow p-6 mb-6">
+    <h2 class="text-lg font-semibold mb-4 text-base-content">Resumen del {{ fecha }}</h2>
     
     <table class="min-w-full">
-        <thead class="bg-gray-50">
+        <thead class="bg-base-300">
             <tr>
-                <th class="px-4 py-2 text-left">Cuenta</th>
-                <th class="px-4 py-2 text-right">Ingresos</th>
-                <th class="px-4 py-2 text-right">Egresos</th>
-                <th class="px-4 py-2 text-right">Saldo del Día</th>
-                <th class="px-4 py-2 text-right">Saldo Acumulado</th>
+                <th class="px-4 py-2 text-left text-base-content/60">Cuenta</th>
+                <th class="px-4 py-2 text-right text-base-content/60">Ingresos</th>
+                <th class="px-4 py-2 text-right text-base-content/60">Egresos</th>
+                <th class="px-4 py-2 text-right text-base-content/60">Saldo del Día</th>
+                <th class="px-4 py-2 text-right text-base-content/60">Saldo Acumulado</th>
             </tr>
         </thead>
         <tbody>
             {% for dato in datos_caja %}
-            <tr class="border-t">
-                <td class="px-4 py-3 font-medium">{{ dato.cuenta.nombre }}</td>
-                <td class="px-4 py-3 text-right text-green-600">$ {{ dato.ingresos|floatformat:2 }}</td>
-                <td class="px-4 py-3 text-right text-red-600">$ {{ dato.egresos|floatformat:2 }}</td>
-                <td class="px-4 py-3 text-right font-bold {% if dato.saldo_dia >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+            <tr class="border-t border-base-300">
+                <td class="px-4 py-3 font-medium text-base-content">{{ dato.cuenta.nombre }}</td>
+                <td class="px-4 py-3 text-right text-success">$ {{ dato.ingresos|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-right text-error">$ {{ dato.egresos|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-right font-bold {% if dato.saldo_dia >= 0 %}text-success{% else %}text-error{% endif %}">
                     $ {{ dato.saldo_dia|floatformat:2 }}
                 </td>
-                <td class="px-4 py-3 text-right font-bold">$ {{ dato.saldo_acumulado|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-right font-bold text-base-content">$ {{ dato.saldo_acumulado|floatformat:2 }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="px-4 py-6 text-center text-gray-500">No hay cajas configuradas</td>
+                <td colspan="5" class="px-4 py-6 text-center text-base-content/60">No hay cajas configuradas</td>
             </tr>
             {% endfor %}
         </tbody>
-        <tfoot class="bg-gray-100 font-bold">
+        <tfoot class="bg-base-300 font-bold">
             <tr>
-                <td class="px-4 py-2">TOTALES</td>
-                <td class="px-4 py-2 text-right text-green-600">$ {{ total_ingresos|floatformat:2 }}</td>
-                <td class="px-4 py-2 text-right text-red-600">$ {{ total_egresos|floatformat:2 }}</td>
-                <td class="px-4 py-2 text-right {% if total_ingresos|add:"-"|add:total_egresos >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                <td class="px-4 py-2 text-base-content">TOTALES</td>
+                <td class="px-4 py-2 text-right text-success">$ {{ total_ingresos|floatformat:2 }}</td>
+                <td class="px-4 py-2 text-right text-error">$ {{ total_egresos|floatformat:2 }}</td>
+                <td class="px-4 py-2 text-right {% if total_ingresos|add:"-"|add:total_egresos >= 0 %}text-success{% else %}text-error{% endif %}">
                     $ {{ total_ingresos|add:"-"|add:total_egresos|floatformat:2 }}
                 </td>
                 <td></td>
@@ -60,40 +60,40 @@
     </table>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <div class="p-4 border-b">
-        <h2 class="font-semibold">Detalle de Movimientos</h2>
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b border-base-300">
+        <h2 class="font-semibold text-base-content">Detalle de Movimientos</h2>
     </div>
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <table class="min-w-full divide-y divide-base-300">
+        <thead class="bg-base-300">
             <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Importe</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contacto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Número</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Importe</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Descripción</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Contacto</th>
             </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-base-200 divide-y divide-base-300">
             {% for m in movimientos_dia %}
             <tr>
-                <td class="px-6 py-4 whitespace-nowrap font-mono">{{ m.numero }}</td>
-                <td class="px-6 py-4">{{ m.cuenta.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-base-content">{{ m.numero }}</td>
+                <td class="px-6 py-4 text-base-content">{{ m.cuenta.nombre }}</td>
                 <td class="px-6 py-4">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if m.tipo == 'cobro' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if m.tipo == 'cobro' %}bg-success/20 text-success{% else %}bg-error/20 text-error{% endif %}">
                         {{ m.get_tipo_display }}
                     </span>
                 </td>
-                <td class="px-6 py-4 font-bold {% if m.tipo == 'cobro' %}text-green-600{% else %}text-red-600{% endif %}">
+                <td class="px-6 py-4 font-bold {% if m.tipo == 'cobro' %}text-success{% else %}text-error{% endif %}">
                     $ {{ m.importe|floatformat:2 }}
                 </td>
-                <td class="px-6 py-4 text-gray-500">{{ m.descripcion|default:"-"|truncatechars:30 }}</td>
-                <td class="px-6 py-4 text-gray-500">{{ m.contacto.nombre|default:"-" }}</td>
+                <td class="px-6 py-4 text-base-content/60">{{ m.descripcion|default:"-"|truncatechars:30 }}</td>
+                <td class="px-6 py-4 text-base-content/60">{{ m.contacto.nombre|default:"-" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay movimientos en esta fecha</td>
+                <td colspan="6" class="px-6 py-4 text-center text-base-content/60">No hay movimientos en esta fecha</td>
             </tr>
             {% endfor %}
         </tbody>

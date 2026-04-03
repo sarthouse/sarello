@@ -3,30 +3,31 @@
  */
 
 .card {
-  @apply bg-base-100 rounded-lg shadow;
-  @apply transition-shadow duration-200 hover:shadow-lg;
+  @apply bg-[var(--surface)] rounded-lg shadow;
+  @apply border border-[var(--border)];
+  @apply transition-shadow duration-200;
 }
 
 .card-compact {
-  @apply rounded-md shadow-sm;
+  @apply rounded-md;
 }
 
 .card-bordered {
-  @apply border border-base-300;
+  @apply border border-[var(--border)];
 }
 
 .card-elevated {
-  @apply shadow-xl;
+  @apply shadow-lg;
 }
 
 .card-header {
-  @apply px-6 py-4 border-b border-base-300;
+  @apply px-6 py-4 border-b border-[var(--border)];
 }
 
 .card-header h2,
 .card-header h3,
 .card-header h4 {
-  @apply text-lg font-semibold text-base-content;
+  @apply text-lg font-semibold text-[var(--text-bright)];
 }
 
 .card-body {
@@ -34,11 +35,11 @@
 }
 
 .card-body p {
-  @apply text-base-content/80;
+  @apply text-[var(--text)];
 }
 
 .card-footer {
-  @apply px-6 py-4 border-t border-base-300;
+  @apply px-6 py-4 border-t border-[var(--border)];
   @apply flex items-center justify-between gap-2;
 }
 

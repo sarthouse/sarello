@@ -7,10 +7,10 @@
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div class="text-center">
-            <h2 class="text-3xl font-extrabold text-gray-900">
+            <h2 class="text-3xl font-extrabold text-base-content">
                 Sarello ERP
             </h2>
-            <p class="mt-2 text-sm text-gray-600">
+            <p class="mt-2 text-sm text-base-content/60">
                 Crear una nueva cuenta
             </p>
         </div>
@@ -21,32 +21,32 @@
             <div class="space-y-4">
                 {% if form.email %}
                 <div>
-                    <label for="id_email" class="block text-sm font-medium text-gray-700">
+                    <label for="id_email" class="block text-sm font-medium text-base-content">
                         Correo electrónico
                     </label>
                     <input type="email" name="email" id="id_email" required 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border"
+                        class="mt-1 block w-full rounded-md border-base-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border bg-base-100 text-base-content"
                         placeholder="correo@ejemplo.com">
                 </div>
                 {% endif %}
                 
                 {% if form.password1 %}
                 <div>
-                    <label for="id_password1" class="block text-sm font-medium text-gray-700">
+                    <label for="id_password1" class="block text-sm font-medium text-base-content">
                         Contraseña
                     </label>
                     <input type="password" name="password1" id="id_password1" required 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border">
+                        class="mt-1 block w-full rounded-md border-base-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border bg-base-100 text-base-content">
                 </div>
                 {% endif %}
                 
                 {% if form.password2 %}
                 <div>
-                    <label for="id_password2" class="block text-sm font-medium text-gray-700">
+                    <label for="id_password2" class="block text-sm font-medium text-base-content">
                         Confirmar contraseña
                     </label>
                     <input type="password" name="password2" id="id_password2" required 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border">
+                        class="mt-1 block w-full rounded-md border-base-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border bg-base-100 text-base-content">
                 </div>
                 {% endif %}
             </div>
@@ -63,7 +63,7 @@
         </form>
         
         <div class="text-center">
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-base-content/60">
                 ¿Ya tiene cuenta? 
                 <a href="{% url 'account_login' %}" class="font-medium text-slate-700 hover:text-slate-500">
                     Iniciar sesión
@@ -72,9 +72,9 @@
         </div>
         
         {% if form.non_field_errors %}
-            <div class="rounded-md bg-red-50 p-4">
+            <div class="rounded-md bg-error/10 p-4">
                 {% for error in form.non_field_errors %}
-                    <p class="text-sm text-red-800">{{ error }}</p>
+                    <p class="text-sm text-error">{{ error }}</p>
                 {% endfor %}
             </div>
         {% endif %}

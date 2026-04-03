@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sarello ERP{% endblock %}</title>
+    <title>{% block title %}Sarello ERP{% endblock %} | Sarello</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,43 +13,102 @@
     <!-- Compiled CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
-    <link rel="stylesheet" href="{% static 'css/theme-output.css' %}">
     
     <!-- HTMX and Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- App scripts -->
     <script defer src="{% static 'js/app.js' %}"></script>
     
+    <!-- Theme initialization -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+    
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-[var(--bg)] text-[var(--text)] font-[var(--sans)]" x-data>
-    {% if user.is_authenticated %}
-        {% include 'partials/navbar.html' %}
+<body class="bg-base-100 text-base-content">
+    
+    {% if user.is_authenticated %}<!-- DaisyUI Drawer for authenticated users -->
+    <div class="drawer lg:drawer-open">
+        <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+        
+        <div class="drawer-content flex flex-col">
+            <!-- Header -->
+            <header class="sticky top-0 z-10 h-16 bg-base-200 border-b border-base-300 flex items-center justify-between px-4">
+                <div class="flex items-center gap-4">
+                    <label for="drawer-toggle" class="btn btn-ghost btn-circle lg:hidden">
+                        <i class="fas fa-bars text-lg"></i>
+                    </label>
+                    <span class="text-lg font-semibold text-base-content">{% block header_title %}Sarello ERP{% endblock %}</span>
+                </div>
+                
+                <!-- Theme Toggle -->
+                <button type="button" 
+                        data-theme-toggle
+                        class="btn btn-ghost btn-circle"
+                        title="Cambiar tema">
+                    <i id="theme-icon" class="fas text-lg"></i>
+                </button>
+            </header>
+            <!-- Main content -->
+            <main class="container mx-auto px-4 py-6">
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="p-4 mb-2 rounded border
+                        {% if message.tags == 'success' %}bg-success/10 text-success border-success/30
+                        {% elif message.tags == 'error' %}bg-error/10 text-error border-error/30
+                        {% else %}bg-accent/10 text-accent border-accent/30{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+    
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+        {% include 'partials/drawer.html' %}
+    </div>
     {% else %}
-        <nav class="bg-[var(--surface)] border-b border-[var(--border)]">
+        <!-- Navbar simple para usuarios no autenticados -->
+        <nav class="bg-base-200 border-b border-base-300">
             <div class="container mx-auto px-4 h-16 flex items-center">
-                <a href="/" class="text-xl font-bold">Sarello ERP</a>
+                <a href="/" class="text-xl font-bold text-base-content">Sarello ERP</a>
+                <div class="ml-auto">
+                    <button type="button" 
+                            data-theme-toggle
+                            class="btn btn-ghost btn-circle"
+                            title="Cambiar tema">
+                        <i id="theme-icon" class="fas text-lg"></i>
+                    </button>
+                </div>
             </div>
         </nav>
-    {% endif %}
 
-    <main class="container mx-auto px-4 py-6">
-        {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}
-            <div class="p-4 mb-2 rounded border
-                {% if message.tags == 'success' %}bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/30
-                {% elif message.tags == 'error' %}bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/30
-                {% else %}bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30{% endif %}">
-                {{ message }}
+        <main class="container mx-auto px-4 py-6">
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="p-4 mb-2 rounded border
+                    {% if message.tags == 'success' %}bg-success/10 text-success border-success/30
+                    {% elif message.tags == 'error' %}bg-error/10 text-error border-error/30
+                    {% else %}bg-accent/10 text-accent border-accent/30{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% endif %}
 
-        {% block content %}{% endblock %}
-    </main>
+            {% block login %}{% endblock %}
+        </main>
+    {% endif %}
+    
 </body>
 </html>

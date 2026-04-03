@@ -5,21 +5,21 @@
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
     <div>
-        <h1 class="text-3xl font-bold text-gray-800">Contactos</h1>
-        <p class="text-gray-600">Clientes y proveedores</p>
+        <h1 class="text-3xl font-bold text-base-content/80">Contactos</h1>
+        <p class="text-base-content/60">Clientes y proveedores</p>
     </div>
-    <a href="{% url 'contactos:contacto_create' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <a href="{% url 'contactos:contacto_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/80">
         <i class="fas fa-plus mr-2"></i>Nuevo Contacto
     </a>
 </div>
 
-<form method="get" class="mb-4 bg-white p-4 rounded-lg shadow">
+<form method="get" class="mb-4 bg-base-200 p-4 rounded-lg shadow">
     <div class="flex flex-wrap items-center gap-4">
         <div class="flex-1 min-w-[200px]">
-            <input type="text" name="q" value="{{ busqueda|default:'' }}" placeholder="Buscar por nombre, código o CUIT..." class="w-full border rounded px-3 py-2">
+            <input type="text" name="q" value="{{ busqueda|default:'' }}" placeholder="Buscar por nombre, código o CUIT..." class="w-full border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
         </div>
         <div>
-            <select name="tipo" class="border rounded px-3 py-2">
+            <select name="tipo" class="border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
                 <option value="">Todos los tipos</option>
                 <option value="cliente" {% if tipo_filter == 'cliente' %}selected{% endif %}>Cliente</option>
                 <option value="proveedor" {% if tipo_filter == 'proveedor' %}selected{% endif %}>Proveedor</option>
@@ -27,7 +27,7 @@
             </select>
         </div>
         <div>
-            <select name="estado" class="border rounded px-3 py-2">
+            <select name="estado" class="border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
                 <option value="">Todos los estados</option>
                 <option value="activo" {% if estado_filter == 'activo' %}selected{% endif %}>Activo</option>
                 <option value="inactivo" {% if estado_filter == 'inactivo' %}selected{% endif %}>Inactivo</option>
@@ -39,57 +39,57 @@
     </div>
 </form>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-base-300">
+        <thead class="bg-base-300">
             <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CUIT</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cond. IVA</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Código</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">CUIT</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cond. IVA</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Estado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Acciones</th>
             </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-base-200 divide-y divide-base-300">
             {% for contacto in page_obj %}
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-base-300/50">
                 <td class="px-6 py-4 whitespace-nowrap font-mono">{{ contacto.codigo }}</td>
                 <td class="px-6 py-4">
-                    <a href="{% url 'contactos:contacto_detail' contacto.pk %}" class="text-blue-600 hover:text-blue-900 font-semibold">
+                    <a href="{% url 'contactos:contacto_detail' contacto.pk %}" class="text-primary hover:text-primary/80 font-semibold">
                         {{ contacto.nombre }}
                     </a>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        {% if contacto.tipo == 'cliente' %}bg-green-100 text-green-800
-                        {% elif contacto.tipo == 'proveedor' %}bg-orange-100 text-orange-800
-                        {% else %}bg-purple-100 text-purple-800{% endif %}">
+                        {% if contacto.tipo == 'cliente' %}bg-success/20 text-success
+                        {% elif contacto.tipo == 'proveedor' %}bg-warning/20 text-warning
+                        {% else %}bg-secondary/20 text-secondary{% endif %}">
                         {{ contacto.get_tipo_display }}
                     </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ contacto.cuil|default:"-" }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ contacto.get_condicion_iva_display }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-base-content/60">{{ contacto.cuil|default:"-" }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-base-content/60">{{ contacto.get_condicion_iva_display }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     {% if contacto.activo %}
-                    <span class="text-green-600"><i class="fas fa-check"></i> Activo</span>
+                    <span class="text-success"><i class="fas fa-check"></i> Activo</span>
                     {% else %}
-                    <span class="text-gray-400"><i class="fas fa-times"></i> Inactivo</span>
+                    <span class="text-base-content/40"><i class="fas fa-times"></i> Inactivo</span>
                     {% endif %}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="{% url 'contactos:contacto_edit' contacto.pk %}" class="text-yellow-600 hover:text-yellow-900 mr-2">
+                    <a href="{% url 'contactos:contacto_edit' contacto.pk %}" class="text-warning hover:text-warning/80 mr-2">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a href="{% url 'contactos:contacto_delete' contacto.pk %}" class="text-red-600 hover:text-red-900">
+                    <a href="{% url 'contactos:contacto_delete' contacto.pk %}" class="text-error hover:text-error/80">
                         <i class="fas fa-trash"></i>
                     </a>
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay contactos</td>
+                <td colspan="7" class="px-6 py-4 text-center text-base-content/60">No hay contactos</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -100,15 +100,15 @@
 <div class="mt-4 flex justify-center">
     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
         {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+        <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-base-300 bg-base-200 text-sm font-medium text-base-content/60 hover:bg-base-300">
             <i class="fas fa-chevron-left"></i>
         </a>
         {% endif %}
-        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+        <span class="relative inline-flex items-center px-4 py-2 border border-base-300 bg-base-200 text-sm font-medium text-base-content">
             Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
         </span>
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+        <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-base-300 bg-base-200 text-sm font-medium text-base-content/60 hover:bg-base-300">
             <i class="fas fa-chevron-right"></i>
         </a>
         {% endif %}

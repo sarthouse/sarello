@@ -1,5 +1,5 @@
 /**
- * Form Components
+ * Form Components - DaisyUI compatible
  */
 
 .form-control {
@@ -13,16 +13,17 @@
 .form-control input,
 .form-control select,
 .form-control textarea {
-  @apply w-full rounded border border-base-300 px-3 py-2;
+  @apply w-full rounded border px-3 py-2;
   @apply bg-base-100 text-base-content;
+  @apply border-base-300;
   @apply transition-colors duration-200;
   @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
-  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-base-200;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .form-control input::placeholder,
 .form-control textarea::placeholder {
-  @apply text-base-content/50;
+  @apply text-base-content/60;
 }
 
 .form-control textarea {
@@ -36,12 +37,6 @@
 
 .form-group label {
   @apply block text-sm font-medium text-base-content;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  @apply form-control;
 }
 
 .form-group.error input,
@@ -65,6 +60,23 @@
 
 .form-group .form-error {
   @apply text-xs text-error;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  @apply w-full rounded border px-3 py-2;
+  @apply bg-base-100 text-base-content;
+  @apply border-base-300;
+  @apply transition-colors duration-200;
+  @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea {
+  @apply border-error focus:border-error focus:ring-error;
 }
 
 /* Input sizes */
@@ -95,7 +107,7 @@
 
 /* Select styling */
 select {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343e4e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 16px 12px;
@@ -111,7 +123,7 @@ input[type="radio"] {
   @apply w-4 h-4 border border-base-300 rounded;
   @apply bg-base-100 text-primary;
   @apply cursor-pointer;
-  @apply focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  @apply focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-base-100;
 }
 
 input[type="radio"] {
@@ -147,11 +159,6 @@ input[type="number"] {
   @apply text-right font-mono;
 }
 
-.input-currency::before {
-  content: '$';
-  @apply absolute left-3 text-base-content/50;
-}
-
 /* Readonly styling */
 input:read-only,
 textarea:read-only,
@@ -164,4 +171,17 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   @apply outline-2 outline-offset-2 outline-primary;
+}
+
+/* Input fields in tables */
+table input,
+table select,
+table textarea {
+  @apply bg-transparent border-base-300;
+}
+
+table input:focus,
+table select:focus,
+table textarea:focus {
+  @apply bg-base-100;
 }

@@ -51,7 +51,6 @@
             {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="neutral" %}
         {% endif %}
     </div>
-{% endinclude %}
 
 {% include "components/cards/card.html" with title="Líneas de Asiento" %}
     {% if asiento.lineas.all %}
@@ -92,7 +91,7 @@
     {% else %}
     {% include "components/empty-states/empty-state.html" with message="No hay líneas en este asiento" icon="fa-file" %}
     {% endif %}
-{% endinclude %}
+
 
 <div class="mt-6 flex gap-2">
     {% include "components/buttons/button.html" with label="Editar" href="/admin/contabilidad/asiento/"|add:asiento.pk|add:"/change/" variant="primary" %}

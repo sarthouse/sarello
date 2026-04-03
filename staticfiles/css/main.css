@@ -2,13 +2,37 @@
  * Sarello ERP - Main CSS Entry Point
  * Compilation: npm run build
  * Development: npm run dev
+ * 
+ * Theme: DaisyUI as source of truth
+ * Only custom properties not covered by DaisyUI
  */
 
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom properties only - what DaisyUI doesn't provide */
+@layer base {
+  :root {
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+    /* Accounting colors (domain specific) */
+    --accounting-debe: #4caf82;
+    --accounting-haber: #e05252;
+    --accounting-saldo: #4f9eff;
+    --accounting-activo: #4f9eff;
+    --accounting-pasivo: #e05252;
+    --accounting-patrimonio: #a78bfa;
+    --accounting-ingreso: #4caf82;
+    --accounting-egreso: #f5a623;
+  }
+}
 
 /* Import custom components */
 @import './components/buttons.css';
@@ -18,61 +42,20 @@
 @import './components/modals.css';
 @import './components/alerts.css';
 
-/* Import themes and utilities */
-@import './themes/variables.css';
+/* Import utilities */
 @import './utilities.css';
 
-/* Base styles */
-:root {
-  color-scheme: light dark;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  @apply bg-base-100 text-base-content transition-colors duration-300;
-  font-feature-settings: 'rlig' 1, 'calt' 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Scrollbar styles */
-::-webkit-scrollbar {
-  @apply w-2 h-2;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-base-200;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-base-300 rounded-full hover:bg-base-content;
-}
-
-/* Selection styles */
-::selection {
-  @apply bg-primary text-primary-content;
-}
-
-::-moz-selection {
-  @apply bg-primary text-primary-content;
-}
-
-/* Focus visible */
-*:focus-visible {
-  @apply outline-2 outline-offset-2 outline-primary;
-}
-
-/* Accessibility improvements */
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Alpine.js cloak - hide elements until Alpine initializes */
+[x-cloak] {
+  display: none !important;
 }

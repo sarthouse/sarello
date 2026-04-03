@@ -1,11 +1,11 @@
 {% include "components/modals/modal.html" with title="Detalle de Cuenta" close_url='contabilidad:plan_cuentas' %}
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Código</p>
-            <p class="text-lg font-mono font-semibold">{{ cuenta.codigo }}</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Código</p>
+            <p class="text-lg font-mono font-semibold text-base-content">{{ cuenta.codigo }}</p>
         </div>
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Tipo</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Tipo</p>
             {% if cuenta.tipo == 'activo' %}
                 {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="info" %}
             {% elif cuenta.tipo == 'pasivo' %}
@@ -19,15 +19,15 @@
             {% endif %}
         </div>
         <div class="col-span-2">
-            <p class="text-sm font-medium text-gray-500 uppercase">Nombre</p>
-            <p class="text-lg font-semibold">{{ cuenta.nombre }}</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Nombre</p>
+            <p class="text-lg font-semibold text-base-content">{{ cuenta.nombre }}</p>
         </div>
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Cuenta Padre</p>
-            <p class="text-sm font-mono">{% if cuenta.padre %}{{ cuenta.padre.codigo }} - {{ cuenta.padre.nombre }}{% else %}—{% endif %}</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Cuenta Padre</p>
+            <p class="text-sm font-mono text-base-content">{% if cuenta.padre %}{{ cuenta.padre.codigo }} - {{ cuenta.padre.nombre }}{% else %}—{% endif %}</p>
         </div>
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Estado</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Estado</p>
             {% if cuenta.activa %}
                 {% include "components/badges/badge.html" with label="Activa" variant="success" %}
             {% else %}
@@ -35,7 +35,7 @@
             {% endif %}
         </div>
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Acepta Movimientos</p>
+            <p class="text-sm font-medium text-base-content/60 uppercase">Acepta Movimientos</p>
             {% if cuenta.acepta_movimientos %}
                 {% include "components/badges/badge.html" with label="Sí" variant="success" %}
             {% else %}
@@ -43,8 +43,8 @@
             {% endif %}
         </div>
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase">Saldo Actual</p>
-            <p class="text-2xl font-bold {% if saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+            <p class="text-sm font-medium text-base-content/60 uppercase">Saldo Actual</p>
+            <p class="text-2xl font-bold {% if saldo >= 0 %}text-success{% else %}text-error{% endif %}">
                 ${{ saldo|floatformat:2 }}
             </p>
         </div>
@@ -53,22 +53,22 @@
     {% if cuenta.hijos.exists %}
     {% include "components/dividers/divider.html" %}
     <div class="mb-6">
-        <h3 class="font-semibold text-gray-900 mb-3">Cuentas Hijas</h3>
+        <h3 class="font-semibold text-base-content mb-3">Cuentas Hijas</h3>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-base-300 text-sm">
+                <thead class="bg-base-300">
                     <tr>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Código</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Tipo</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-base-content/60">Código</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-base-content/60">Nombre</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-base-content/60">Tipo</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
+                <tbody class="divide-y divide-base-300">
                     {% for hijo in cuenta.hijos.all %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-2 font-mono font-semibold">{{ hijo.codigo }}</td>
-                        <td class="px-3 py-2">{{ hijo.nombre }}</td>
-                        <td class="px-3 py-2">{{ hijo.get_tipo_display }}</td>
+                    <tr class="hover:bg-base-300">
+                        <td class="px-3 py-2 font-mono font-semibold text-base-content">{{ hijo.codigo }}</td>
+                        <td class="px-3 py-2 text-base-content">{{ hijo.nombre }}</td>
+                        <td class="px-3 py-2 text-base-content">{{ hijo.get_tipo_display }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -79,27 +79,27 @@
     
     {% include "components/dividers/divider.html" %}
     <div>
-        <h3 class="font-semibold text-gray-900 mb-3">Últimos Movimientos</h3>
+        <h3 class="font-semibold text-base-content mb-3">Últimos Movimientos</h3>
         {% if lineas %}
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-base-300 text-sm">
+                <thead class="bg-base-300">
                     <tr>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Fecha</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Asiento</th>
-                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Debe</th>
-                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Haber</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-base-content/60">Fecha</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-base-content/60">Asiento</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-base-content/60">Debe</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-base-content/60">Haber</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
+                <tbody class="divide-y divide-base-300">
                     {% for linea in lineas %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-2">{{ linea.asiento.fecha|date:"d/m/Y" }}</td>
-                        <td class="px-3 py-2 font-mono">{{ linea.asiento.numero }}</td>
-                        <td class="px-3 py-2 text-right font-semibold {% if linea.debe > 0 %}text-green-600{% else %}text-gray-400{% endif %}">
+                    <tr class="hover:bg-base-300">
+                        <td class="px-3 py-2 text-base-content">{{ linea.asiento.fecha|date:"d/m/Y" }}</td>
+                        <td class="px-3 py-2 font-mono text-base-content">{{ linea.asiento.numero }}</td>
+                        <td class="px-3 py-2 text-right font-semibold {% if linea.debe > 0 %}text-success{% else %}text-base-content/40{% endif %}">
                             {% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% else %}-{% endif %}
                         </td>
-                        <td class="px-3 py-2 text-right font-semibold {% if linea.haber > 0 %}text-red-600{% else %}text-gray-400{% endif %}">
+                        <td class="px-3 py-2 text-right font-semibold {% if linea.haber > 0 %}text-error{% else %}text-base-content/40{% endif %}">
                             {% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% else %}-{% endif %}
                         </td>
                     </tr>
@@ -115,5 +115,3 @@
     <div class="flex justify-end gap-2 mt-6">
         {% include "components/buttons/button.html" with label="Editar" href="{% url 'contabilidad:cuenta_edit' cuenta.pk %}" variant="warning" %}
         {% include "components/buttons/button.html" with label="Cerrar" onclick="window.location.href='{% url 'contabilidad:plan_cuentas' %}'" variant="secondary" %}
-    </div>
-{% endinclude %}

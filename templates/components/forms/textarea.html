@@ -1,10 +1,9 @@
-
 {% with rows=rows|default:4 required=required|default:False %}
 <div class="form-field">
     {% if label %}
-    <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ name }}">
+    <label class="block text-sm font-medium text-base-content mb-1" for="{{ name }}">
         {{ label }}
-        {% if required %}<span class="text-red-500">*</span>{% endif %}
+        {% if required %}<span class="text-error">*</span>{% endif %}
     </label>
     {% endif %}
     
@@ -13,16 +12,16 @@
         id="{{ name }}"
         rows="{{ rows }}"
         placeholder="{{ placeholder|default:'' }}"
-        class="textarea textarea-bordered w-full {% if error %}textarea-error{% endif %}"
+        class="textarea textarea-bordered w-full bg-base-100 text-base-content {% if error %}textarea-error{% endif %}"
         {% if required %}required{% endif %}
         {% if readonly %}readonly{% endif %}>{{ value|default:'' }}</textarea>
     
     {% if help_text %}
-    <p class="mt-1 text-sm text-gray-500">{{ help_text }}</p>
+    <p class="mt-1 text-sm text-base-content/60">{{ help_text }}</p>
     {% endif %}
     
     {% if error %}
-    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    <p class="mt-1 text-sm text-error">{{ error }}</p>
     {% endif %}
 </div>
 {% endwith %}

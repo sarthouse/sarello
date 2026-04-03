@@ -4,9 +4,8 @@
   "description": "Sistema ERP argentino con Django y Tailwind CSS",
   "scripts": {
     "dev": "tailwindcss -i ./staticfiles/css/main.css -o ./staticfiles/css/output.css --watch",
-    "build": "tailwindcss -i ./staticfiles/css/main.css -o ./staticfiles/css/output.css --minify",
-    "build:theme": "tailwindcss -i ./staticfiles/css/theme.css -o ./staticfiles/css/theme-output.css --minify"
-  },
+    "build": "tailwindcss -i ./staticfiles/css/main.css -o ./staticfiles/css/output.css --minify"
+    },
   "dependencies": {
     "tailwindcss": "^3.4.0",
     "daisyui": "^4.7.0"

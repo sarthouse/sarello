@@ -3,17 +3,18 @@
 {% block title %}Asientos Contables{% endblock %}
 
 {% block content %}
-{% include "components/page-header.html" with title="Asientos Contables" subtitle="Listado de asientos del libro diario" action_label="Nuevo Asiento" action_url="{% url 'contabilidad:asiento_create' %}" action_icon="fa-plus" %}
+{% url 'contabilidad:asiento_create' as asiento_create_url %}
+{% include "components/page-header.html" with title="Asientos Contables" subtitle="Listado de asientos del libro diario" action_label="Nuevo Asiento" action_url=asiento_create_url action_icon="fa-plus" %}
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Filtros</h2>
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
+    <div class="bg-base-300 px-6 py-4 border-b border-base-300">
+        <h2 class="text-lg font-semibold text-base-content">Filtros</h2>
     </div>
     <div class="px-6 py-4">
         <form method="get" class="flex items-center gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Ejercicio:</label>
-                <select name="ejercicio" class="input input-bordered">
+                <label class="block text-sm font-medium text-base-content mb-1">Ejercicio:</label>
+                <select name="ejercicio" class="input input-bordered bg-base-100 text-base-content border-base-300">
                     <option value="">Todos los abiertos</option>
                     {% for ej in ejercicios %}
                     <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
@@ -27,60 +28,65 @@
     </div>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
     <div class="px-6 py-4">
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-base-300">
+            <thead class="bg-base-300">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Debe</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Haber</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Número</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Fecha</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Descripción</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Haber</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-base-200 divide-y divide-base-300">
                 {% for asiento in page_obj %}
-                <tr class="hover:bg-gray-50">
+                <tr class="hover:bg-base-300">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="text-blue-600 hover:text-blue-900 font-mono">
+                        <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="text-primary hover:text-primary/80 font-mono">
                             {{ asiento.numero }}
                         </a>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ asiento.fecha }}</td>
-                    <td class="px-6 py-4">{{ asiento.descripcion|truncatewords:3 }}</td>
-                    <td class="px-6 py-4 text-right text-green-600">{{ asiento.total_debe }}</td>
-                    <td class="px-6 py-4 text-right text-red-600">{{ asiento.total_haber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-base-content/60">{{ asiento.fecha }}</td>
+                    <td class="px-6 py-4 text-base-content">{{ asiento.descripcion|truncatewords:3 }}</td>
+                    <td class="px-6 py-4 text-right text-success">{{ asiento.total_debe }}</td>
+                    <td class="px-6 py-4 text-right text-error">{{ asiento.total_haber }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         {% if asiento.estado == 'confirmado' %}
                             {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="success" %}
                         {% elif asiento.estado == 'cancelado' %}
                             {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="danger" %}
                         {% else %}
-                            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="gray" %}
+                            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="neutral" %}
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap flex gap-2">
-                        <a href="{% url 'contabilidad:asiento_edit' asiento.pk %}" class="text-blue-600 hover:text-blue-900" title="Editar">
+                        <a href="{% url 'contabilidad:asiento_edit' asiento.pk %}" class="text-primary hover:text-primary/80" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="{% url 'contabilidad:asiento_delete' asiento.pk %}" class="text-red-600 hover:text-red-900" title="Eliminar">
+                        <a href="{% url 'contabilidad:asiento_delete' asiento.pk %}" class="text-error hover:text-error/80" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay asientos registrados</td>
+                    <td colspan="7" class="px-6 py-4 text-center text-base-content/60">No hay asientos registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
-
-{% include "components/pagination.html" with page_obj=page_obj query_params="{% if ejercicio_seleccionado %}&ejercicio={{ ejercicio_seleccionado }}{% endif %}" %}
+{% if ejercicio_seleccionado %}
+    {% with query_params="&ejercicio="|add:ejercicio_seleccionado %}
+        {% include "components/pagination.html" with page_obj=page_obj query_params=query_params %}
+    {% endwith %}
+{% else %}
+    {% include "components/pagination.html" with page_obj=page_obj query_params="" %}
+{% endif %}
 {% endblock %}

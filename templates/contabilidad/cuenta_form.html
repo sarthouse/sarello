@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{% url 'contabilidad:plan_cuentas' %}" class="text-blue-600 hover:text-blue-800">
+    <a href="{% url 'contabilidad:plan_cuentas' %}" class="text-primary hover:text-primary-focus">
         <i class="fas fa-arrow-left mr-2"></i>Volver al plan de cuentas
     </a>
 </div>
@@ -22,12 +22,12 @@
             <div class="space-y-2">
                 <div class="flex items-center gap-2">
                     {{ form.acepta_movimientos }}
-                    <label class="text-sm text-gray-700 cursor-pointer">Acepta movimientos</label>
+                    <label class="text-sm text-base-content cursor-pointer">Acepta movimientos</label>
                 </div>
                 
                 <div class="flex items-center gap-2">
                     {{ form.activa }}
-                    <label class="text-sm text-gray-700 cursor-pointer">Activa</label>
+                    <label class="text-sm text-base-content cursor-pointer">Activa</label>
                 </div>
             </div>
             
@@ -38,6 +38,5 @@
                 </a>
             </div>
         </form>
-    {% endinclude %}
 </div>
 {% endblock %}

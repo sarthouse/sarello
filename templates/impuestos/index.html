@@ -4,28 +4,28 @@
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Impuestos</h1>
-    <p class="text-gray-600">Configuración de IVA, IIBB, retenciones y percepciones</p>
+    <h1 class="text-3xl font-bold text-base-content">Impuestos</h1>
+    <p class="text-base-content/60">Configuración de IVA, IIBB, retenciones y percepciones</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <a href="{% url 'impuestos:tipos' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+    <a href="{% url 'impuestos:tipos' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-xl font-semibold">Tipos de Impuesto</h2>
-                <p class="text-gray-500 text-sm">IVA, IIBB, Retenciones, Percepciones</p>
+                <h2 class="text-xl font-semibold text-base-content">Tipos de Impuesto</h2>
+                <p class="text-base-content/60 text-sm">IVA, IIBB, Retenciones, Percepciones</p>
             </div>
-            <i class="fas fa-percentage text-4xl text-blue-500"></i>
+            <i class="fas fa-percentage text-4xl text-primary"></i>
         </div>
     </a>
 
-    <a href="{% url 'impuestos:alicuotas' %}" class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+    <a href="{% url 'impuestos:alicuotas' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-xl font-semibold">Alícuotas</h2>
-                <p class="text-gray-500 text-sm">Porcentajes y configuraciones</p>
+                <h2 class="text-xl font-semibold text-base-content">Alícuotas</h2>
+                <p class="text-base-content/60 text-sm">Porcentajes y configuraciones</p>
             </div>
-            <i class="fas fa-calculator text-4xl text-green-500"></i>
+            <i class="fas fa-calculator text-4xl text-success"></i>
         </div>
     </a>
 </div>

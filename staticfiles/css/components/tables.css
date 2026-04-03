@@ -7,7 +7,24 @@
 }
 
 .table thead {
-  @apply bg-base-200;
+  @apply bg-[var(--surface2)];
+}
+
+.table thead th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-[var(--text-dim)];
+  @apply border-b border-[var(--border)];
+}
+
+.table thead th.sortable {
+  @apply cursor-pointer select-none hover:bg-[var(--surface)];
+}
+
+.table tbody tr {
+  @apply border-b border-[var(--border)] hover:bg-[var(--surface2)] transition-colors;
+}
+
+.table tbody td {
+  @apply px-4 py-3 text-sm text-[var(--text)];
 }
 
 .table thead th {
@@ -150,21 +167,21 @@
 
 /* Accounting table styles */
 .table.accounting tbody td.debe {
-  @apply text-success font-semibold;
+  @apply text-[var(--success)] font-semibold;
 }
 
 .table.accounting tbody td.haber {
-  @apply text-error font-semibold;
+  @apply text-[var(--danger)] font-semibold;
 }
 
 .table.accounting tbody td.saldo {
-  @apply text-info font-semibold;
+  @apply text-[var(--accent)] font-semibold;
 }
 
 .table.accounting tfoot {
-  @apply bg-base-300 font-semibold;
+  @apply bg-[var(--surface2)] font-semibold;
 }
 
 .table.accounting tfoot td {
-  @apply border-t-2 border-base-400;
+  @apply border-t-2 border-[var(--border)];
 }

@@ -27,51 +27,44 @@
 
 /* Primary button */
 .btn-primary {
-  @apply btn-base bg-primary text-primary-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-primary;
+  @apply btn-base bg-[var(--accent)] text-white;
+  @apply hover:opacity-90;
+  @apply focus-visible:outline-[var(--accent)];
 }
 
 /* Secondary button */
 .btn-secondary {
-  @apply btn-base bg-secondary text-secondary-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-secondary;
-}
-
-/* Accent button */
-.btn-accent {
-  @apply btn-base bg-accent text-accent-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-accent;
+  @apply btn-base bg-[var(--surface2)] text-[var(--text)] border border-[var(--border)];
+  @apply hover:border-[var(--accent)] hover:text-[var(--accent)];
+  @apply focus-visible:outline-[var(--accent)];
 }
 
 /* Ghost button (outline style) */
 .btn-ghost {
-  @apply btn-base bg-transparent text-base-content border border-base-300;
-  @apply hover:bg-base-200 hover:border-base-400;
-  @apply focus-visible:outline-base-content;
+  @apply btn-base bg-transparent text-[var(--text)] border border-[var(--border)];
+  @apply hover:bg-[var(--surface2)];
+  @apply focus-visible:outline-[var(--accent)];
 }
 
 /* Success button */
 .btn-success {
-  @apply btn-base bg-success text-success-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-success;
+  @apply btn-base bg-[var(--success)] text-white;
+  @apply hover:opacity-90;
+  @apply focus-visible:outline-[var(--success)];
 }
 
 /* Warning button */
 .btn-warning {
-  @apply btn-base bg-warning text-warning-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-warning;
+  @apply btn-base bg-[var(--warn)] text-white;
+  @apply hover:opacity-90;
+  @apply focus-visible:outline-[var(--warn)];
 }
 
 /* Error/Danger button */
 .btn-error {
-  @apply btn-base bg-error text-error-content;
-  @apply hover:bg-opacity-90 hover:shadow-md;
-  @apply focus-visible:outline-error;
+  @apply btn-base bg-[var(--danger)] text-white;
+  @apply hover:opacity-90;
+  @apply focus-visible:outline-[var(--danger)];
 }
 
 /* Info button */
@@ -110,12 +103,12 @@
 
 /* Button group */
 .btn-group {
-  @apply inline-flex rounded overflow-hidden border border-base-300;
+  @apply inline-flex rounded overflow-hidden border border-[var(--border)];
 }
 
 .btn-group .btn {
   @apply border-0 rounded-none first:rounded-l last:rounded-r;
-  @apply border-r border-base-300 last:border-r-0;
+  @apply border-r border-[var(--border)] last:border-r-0;
 }
 
 /* Icon in button */

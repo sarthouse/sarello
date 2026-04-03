@@ -6,12 +6,17 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Sarello ERP initialized');
 
-  // Module initialization can be added here
-  // Example: initForms();
-  //         initTables();
-  //         if (document.body.dataset.module === 'accounting') {
-  //           initAccounting();
-  //         }
+  // Initialize theme toggle
+  if (typeof Sarello !== 'undefined' && Sarello.initThemeToggle) {
+    Sarello.initThemeToggle();
+  }
+
+  // Initialize Alpine store for sidebar
+  if (typeof Alpine !== 'undefined') {
+    Alpine.store('sidebar', {
+      open: false
+    });
+  }
 
   // HTMX configuration
   if (typeof htmx !== 'undefined') {
@@ -146,4 +151,38 @@ window.Sarello = {
   formatCurrency,
   formatNumber,
   parseCurrency,
+  initThemeToggle,
 };
+
+/**
+ * Initialize theme toggle functionality
+ */
+function initThemeToggle() {
+  const updateIcon = () => {
+    const icon = document.getElementById('theme-icon');
+    if (!icon) return;
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    icon.className = isDark ? 'fas fa-moon text-lg' : 'fas fa-sun text-lg';
+  };
+
+  // Initial update
+  updateIcon();
+
+  // Observe theme changes
+  const observer = new MutationObserver(updateIcon);
+  observer.observe(document.documentElement, { 
+    attributes: true, 
+    attributeFilter: ['data-theme'] 
+  });
+
+  // Handle click on any theme toggle button
+  document.addEventListener('click', function(e) {
+    const toggleBtn = e.target.closest('[data-theme-toggle]');
+    if (toggleBtn) {
+      const currentTheme = document.documentElement.dataset.theme;
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = newTheme;
+      localStorage.setItem('theme', newTheme);
+    }
+  });
+}

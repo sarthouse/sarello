@@ -4,13 +4,13 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{% url 'impuestos:alicuotas' %}" class="text-blue-600 hover:text-blue-800">
+    <a href="{% url 'impuestos:alicuotas' %}" class="text-primary hover:text-primary/80">
         <i class="fas fa-arrow-left mr-2"></i>Volver a alícuotas
     </a>
 </div>
 
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-base-200 rounded-lg shadow p-6">
         <h1 class="text-2xl font-bold mb-6">{{ action }} Alícuota</h1>
         
         <form method="post">
@@ -18,56 +18,56 @@
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Impuesto</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Tipo de Impuesto</label>
                     {{ form.tipo_impuesto }}
                     {% if form.tipo_impuesto.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.tipo_impuesto.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.tipo_impuesto.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Nombre</label>
                     {{ form.nombre }}
                     {% if form.nombre.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.nombre.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.nombre.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Porcentaje</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Porcentaje</label>
                     {{ form.porcentaje }}
                     {% if form.porcentaje.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.porcentaje.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.porcentaje.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Jurisdicción</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Jurisdicción</label>
                     {{ form.jurisdiccion }}
                     {% if form.jurisdiccion.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.jurisdiccion.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.jurisdiccion.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vigente desde</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Vigente desde</label>
                     {{ form.fecha_desde }}
                     {% if form.fecha_desde.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.fecha_desde.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.fecha_desde.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vigente hasta</label>
+                    <label class="block text-sm font-medium text-base-content mb-1">Vigente hasta</label>
                     {{ form.fecha_hasta }}
                     {% if form.fecha_hasta.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.fecha_hasta.errors.0 }}</p>
+                    <p class="text-error text-sm mt-1">{{ form.fecha_hasta.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div class="flex items-center gap-2">
                     {{ form.por_defecto }}
-                    <label class="text-sm text-gray-700">Por defecto</label>
+                    <label class="text-sm text-base-content">Por defecto</label>
                 </div>
             </div>
             
@@ -75,7 +75,7 @@
                 <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
                     <i class="fas fa-save mr-2"></i>Guardar
                 </button>
-                <a href="{% url 'impuestos:alicuotas' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+                <a href="{% url 'impuestos:alicuotas' %}" class="bg-base-300 text-base-content px-4 py-2 rounded hover:bg-base-300/80">
                     Cancelar
                 </a>
             </div>

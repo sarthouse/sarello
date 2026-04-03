@@ -1,20 +1,19 @@
-
 {% if items %}
 <nav aria-label="Breadcrumb" class="mb-6">
     <ol class="flex items-center gap-2 text-sm">
         {% for item in items %}
         <li>
             {% if item.url %}
-            <a href="{{ item.url }}" class="text-blue-600 hover:text-blue-900">
+            <a href="{{ item.url }}" class="text-primary hover:text-primary/80">
                 {% if item.icon %}<i class="fas {{ item.icon }} mr-1"></i>{% endif %}
                 {{ item.label }}
             </a>
             {% else %}
-            <span class="text-gray-500">{{ item.label }}</span>
+            <span class="text-base-content/60">{{ item.label }}</span>
             {% endif %}
         </li>
         {% if not forloop.last %}
-        <li class="text-gray-400">
+        <li class="text-base-content/40">
             <i class="fas fa-chevron-right"></i>
         </li>
         {% endif %}
