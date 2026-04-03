@@ -3,7 +3,7 @@
 Sistema de gestión empresarial (ERP) desarrollado con Django para Argentina.
 
 **Versión:** 0.1.0
-**Última actualización:** Marzo 2026
+**Última actualización:** Abril 2026
 
 ---
 
@@ -89,11 +89,11 @@ source venv/bin/activate
 ### Paso 3: Instalar las librerías
 
 ```bash
-# Esto instala Django, Tailwind, y todas las dependencias
+# Esto instala Django, DRF, pytest, y todas las dependencias
 pip install -r requirements/local.txt
 ```
 
-**Tiempo estimado:** 2-5 minutos取决于 tu conexión a internet.
+**Tiempo estimado:** 2-5 minutos (depende de tu conexión a internet).
 
 ### Paso 4: Configurar el archivo .env
 
@@ -126,7 +126,7 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-Seguilo los pasos:
+Seguí los pasos:
 - **Email:** Tu email
 - **Password:** Una contraseña segura (mínimo 8 caracteres)
 
@@ -161,93 +161,21 @@ Docker es como un "contenedor" que tiene todo lo necesario para que el programa 
 
 **Importante:** Una vez instalado, ejecutar Docker Desktop y esperar a que diga "Docker is running".
 
-### Paso 2: Crear los archivos de configuración
+**Nota:** El archivo `docker-compose.yml` ya existe en el proyecto. No es necesario crearlo nuevamente.
 
-En la raíz del proyecto, crear estos archivos:
+### Paso 2: Crear archivo .env
 
-#### docker-compose.yml
-```yaml
-version: '3.8'
-
-services:
-  web:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://sarello:sarello123@db:5432/sarello
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=CAMBIAME-POR-UNA-CLAVE-SEGURA-EN-PRODUCCION
-      - DEBUG=False
-      - ALLOWED_HOSTS=localhost,127.0.0.1,tu-dominio.com
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - ./media:/app/media
-
-  db:
-    image: postgres:16
-    environment:
-      - POSTGRES_DB=sarello
-      - POSTGRES_USER=sarello
-      - POSTGRES_PASSWORD=sarello123
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-
-  celery:
-    build: .
-    command: celery -A core worker -l info
-    environment:
-      - DATABASE_URL=postgres://sarello:sarello123@db:5432/sarello
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - ./media:/app/media
-
-volumes:
-  postgres_data:
-```
-
-#### Dockerfile
-```dockerfile
-FROM python:3.12-slim
-
-WORKDIR /app
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements/production.txt .
-RUN pip install --no-cache-dir -r production.txt
-
-COPY . .
-
-RUN python manage.py collectstatic --noinput
-
-EXPOSE 8000
-
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
-```
-
-#### .env
 ```bash
+cp .env.example .env    # Mac/Linux
+copy .env.example .env  # Windows
+```
+
+Editá el archivo `.env` con un editor de texto:
+
+```env
 SECRET_KEY=CAMBIAME-POR-UNA-CLAVE-MUY-LARGA-Y-SEGURA
 DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=localhost,127.0.0.1,tu-dominio.com
 DATABASE_URL=postgres://sarello:sarello123@db:5432/sarello
 REDIS_URL=redis://redis:6379/0
 ```
@@ -273,9 +201,13 @@ docker-compose exec web python manage.py createsuperuser
 
 ### Paso 5: Acceder
 
+Abrí tu navegador y ve a:
+
 ```
 http://localhost:8000
 ```
+
+**¡Listo!** El sistema está corriendo en producción con Docker.
 
 ---
 
@@ -364,6 +296,27 @@ python manage.py showmigrations
 python manage.py shell
 ```
 
+### Testing y Calidad de Código
+```bash
+# Ejecutar todas las pruebas
+pytest
+
+# Ejecutar pruebas de una app específica
+pytest apps/contabilidad/
+
+# Ejecutar con reporte de cobertura
+pytest --cov=apps
+
+# Verificar código con Ruff
+ruff check .
+
+# Auto-corregir con Ruff
+ruff check . --fix
+
+# Formatear código
+ruff format .
+```
+
 ### Docker
 ```bash
 # Ver logs
@@ -398,41 +351,61 @@ rmdir /s /q venv    # Windows
 
 ```
 sarello/
-├── core/                    # Configuración de Django
-├── apps/
-│   ├── base/               # Modelos base
-│   ├── contabilidad/        # Contabilidad
-│   ├── tesoreria/          # Cajas y bancos
-│   ├── impuestos/           # IVA, IIBB
-│   ├── contactos/           # Clientes y proveedores
-│   ├── inventario/          # Productos
-│   ├── ventas/             # Ventas
-│   ├── compras/            # Compras
-│   └── configuracion/      # Configuración
-├── templates/              # Plantillas HTML
-├── static/                 # Archivos CSS/JS
-├── requirements/            # Dependencias
-├── manage.py               # Comando principal
-└── README.md               # Este archivo
+├── apps/                          # Aplicaciones Django
+│   ├── base/                      # Modelos base (TimeStampedModel, DocumentoBase)
+│   ├── contabilidad/              # Módulo de contabilidad
+│   ├── tesoreria/                 # Módulo de tesorería/cajas
+│   ├── impuestos/                 # Módulo de impuestos
+│   ├── contactos/                 # Módulo de contactos (clientes/proveedores)
+│   ├── inventario/                # Módulo de inventario/productos
+│   ├── ventas/                    # Módulo de ventas
+│   ├── compras/                   # Módulo de compras
+│   ├── manufactura/               # Módulo de manufactura
+│   ├── configuracion/             # Módulo de configuración
+│   └── integraciones/             # Integraciones (AFIP, etc)
+├── core/                          # Configuración de Django
+├── templates/                     # Plantillas HTML
+├── static/                        # Archivos CSS/JS/imágenes
+├── requirements/                  # Dependencias
+│   ├── base.txt                   # Dependencias core
+│   ├── local.txt                  # Extras de desarrollo
+│   └── production.txt             # Dependencias de producción
+├── manage.py                      # CLI de Django
+├── AGENTS.md                      # Guía de código para agentes y desarrolladores
+└── README.md                      # Este archivo
 ```
+
+---
+
+## Documentación y Guías
+
+- **AGENTS.md** - Guía completa de estilo de código, comandos, y best practices para desarrolladores y agentes de código
+- **README.md** - Este archivo (instalación y uso básico)
+- **Django Docs** - https://docs.djangoproject.com/
 
 ---
 
 ## ¿Necesitás ayuda?
 
-1. Revisá los logs del servidor
-2. Buscá el error en Google
-3. Consultá la documentación de Django: https://docs.djangoproject.com/
+1. Revisá **AGENTS.md** para guías de código y best practices
+2. Revisá los logs del servidor: `docker-compose logs -f` o `python manage.py runserver`
+3. Buscá el error en Google
+4. Consultá la documentación de Django: https://docs.djangoproject.com/
 
 ---
 
 ## Notas técnicas
 
 - **Moneda:** Pesos argentinos (ARS)
-- **Decimal:** Siempre usar DecimalField, nunca float para dinero
-- **Integración contable:** Mediante señales Django
+- **Decimal:** Siempre usar `DecimalField`, nunca float para dinero
+- **Auditoría:** Todos los modelos heredan de `TimeStampedModel` para timestamps automáticos
+- **Estados:** Usar `DocumentoBase` para facturas, comprobantes (borrador → confirmado → cancelado)
+- **Zona horaria:** America/Argentina/Buenos_Aires
 - **AFIP:** Factura electrónica en Fase 7 (futuro)
+- **Testing:** Usar pytest con pytest-django (ver AGENTS.md para detalles)
 
 ---
 
 **¡Gracias por usar Sarello ERP!**
+
+Última actualización: Abril 2026

@@ -1,0 +1,182 @@
+/**
+ * Sarello ERP - Theme CSS Entry Point
+ * Compilation: npm run build:theme
+ * This file compiles theme-specific styles separately
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DaisyUI Theme Customization */
+:root[data-theme="light"] {
+  /* Primary colors */
+  --p: 219 89% 51%;
+  --pc: 210 40% 98%;
+
+  /* Secondary colors */
+  --s: 160 84% 39%;
+  --sc: 0 0% 100%;
+
+  /* Accent colors */
+  --a: 36 100% 50%;
+  --ac: 0 0% 0%;
+
+  /* Neutral colors */
+  --n: 217 32% 17%;
+  --nf: 217 32% 17%;
+  --nc: 210 40% 98%;
+
+  /* Base colors */
+  --b1: 0 0% 100%;
+  --b2: 210 40% 96%;
+  --b3: 217 32% 17%;
+  --bc: 215 28% 17%;
+
+  /* State colors */
+  --in: 207 100% 50%;
+  --su: 160 84% 39%;
+  --wa: 38 92% 50%;
+  --er: 0 84% 60%;
+
+  /* Status feedback */
+  --success: rgb(16 185 129);
+  --warning: rgb(245 158 11);
+  --error: rgb(239 68 68);
+  --info: rgb(14 165 233);
+
+  /* Accounting specific colors */
+  --accounting-debe: rgb(34 197 94);
+  --accounting-haber: rgb(239 68 68);
+  --accounting-saldo: rgb(14 165 233);
+  --accounting-activo: rgb(59 130 246);
+  --accounting-pasivo: rgb(239 68 68);
+  --accounting-patrimonio: rgb(139 92 246);
+  --accounting-ingreso: rgb(34 197 94);
+  --accounting-egreso: rgb(245 158 11);
+}
+
+:root[data-theme="dark"] {
+  /* Primary colors - Dark blue */
+  --p: 219 89% 35%;
+  --pc: 210 40% 98%;
+
+  /* Secondary colors - Dark green */
+  --s: 160 84% 32%;
+  --sc: 210 40% 98%;
+
+  /* Accent colors - Dark orange */
+  --a: 36 100% 40%;
+  --ac: 210 40% 98%;
+
+  /* Neutral colors */
+  --n: 217 32% 17%;
+  --nf: 217 32% 17%;
+  --nc: 210 40% 98%;
+
+  /* Base colors */
+  --b1: 217 32% 17%;
+  --b2: 217 32% 25%;
+  --b3: 217 32% 40%;
+  --bc: 210 40% 98%;
+
+  /* State colors */
+  --in: 207 100% 60%;
+  --su: 160 84% 45%;
+  --wa: 38 92% 60%;
+  --er: 0 84% 70%;
+
+  /* Status feedback */
+  --success: rgb(34 197 94);
+  --warning: rgb(245 158 11);
+  --error: rgb(239 68 68);
+  --info: rgb(14 165 233);
+
+  /* Accounting specific colors */
+  --accounting-debe: rgb(34 197 94);
+  --accounting-haber: rgb(239 68 68);
+  --accounting-saldo: rgb(14 165 233);
+  --accounting-activo: rgb(59 130 246);
+  --accounting-pasivo: rgb(239 68 68);
+  --accounting-patrimonio: rgb(139 92 246);
+  --accounting-ingreso: rgb(34 197 94);
+  --accounting-egreso: rgb(245 158 11);
+}
+
+/* Theme transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Accounting module theme */
+[data-module="accounting"] {
+  --module-primary: var(--accounting-activo);
+  --module-secondary: var(--accounting-pasivo);
+  --module-accent: var(--accounting-patrimonio);
+}
+
+/* Finance specific badges */
+.badge-debe {
+  @apply badge badge-success;
+}
+
+.badge-haber {
+  @apply badge badge-error;
+}
+
+.badge-saldo {
+  @apply badge badge-info;
+}
+
+/* Accounting table color coding */
+.accounting-debe {
+  @apply text-success font-semibold;
+}
+
+.accounting-haber {
+  @apply text-error font-semibold;
+}
+
+.accounting-saldo {
+  @apply text-info font-semibold;
+}
+
+/* Account type badges */
+.cuenta-activo {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+}
+
+.cuenta-pasivo {
+  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+}
+
+.cuenta-patrimonio {
+  @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+}
+
+.cuenta-ingreso {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+.cuenta-egreso {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+}
+
+/* Print styles for accounting documents */
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+
+  .print-hidden {
+    @apply hidden;
+  }
+
+  .print-visible {
+    @apply block !important;
+  }
+
+  @page {
+    margin: 0.5in;
+  }
+}

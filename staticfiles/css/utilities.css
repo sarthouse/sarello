@@ -1,0 +1,333 @@
+/**
+ * Custom Utilities - Extends Tailwind CSS
+ */
+
+/* Text utilities */
+.text-truncate {
+  @apply truncate;
+}
+
+.text-ellipsis {
+  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.text-clamp-2 {
+  @apply line-clamp-2;
+}
+
+.text-clamp-3 {
+  @apply line-clamp-3;
+}
+
+.text-mono {
+  @apply font-mono;
+}
+
+.text-accounting-debe {
+  @apply text-success font-mono font-semibold;
+}
+
+.text-accounting-haber {
+  @apply text-error font-mono font-semibold;
+}
+
+/* Flex utilities */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+.flex-start {
+  @apply flex items-start justify-start;
+}
+
+.flex-end {
+  @apply flex items-end justify-end;
+}
+
+.gap-x {
+  @apply gap-x-4;
+}
+
+.gap-y {
+  @apply gap-y-4;
+}
+
+/* Grid utilities */
+.grid-auto {
+  @apply grid auto-cols-fr gap-4;
+}
+
+.grid-cols-auto {
+  @apply grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-4;
+}
+
+/* Position utilities */
+.absolute-center {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.absolute-top {
+  @apply absolute top-0 left-0 right-0;
+}
+
+.absolute-bottom {
+  @apply absolute bottom-0 left-0 right-0;
+}
+
+/* Border utilities */
+.border-color-primary {
+  @apply border-primary;
+}
+
+.border-color-secondary {
+  @apply border-secondary;
+}
+
+.border-top {
+  @apply border-t border-base-300;
+}
+
+.border-bottom {
+  @apply border-b border-base-300;
+}
+
+.border-left {
+  @apply border-l border-base-300;
+}
+
+.border-right {
+  @apply border-r border-base-300;
+}
+
+/* Shadow utilities */
+.shadow-inset {
+  @apply shadow-inset;
+}
+
+.shadow-none {
+  @apply shadow-none;
+}
+
+.shadow-focus {
+  @apply shadow-md ring-2 ring-primary;
+}
+
+/* Responsive visibility */
+.hidden-sm {
+  @apply sm:block;
+}
+
+@media (max-width: 640px) {
+  .hidden-sm {
+    @apply hidden;
+  }
+}
+
+.hidden-md {
+  @apply md:block;
+}
+
+@media (max-width: 768px) {
+  .hidden-md {
+    @apply hidden;
+  }
+}
+
+.hidden-lg {
+  @apply lg:block;
+}
+
+@media (max-width: 1024px) {
+  .hidden-lg {
+    @apply hidden;
+  }
+}
+
+/* Spacing utilities */
+.space-between {
+  @apply space-x-4;
+}
+
+.gap-tight {
+  @apply gap-2;
+}
+
+.gap-loose {
+  @apply gap-6;
+}
+
+.py-auto {
+  @apply py-auto;
+}
+
+/* Color utilities */
+.text-success {
+  @apply text-success;
+}
+
+.text-error {
+  @apply text-error;
+}
+
+.text-warning {
+  @apply text-warning;
+}
+
+.text-info {
+  @apply text-info;
+}
+
+.bg-success-light {
+  @apply bg-success/10;
+}
+
+.bg-error-light {
+  @apply bg-error/10;
+}
+
+.bg-warning-light {
+  @apply bg-warning/10;
+}
+
+.bg-info-light {
+  @apply bg-info/10;
+}
+
+/* Opacity utilities */
+.opacity-disabled {
+  @apply opacity-50;
+}
+
+/* Transform utilities */
+.transform-none {
+  @apply transform-none;
+}
+
+.scale-in {
+  @apply scale-100;
+}
+
+.scale-out {
+  @apply scale-0;
+}
+
+/* Animation utilities */
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce 2s infinite;
+}
+
+/* Content utilities */
+.content-empty::before {
+  content: attr(data-empty);
+  @apply block text-center text-base-content/50 py-8;
+}
+
+/* Numeric formatting */
+.number-format {
+  @apply font-mono text-right;
+}
+
+.currency-format {
+  @apply font-mono text-right;
+}
+
+.percentage-format {
+  @apply font-mono;
+}
+
+/* Table utilities */
+.table-striped tbody tr:nth-child(odd) {
+  @apply bg-base-200;
+}
+
+.table-hover tbody tr:hover {
+  @apply bg-base-300;
+}
+
+.table-compact {
+  @apply text-sm;
+}
+
+/* Form utilities */
+.form-input-error {
+  @apply border-error focus:border-error focus:ring-error;
+}
+
+.form-input-success {
+  @apply border-success focus:border-success focus:ring-success;
+}
+
+.form-input-disabled {
+  @apply bg-base-200 cursor-not-allowed opacity-50;
+}
+
+/* Status badges */
+.badge-status {
+  @apply inline-block px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-success {
+  @apply badge-status bg-success/20 text-success;
+}
+
+.badge-error {
+  @apply badge-status bg-error/20 text-error;
+}
+
+.badge-warning {
+  @apply badge-status bg-warning/20 text-warning;
+}
+
+.badge-info {
+  @apply badge-status bg-info/20 text-info;
+}
+
+/* Loading states */
+.loading {
+  @apply pointer-events-none opacity-60;
+}
+
+.loading::after {
+  content: '';
+  @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent;
+}
+
+/* Accessibility */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden clip whitespace-nowrap border-0;
+}
+
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  @apply static w-auto h-auto p-0 m-0 overflow-visible clip-auto whitespace-normal;
+}
+
+/* Print utilities */
+@media print {
+  .print-hidden {
+    @apply hidden !important;
+  }
+
+  .print-visible {
+    @apply block !important;
+  }
+
+  .no-print {
+    @apply hidden !important;
+  }
+}
+
+/* Container queries (if supported) */
+@supports (container-type: inline-size) {
+  .container-query {
+    container-type: inline-size;
+  }
+}

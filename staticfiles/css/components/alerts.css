@@ -1,0 +1,188 @@
+/**
+ * Alert Components
+ */
+
+.alert {
+  @apply rounded-lg p-4 flex gap-3;
+  @apply transition-all duration-200;
+}
+
+.alert-icon {
+  @apply flex-shrink-0 w-5 h-5;
+}
+
+.alert-content {
+  @apply flex-1;
+}
+
+.alert-title {
+  @apply font-semibold;
+}
+
+.alert-message {
+  @apply text-sm opacity-90;
+  @apply mt-1;
+}
+
+.alert-close {
+  @apply flex-shrink-0 cursor-pointer opacity-60 hover:opacity-100;
+  @apply transition-opacity;
+}
+
+/* Success Alert */
+.alert-success {
+  @apply bg-success/10 text-success border border-success/30;
+}
+
+.alert-success .alert-icon {
+  @apply text-success;
+}
+
+/* Error/Danger Alert */
+.alert-error {
+  @apply bg-error/10 text-error border border-error/30;
+}
+
+.alert-error .alert-icon {
+  @apply text-error;
+}
+
+/* Warning Alert */
+.alert-warning {
+  @apply bg-warning/10 text-warning border border-warning/30;
+}
+
+.alert-warning .alert-icon {
+  @apply text-warning;
+}
+
+/* Info Alert */
+.alert-info {
+  @apply bg-info/10 text-info border border-info/30;
+}
+
+.alert-info .alert-icon {
+  @apply text-info;
+}
+
+/* Dismissible alerts */
+.alert.dismissible {
+  @apply pr-2;
+}
+
+.alert.dismissible .alert-close {
+  @apply w-6 h-6 flex items-center justify-center;
+}
+
+/* Alert sizes */
+.alert-sm {
+  @apply px-3 py-2 text-sm;
+}
+
+.alert-sm .alert-icon {
+  @apply w-4 h-4;
+}
+
+.alert-md {
+  @apply px-4 py-3 text-base;
+}
+
+.alert-lg {
+  @apply px-6 py-4 text-lg;
+}
+
+/* Inline alert (small banner) */
+.alert-inline {
+  @apply rounded-md p-3 text-sm;
+  @apply gap-2;
+}
+
+.alert-inline .alert-icon {
+  @apply w-4 h-4;
+}
+
+/* Toast notification (bottom right) */
+.toast {
+  @apply fixed bottom-4 right-4 z-50;
+  @apply max-w-sm w-full;
+}
+
+.toast-item {
+  @apply alert rounded-lg shadow-lg mb-2;
+  @apply animate-in fade-in slide-in-from-bottom-4 duration-300;
+}
+
+.toast-item.dismissing {
+  @apply animate-out fade-out slide-out-to-bottom-4 duration-300;
+}
+
+/* Stack toasts */
+.toast-stack {
+  @apply flex flex-col gap-2;
+}
+
+/* Progress alert (with progress bar) */
+.alert-progress {
+  @apply relative overflow-hidden;
+}
+
+.alert-progress::after {
+  content: '';
+  @apply absolute bottom-0 left-0 h-1 bg-current opacity-30;
+  @apply animate-pulse;
+}
+
+/* Alert with actions */
+.alert-actions {
+  @apply flex gap-2 mt-4;
+}
+
+.alert-actions .btn {
+  @apply btn-sm;
+}
+
+/* Alert group */
+.alert-group {
+  @apply flex flex-col gap-3;
+}
+
+/* Callout (sidebar alert) */
+.callout {
+  @apply border-l-4 pl-4 py-2;
+}
+
+.callout-success {
+  @apply border-success text-success-content bg-success/5;
+}
+
+.callout-error {
+  @apply border-error text-error-content bg-error/5;
+}
+
+.callout-warning {
+  @apply border-warning text-warning-content bg-warning/5;
+}
+
+.callout-info {
+  @apply border-info text-info-content bg-info/5;
+}
+
+.callout-title {
+  @apply font-semibold;
+}
+
+.callout-text {
+  @apply text-sm;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .toast {
+    @apply left-4 right-4 bottom-4;
+    @apply max-w-none;
+  }
+
+  .alert {
+    @apply px-3 py-2 text-sm;
+  }
+}

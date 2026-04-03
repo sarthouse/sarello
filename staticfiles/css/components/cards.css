@@ -1,0 +1,221 @@
+/**
+ * Card Components
+ */
+
+.card {
+  @apply bg-base-100 rounded-lg shadow;
+  @apply transition-shadow duration-200 hover:shadow-lg;
+}
+
+.card-compact {
+  @apply rounded-md shadow-sm;
+}
+
+.card-bordered {
+  @apply border border-base-300;
+}
+
+.card-elevated {
+  @apply shadow-xl;
+}
+
+.card-header {
+  @apply px-6 py-4 border-b border-base-300;
+}
+
+.card-header h2,
+.card-header h3,
+.card-header h4 {
+  @apply text-lg font-semibold text-base-content;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+.card-body p {
+  @apply text-base-content/80;
+}
+
+.card-footer {
+  @apply px-6 py-4 border-t border-base-300;
+  @apply flex items-center justify-between gap-2;
+}
+
+.card-footer.reverse {
+  @apply flex-row-reverse;
+}
+
+/* Card actions */
+.card-actions {
+  @apply flex gap-2 justify-end;
+}
+
+.card-actions.start {
+  @apply justify-start;
+}
+
+.card-actions.between {
+  @apply justify-between;
+}
+
+/* Stat card */
+.card-stat {
+  @apply bg-base-100 rounded-lg shadow p-6;
+}
+
+.card-stat-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.card-stat-title {
+  @apply text-sm font-medium text-base-content/60;
+}
+
+.card-stat-icon {
+  @apply text-4xl opacity-20;
+}
+
+.card-stat-value {
+  @apply text-3xl font-bold text-base-content mb-2;
+}
+
+.card-stat-change {
+  @apply text-sm font-medium;
+}
+
+.card-stat-change.up {
+  @apply text-success;
+}
+
+.card-stat-change.down {
+  @apply text-error;
+}
+
+.card-stat-change.neutral {
+  @apply text-base-content/60;
+}
+
+/* Alert card */
+.card-alert {
+  @apply rounded-lg p-4 border-l-4;
+  @apply flex gap-4 items-start;
+}
+
+.card-alert.success {
+  @apply bg-success/10 border-success text-success-content;
+}
+
+.card-alert.error {
+  @apply bg-error/10 border-error text-error-content;
+}
+
+.card-alert.warning {
+  @apply bg-warning/10 border-warning text-warning-content;
+}
+
+.card-alert.info {
+  @apply bg-info/10 border-info text-info-content;
+}
+
+.card-alert-icon {
+  @apply flex-shrink-0 text-xl;
+}
+
+.card-alert-content {
+  @apply flex-1;
+}
+
+.card-alert-title {
+  @apply font-semibold mb-1;
+}
+
+.card-alert-message {
+  @apply text-sm opacity-90;
+}
+
+.card-alert-close {
+  @apply flex-shrink-0 cursor-pointer hover:opacity-70;
+  @apply transition-opacity;
+}
+
+/* Form card */
+.card-form {
+  @apply bg-base-100 rounded-lg shadow overflow-hidden;
+}
+
+.card-form-header {
+  @apply px-6 py-4 bg-base-200 border-b border-base-300;
+}
+
+.card-form-body {
+  @apply p-6;
+}
+
+.card-form-footer {
+  @apply px-6 py-4 bg-base-200 border-t border-base-300;
+  @apply flex gap-2 justify-end;
+}
+
+/* Empty state card */
+.card-empty {
+  @apply bg-base-100 rounded-lg shadow p-12 text-center;
+}
+
+.card-empty-icon {
+  @apply text-6xl text-base-content/20 mb-4;
+}
+
+.card-empty-title {
+  @apply text-xl font-semibold text-base-content mb-2;
+}
+
+.card-empty-message {
+  @apply text-base-content/60 mb-6;
+}
+
+/* Grid of cards */
+.card-grid {
+  @apply grid gap-4;
+  @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+}
+
+.card-grid.cols-1 {
+  @apply grid-cols-1;
+}
+
+.card-grid.cols-2 {
+  @apply sm:grid-cols-2;
+}
+
+.card-grid.cols-3 {
+  @apply lg:grid-cols-3;
+}
+
+/* Responsive cards */
+@media (max-width: 640px) {
+  .card-header {
+    @apply px-4 py-3;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  .card-footer {
+    @apply px-4 py-3;
+    @apply flex-col gap-3;
+  }
+}
+
+/* Card loading state */
+.card.loading {
+  @apply opacity-60 pointer-events-none;
+}
+
+.card.loading::after {
+  content: '';
+  @apply absolute inset-0 rounded-lg;
+  @apply flex items-center justify-center;
+  background: rgba(0, 0, 0, 0.1) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpath d='M1 12a11 11 0 0 0 16.4 10.3M23 12a11 11 0 0 0-16.4-10'%3e%3c/circle%3e%3c/svg%3e") center/40px no-repeat;
+}

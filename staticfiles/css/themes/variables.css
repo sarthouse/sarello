@@ -1,0 +1,148 @@
+/**
+ * CSS Custom Properties for Themes
+ * Variables for colors, spacing, and other design tokens
+ */
+
+:root {
+  /* Color palette - Primary */
+  --primary: rgb(30 64 175);
+  --primary-light: rgb(59 130 246);
+  --primary-dark: rgb(15 23 42);
+  --primary-content: rgb(255 255 255);
+
+  /* Color palette - Secondary */
+  --secondary: rgb(16 185 129);
+  --secondary-light: rgb(52 211 153);
+  --secondary-dark: rgb(5 122 85);
+  --secondary-content: rgb(255 255 255);
+
+  /* Color palette - Accent */
+  --accent: rgb(249 115 22);
+  --accent-light: rgb(251 146 60);
+  --accent-dark: rgb(194 65 12);
+  --accent-content: rgb(255 255 255);
+
+  /* State colors */
+  --success: rgb(34 197 94);
+  --warning: rgb(245 158 11);
+  --error: rgb(239 68 68);
+  --info: rgb(14 165 233);
+
+  /* Neutral */
+  --neutral-dark: rgb(15 23 42);
+  --neutral-medium: rgb(107 114 128);
+  --neutral-light: rgb(243 244 246);
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: 'Courier New', monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Source Code Pro';
+
+  /* Spacing scale */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Border radius */
+  --radius-none: 0;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Z-index */
+  --z-0: 0;
+  --z-10: 10;
+  --z-20: 20;
+  --z-30: 30;
+  --z-40: 40;
+  --z-50: 50;
+  --z-auto: auto;
+
+  /* Accounting specific colors */
+  --accounting-debe: rgb(34 197 94);
+  --accounting-haber: rgb(239 68 68);
+  --accounting-saldo: rgb(14 165 233);
+  --accounting-activo: rgb(59 130 246);
+  --accounting-pasivo: rgb(239 68 68);
+  --accounting-patrimonio: rgb(139 92 246);
+  --accounting-ingreso: rgb(34 197 94);
+  --accounting-egreso: rgb(245 158 11);
+
+  /* Opacity scale */
+  --opacity-0: 0;
+  --opacity-5: 0.05;
+  --opacity-10: 0.1;
+  --opacity-20: 0.2;
+  --opacity-30: 0.3;
+  --opacity-40: 0.4;
+  --opacity-50: 0.5;
+  --opacity-60: 0.6;
+  --opacity-70: 0.7;
+  --opacity-80: 0.8;
+  --opacity-90: 0.9;
+  --opacity-100: 1;
+
+  /* Safe area (for mobile notches) */
+  --safe-area-inset-top: 0;
+  --safe-area-inset-right: 0;
+  --safe-area-inset-bottom: 0;
+  --safe-area-inset-left: 0;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: rgb(59 130 246);
+    --primary-dark: rgb(30 64 175);
+    --neutral-dark: rgb(243 244 246);
+    --neutral-light: rgb(15 23 42);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  :root {
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-base: 0ms;
+    --transition-slow: 0ms;
+  }
+}
+
+/* Print styles */
+@media print {
+  :root {
+    --primary: #000;
+    --secondary: #000;
+    --accent: #000;
+  }
+}

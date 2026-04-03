@@ -1,0 +1,142 @@
+/**
+ * Button Components
+ */
+
+/* Base button styles */
+.btn-base {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded font-medium transition-all duration-200 cursor-pointer;
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.btn-md {
+  @apply px-4 py-2 text-base;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+.btn-full {
+  @apply w-full;
+}
+
+/* Primary button */
+.btn-primary {
+  @apply btn-base bg-primary text-primary-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-primary;
+}
+
+/* Secondary button */
+.btn-secondary {
+  @apply btn-base bg-secondary text-secondary-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-secondary;
+}
+
+/* Accent button */
+.btn-accent {
+  @apply btn-base bg-accent text-accent-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-accent;
+}
+
+/* Ghost button (outline style) */
+.btn-ghost {
+  @apply btn-base bg-transparent text-base-content border border-base-300;
+  @apply hover:bg-base-200 hover:border-base-400;
+  @apply focus-visible:outline-base-content;
+}
+
+/* Success button */
+.btn-success {
+  @apply btn-base bg-success text-success-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-success;
+}
+
+/* Warning button */
+.btn-warning {
+  @apply btn-base bg-warning text-warning-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-warning;
+}
+
+/* Error/Danger button */
+.btn-error {
+  @apply btn-base bg-error text-error-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-error;
+}
+
+/* Info button */
+.btn-info {
+  @apply btn-base bg-info text-info-content;
+  @apply hover:bg-opacity-90 hover:shadow-md;
+  @apply focus-visible:outline-info;
+}
+
+/* Link button */
+.btn-link {
+  @apply btn-base bg-transparent text-primary underline;
+  @apply hover:text-primary-focus;
+  @apply p-0 rounded-none;
+}
+
+/* Icon button */
+.btn-icon {
+  @apply btn-base rounded-full w-10 h-10 p-0;
+}
+
+.btn-icon.btn-sm {
+  @apply w-8 h-8;
+}
+
+.btn-icon.btn-lg {
+  @apply w-12 h-12;
+}
+
+/* Loading state */
+.btn.loading::before {
+  content: '';
+  @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent;
+  @apply mr-2;
+}
+
+/* Button group */
+.btn-group {
+  @apply inline-flex rounded overflow-hidden border border-base-300;
+}
+
+.btn-group .btn {
+  @apply border-0 rounded-none first:rounded-l last:rounded-r;
+  @apply border-r border-base-300 last:border-r-0;
+}
+
+/* Icon in button */
+.btn i,
+.btn .icon {
+  @apply w-5 h-5;
+}
+
+/* Button with loading indicator */
+.btn.is-loading {
+  @apply pointer-events-none opacity-60;
+}
+
+.btn.is-loading::after {
+  content: '';
+  @apply absolute inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent;
+}
+
+/* Responsive buttons */
+@media (max-width: 640px) {
+  .btn-responsive {
+    @apply btn-sm w-full;
+  }
+}

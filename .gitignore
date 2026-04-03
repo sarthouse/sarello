@@ -8,7 +8,7 @@ env/
 ENV/
 *.log
 db.sqlite3
-staticfiles/
+static/
 media/
 .env
 .DS_Store
@@ -17,4 +17,19 @@ media/
 .idea/
 .vscode/
 utils/
-AGENTS.md
+
+# Assets compilados (generados por npm)
+staticfiles/css/output.css
+staticfiles/css/output.css.map
+staticfiles/css/theme-output.css
+staticfiles/css/theme-output.css.map
+
+# Node
+node_modules/
+package-lock.json
+npm-debug.log
+yarn-error.log
+
+# IDE / Editor
+.vscode/settings.json
+.idea/

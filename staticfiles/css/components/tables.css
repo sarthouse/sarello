@@ -1,0 +1,170 @@
+/**
+ * Table Components
+ */
+
+.table {
+  @apply w-full border-collapse;
+}
+
+.table thead {
+  @apply bg-base-200;
+}
+
+.table thead th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-base-content;
+  @apply border-b border-base-300;
+}
+
+.table thead th.sortable {
+  @apply cursor-pointer select-none hover:bg-base-300;
+}
+
+.table thead th.sortable::after {
+  content: ' ⇅';
+  @apply text-xs opacity-50;
+}
+
+.table thead th.sorted-asc::after {
+  content: ' ↑';
+  @apply opacity-100;
+}
+
+.table thead th.sorted-desc::after {
+  content: ' ↓';
+  @apply opacity-100;
+}
+
+.table tbody tr {
+  @apply border-b border-base-300 hover:bg-base-200 transition-colors;
+}
+
+.table tbody tr.active {
+  @apply bg-primary/10;
+}
+
+.table tbody td {
+  @apply px-4 py-3 text-sm;
+}
+
+.table tbody td.numeric {
+  @apply text-right font-mono;
+}
+
+/* Table striped rows */
+.table.striped tbody tr:nth-child(odd) {
+  @apply bg-base-100;
+}
+
+.table.striped tbody tr:nth-child(even) {
+  @apply bg-base-200;
+}
+
+/* Table compact */
+.table.compact thead th {
+  @apply px-2 py-1 text-xs;
+}
+
+.table.compact tbody td {
+  @apply px-2 py-1 text-xs;
+}
+
+/* Table responsive */
+@media (max-width: 768px) {
+  .table.responsive {
+    @apply block;
+  }
+
+  .table.responsive thead {
+    @apply hidden;
+  }
+
+  .table.responsive tbody,
+  .table.responsive tr,
+  .table.responsive td {
+    @apply block w-full;
+  }
+
+  .table.responsive tr {
+    @apply mb-4 border border-base-300 rounded;
+  }
+
+  .table.responsive td {
+    @apply px-4 py-2 text-sm;
+    @apply before:content-[attr(data-label)] before:font-semibold before:w-24 before:inline-block;
+  }
+}
+
+/* Table with actions */
+.table-actions {
+  @apply flex gap-2 justify-end;
+}
+
+.table-action-btn {
+  @apply p-2 hover:bg-base-300 rounded transition-colors;
+}
+
+.table-action-btn i {
+  @apply w-4 h-4;
+}
+
+/* Pagination */
+.pagination {
+  @apply flex items-center justify-center gap-2 mt-4;
+}
+
+.pagination .page-link {
+  @apply px-3 py-2 border border-base-300 rounded;
+  @apply hover:bg-base-200 transition-colors;
+  @apply text-sm font-medium;
+}
+
+.pagination .page-link.active {
+  @apply bg-primary text-primary-content border-primary;
+}
+
+.pagination .page-link.disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Table info */
+.table-info {
+  @apply text-sm text-base-content/60 mt-2;
+}
+
+.table-info-item {
+  @apply inline-block mr-4;
+}
+
+/* Column visibility */
+.table.hide-on-mobile thead th.hide-on-mobile,
+.table.hide-on-mobile tbody td.hide-on-mobile {
+  @apply hidden;
+}
+
+@media (max-width: 768px) {
+  .table thead th.show-on-mobile,
+  .table tbody td.show-on-mobile {
+    @apply table-cell;
+  }
+}
+
+/* Accounting table styles */
+.table.accounting tbody td.debe {
+  @apply text-success font-semibold;
+}
+
+.table.accounting tbody td.haber {
+  @apply text-error font-semibold;
+}
+
+.table.accounting tbody td.saldo {
+  @apply text-info font-semibold;
+}
+
+.table.accounting tfoot {
+  @apply bg-base-300 font-semibold;
+}
+
+.table.accounting tfoot td {
+  @apply border-t-2 border-base-400;
+}
