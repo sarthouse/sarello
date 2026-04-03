@@ -81,7 +81,8 @@ def cuenta_create(request):
     return render(request, 'contabilidad/cuenta_form.html', {
         'form': form,
         'cuentas': cuentas,
-        'action': 'Crear'
+        'action': 'Crear',
+        'card_title': 'Crear Cuenta Contable'
     })
 
 
@@ -103,7 +104,8 @@ def cuenta_edit(request, pk):
         'form': form,
         'cuentas': cuentas,
         'cuenta': cuenta,
-        'action': 'Editar'
+        'action': 'Editar',
+        'card_title': 'Editar Cuenta Contable'
     })
 
 
@@ -137,7 +139,8 @@ def ejercicio_create(request):
     
     return render(request, 'contabilidad/ejercicio_form.html', {
         'form': form,
-        'action': 'Crear'
+        'action': 'Crear',
+        'card_title': 'Crear Ejercicio Contable'
     })
 
 
@@ -157,7 +160,8 @@ def ejercicio_edit(request, pk):
     return render(request, 'contabilidad/ejercicio_form.html', {
         'form': form,
         'ejercicio': ejercicio,
-        'action': 'Editar'
+        'action': 'Editar',
+        'card_title': 'Editar Ejercicio Contable'
     })
 
 
@@ -171,11 +175,16 @@ def dashboard(request):
     
     ultimos_asientos = Asiento.objects.select_related('ejercicio').order_by('-fecha', '-numero')[:10]
     
+    alerta_ejercicio_titulo = f"Ejercicio actual: {ejercicio_actual.nombre}" if ejercicio_actual else "No hay ejercicio aberto"
+    alerta_ejercicio_mensaje = f"{ejercicio_actual.fecha_inicio} - {ejercicio_actual.fecha_fin}" if ejercicio_actual else "Debe crear un ejercicio contable para poder registrar asientos."
+    
     contexto = {
         'ejercicio_actual': ejercicio_actual,
         'cuentas_total': cuentas_total,
         'cuentas_raiz': cuentas_raiz,
         'ultimos_asientos': ultimos_asientos,
+        'alerta_ejercicio_titulo': alerta_ejercicio_titulo,
+        'alerta_ejercicio_mensaje': alerta_ejercicio_mensaje,
     }
     return render(request, 'contabilidad/dashboard.html', contexto)
 

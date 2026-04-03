@@ -7,7 +7,7 @@
     title="Asiento"|add:" "|add:asiento.numero
     subtitle=asiento.ejercicio.nombre %}
 
-{% include "components/card.html" with title="Información del Asiento" %}
+{% include "components/cards/card.html" with title="Información del Asiento" %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
         <div>
             <p class="text-gray-500 text-xs font-medium uppercase">Fecha</p>
@@ -44,16 +44,16 @@
     <div class="flex items-center gap-2">
         <span class="text-gray-500 text-sm font-medium uppercase">Estado:</span>
         {% if asiento.estado == 'confirmado' %}
-            {% include "components/badge.html" with label=asiento.get_estado_display variant="success" %}
+            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="success" %}
         {% elif asiento.estado == 'cancelado' %}
-            {% include "components/badge.html" with label=asiento.get_estado_display variant="error" %}
+            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="error" %}
         {% else %}
-            {% include "components/badge.html" with label=asiento.get_estado_display variant="neutral" %}
+            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="neutral" %}
         {% endif %}
     </div>
 {% endinclude %}
 
-{% include "components/card.html" with title="Líneas de Asiento" %}
+{% include "components/cards/card.html" with title="Líneas de Asiento" %}
     {% if asiento.lineas.all %}
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
@@ -90,12 +90,12 @@
         </table>
     </div>
     {% else %}
-    {% include "components/empty-state.html" with message="No hay líneas en este asiento" icon="fa-file" %}
+    {% include "components/empty-states/empty-state.html" with message="No hay líneas en este asiento" icon="fa-file" %}
     {% endif %}
 {% endinclude %}
 
 <div class="mt-6 flex gap-2">
-    {% include "components/button.html" with label="Editar" href="/admin/contabilidad/asiento/"|add:asiento.pk|add:"/change/" variant="primary" %}
-    {% include "components/button.html" with label="Volver" onclick="history.back()" variant="secondary" %}
+    {% include "components/buttons/button.html" with label="Editar" href="/admin/contabilidad/asiento/"|add:asiento.pk|add:"/change/" variant="primary" %}
+    {% include "components/buttons/button.html" with label="Volver" onclick="history.back()" variant="secondary" %}
 </div>
 {% endblock %}

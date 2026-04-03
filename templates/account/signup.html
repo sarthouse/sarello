@@ -1,47 +1,83 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load allauth %}
 
 {% block title %}Registrarse{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div class="text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900">
                 Sarello ERP
             </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
+            <p class="mt-2 text-sm text-gray-600">
                 Crear una nueva cuenta
             </p>
         </div>
         
-        {% element form form=form method="post" action=signup_url %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form %}
-                    {% slot %}
-                    {% endelement %}
-                {% endelement %}
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        <form class="mt-8 space-y-6" method="post" action="{{ signup_url }}">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                {% if form.email %}
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700">
+                        Correo electrónico
+                    </label>
+                    <input type="email" name="email" id="id_email" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border"
+                        placeholder="correo@ejemplo.com">
+                </div>
                 {% endif %}
-            {% endslot %}
-            {% slot actions %}
-                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
-                    {% trans "Sign Up" %}
+                
+                {% if form.password1 %}
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-700">
+                        Contraseña
+                    </label>
+                    <input type="password" name="password1" id="id_password1" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border">
+                </div>
+                {% endif %}
+                
+                {% if form.password2 %}
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-700">
+                        Confirmar contraseña
+                    </label>
+                    <input type="password" name="password2" id="id_password2" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm px-3 py-2 border">
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+            {% endif %}
+            
+            <div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                    {% trans "Registrarse" %}
                 </button>
-            {% endslot %}
-        {% endelement %}
+            </div>
+        </form>
         
-        <div class="text-center mt-4">
+        <div class="text-center">
             <p class="text-sm text-gray-600">
                 ¿Ya tiene cuenta? 
                 <a href="{% url 'account_login' %}" class="font-medium text-slate-700 hover:text-slate-500">
-                    Iniciar Sesión
+                    Iniciar sesión
                 </a>
             </p>
         </div>
+        
+        {% if form.non_field_errors %}
+            <div class="rounded-md bg-red-50 p-4">
+                {% for error in form.non_field_errors %}
+                    <p class="text-sm text-red-800">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

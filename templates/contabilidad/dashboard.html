@@ -6,7 +6,7 @@
 {% include "components/page-header.html" with title="Contabilidad" subtitle="Panel de control contable" %}
 
 {% if ejercicio_actual %}
-    {% include "components/alert.html" with title="Ejercicio actual: "|add:ejercicio_actual.nombre message=ejercicio_actual.fecha_inicio|add:" - "|add:ejercicio_actual.fecha_fin variant="info" %}
+    {% include "components/alerts/alert.html" with title=alerta_ejercicio_titulo message=alerta_ejercicio_mensaje variant="info" %}
     <div class="mb-6 flex justify-between items-center bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
         <div>
             <span class="inline-block {% if ejercicio_actual.estado == 'abierto' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %} px-2 py-1 text-xs rounded">
@@ -30,7 +30,7 @@
         </div>
     </div>
 {% else %}
-    {% include "components/alert.html" with title="No hay ejercicio abierto" message="Debe crear un ejercicio contable para poder registrar asientos." variant="warning" %}
+    {% include "components/alerts/alert.html" with title="No hay ejercicio abierto" message="Debe crear un ejercicio contable para poder registrar asientos." variant="warning" %}
     <div class="mb-6 flex justify-end">
         <a href="{% url 'contabilidad:ejercicio_create' %}" class="btn btn-warning btn-sm">
             <i class="fas fa-plus mr-1"></i>Crear Ejercicio
@@ -105,7 +105,10 @@
                 {% endfor %}
             </ul>
             {% else %}
-                {% include "components/empty-state.html" with title="Sin cuentas" description="No hay cuentas configuradas." action_label="Crear cuenta" action_url="{% url 'contabilidad:cuenta_create' %}" %}
+                <div class="text-center py-8">
+                    <p class="text-gray-500 mb-4">No hay cuentas configuradas.</p>
+                    <a href="{% url 'contabilidad:cuenta_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600">Crear cuenta</a>
+                </div>
             {% endif %}
         </div>
     </div>
@@ -132,13 +135,18 @@
                 {% endfor %}
             </div>
             {% else %}
-                {% include "components/empty-state.html" with title="Sin asientos" description="No hay asientos registrados." action_label="Crear asiento" action_url="{% url 'contabilidad:asiento_create' %}" %}
+                <div class="text-center py-8">
+                    <p class="text-gray-500 mb-4">No hay asientos registrados.</p>
+                    <a href="{% url 'contabilidad:asiento_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600">Crear asiento</a>
+                </div>
             {% endif %}
         </div>
     </div>
 </div>
 
 <div class="mt-6">
-    {% include "components/button.html" with label="Balance de Sumas y Saldos" variant="primary" size="lg" icon="fa-balance-scale" onclick="window.location='{% url 'contabilidad:balance' %}'" %}
+    <a href="{% url 'contabilidad:balance' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600">
+    Balance de Sumas y Saldos
+</a>
 </div>
 {% endblock %}

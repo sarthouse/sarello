@@ -33,7 +33,7 @@
                     {% endfor %}
                 </select>
             </div>
-            {% include "components/button.html" with label="Consultar" type="submit" variant="primary" icon="fa-search" %}
+            {% include "components/buttons/button.html" with label="Consultar" type="submit" variant="primary" icon="fa-search" %}
         </form>
     </div>
 </div>
@@ -103,7 +103,7 @@
     {% include "components/pagination.html" with page_obj=lineas ejercicio_seleccionado=ejercicio_seleccionado cuenta_seleccionada=cuenta_seleccionada %}
     {% endif %}
     {% else %}
-    {% include "components/empty-state.html" with message="No hay movimientos en esta cuenta" icon="fa-inbox" %}
+    {% include "components/empty-states/empty-state.html" with message="No hay movimientos en esta cuenta" icon="fa-inbox" %}
     {% endif %}
     </div>
 </div>

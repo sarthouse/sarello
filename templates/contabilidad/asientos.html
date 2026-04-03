@@ -22,7 +22,7 @@
                     {% endfor %}
                 </select>
             </div>
-            {% include "components/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
+            {% include "components/buttons/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
         </form>
     </div>
 </div>
@@ -56,11 +56,11 @@
                     <td class="px-6 py-4 text-right text-red-600">{{ asiento.total_haber }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         {% if asiento.estado == 'confirmado' %}
-                            {% include "components/badge.html" with label=asiento.get_estado_display variant="success" %}
+                            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="success" %}
                         {% elif asiento.estado == 'cancelado' %}
-                            {% include "components/badge.html" with label=asiento.get_estado_display variant="danger" %}
+                            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="danger" %}
                         {% else %}
-                            {% include "components/badge.html" with label=asiento.get_estado_display variant="gray" %}
+                            {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="gray" %}
                         {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap flex gap-2">

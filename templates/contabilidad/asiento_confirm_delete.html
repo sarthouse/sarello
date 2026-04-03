@@ -10,13 +10,13 @@
 </div>
 
 <div class="max-w-2xl mx-auto">
-    {% include "components/card.html" with title="Eliminar Asiento" %}
+    {% include "components/cards/card.html" with title="Eliminar Asiento" %}
         <p class="text-gray-700 mb-4">¿Está seguro de eliminar el asiento <strong>{{ asiento.numero }}</strong> ({{ asiento.fecha }})?</p>
         
         <form method="post" class="mt-6">
             {% csrf_token %}
             <div class="flex gap-2">
-                {% include "components/button.html" with label="Eliminar" variant="danger" type="submit" icon="fa-trash" %}
+                {% include "components/buttons/button.html" with label="Eliminar" variant="danger" type="submit" icon="fa-trash" %}
                 <a href="{% url 'contabilidad:asientos' %}" class="btn btn-ghost">
                     Cancelar
                 </a>

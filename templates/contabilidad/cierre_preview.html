@@ -7,7 +7,7 @@
     title="Cierre de Ejercicio"
     subtitle="Revisar y confirmar el cierre de "|add:ejercicio.nombre %}
 
-{% include "components/card.html" with title="Resumen del Ejercicio" %}
+{% include "components/cards/card.html" with title="Resumen del Ejercicio" %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-gray-50 p-4 rounded-lg">
             <p class="text-sm font-medium text-gray-500 uppercase">Período</p>
@@ -30,7 +30,7 @@
     </div>
 {% endinclude %}
 
-{% include "components/card.html" with title="Asiento de Cierre - Preview" %}
+{% include "components/cards/card.html" with title="Asiento de Cierre - Preview" %}
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -77,7 +77,7 @@
     </div>
 {% endinclude %}
 
-{% include "components/alert.html" with 
+{% include "components/alerts/alert.html" with 
     type="warning"
     title="Importante"
     message="Esta acción cerrará el ejercicio y no podrá revertirse fácilmente. Los asientos de ingresos y egresos se convertirán en datos históricos. El resultado se registrará en la cuenta de Resultados Acumulados." %}
@@ -85,8 +85,8 @@
 <div class="mt-6">
     <form action="{% url 'contabilidad:cerrar_ejercicio' ejercicio.pk %}" method="post" class="flex gap-2">
         {% csrf_token %}
-        {% include "components/button.html" with label="Confirmar Cierre" type="submit" variant="error" icon="fa-lock" %}
-        {% include "components/button.html" with label="Cancelar" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
+        {% include "components/buttons/button.html" with label="Confirmar Cierre" type="submit" variant="error" icon="fa-lock" %}
+        {% include "components/buttons/button.html" with label="Cancelar" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
     </form>
 </div>
 {% endblock %}

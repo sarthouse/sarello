@@ -10,18 +10,18 @@
 </div>
 
 <div class="max-w-2xl mx-auto">
-    {% include "components/card.html" with title=action|add:" Ejercicio Contable" %}
+    {% include "components/cards/card.html" with title=card_title %}
         <form method="post" class="space-y-4">
             {% csrf_token %}
             
-            {% include "components/form-group.html" with label="Nombre" field=form.nombre %}
-            {% include "components/form-group.html" with label="Fecha de inicio" field=form.fecha_inicio %}
-            {% include "components/form-group.html" with label="Fecha de fin" field=form.fecha_fin %}
-            {% include "components/form-group.html" with label="Estado" field=form.estado %}
-            {% include "components/form-group.html" with label="Ejercicio anterior" field=form.ejercicio_anterior %}
+            {% include "components/forms/form-group.html" with label="Nombre" field=form.nombre %}
+            {% include "components/forms/form-group.html" with label="Fecha de inicio" field=form.fecha_inicio %}
+            {% include "components/forms/form-group.html" with label="Fecha de fin" field=form.fecha_fin %}
+            {% include "components/forms/form-group.html" with label="Estado" field=form.estado %}
+            {% include "components/forms/form-group.html" with label="Ejercicio anterior" field=form.ejercicio_anterior %}
             
             <div class="mt-6 flex gap-2 pt-4">
-                {% include "components/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
+                {% include "components/buttons/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
                 <a href="{% url 'contabilidad:dashboard' %}" class="btn btn-ghost">
                     Cancelar
                 </a>

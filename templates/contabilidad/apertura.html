@@ -80,7 +80,7 @@
     </div>
     </div>
     {% else %}
-    {% include "components/empty-state.html" with message="No hay saldos para generar apertura. Verifique que el ejercicio anterior tenga movimientos." icon="fa-inbox" %}
+    {% include "components/empty-states/empty-state.html" with message="No hay saldos para generar apertura. Verifique que el ejercicio anterior tenga movimientos." icon="fa-inbox" %}
     {% endif %}
 </div>
 
@@ -88,11 +88,11 @@
     {% if lineas %}
     <form method="post" class="flex gap-2">
         {% csrf_token %}
-        {% include "components/button.html" with label="Generar Asiento de Apertura" type="submit" variant="success" icon="fa-plus" %}
-        {% include "components/button.html" with label="Cancelar" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
+        {% include "components/buttons/button.html" with label="Generar Asiento de Apertura" type="submit" variant="success" icon="fa-plus" %}
+        {% include "components/buttons/button.html" with label="Cancelar" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
     </form>
     {% else %}
-    {% include "components/button.html" with label="Volver" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
+    {% include "components/buttons/button.html" with label="Volver" href="{% url 'contabilidad:dashboard' %}" variant="secondary" %}
     {% endif %}
 </div>
 {% endblock %}

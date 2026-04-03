@@ -10,14 +10,14 @@
 </div>
 
 <div class="max-w-2xl mx-auto">
-    {% include "components/card.html" with title=action|add:" Cuenta Contable" %}
+    {% include "components/cards/card.html" with title=card_title %}
         <form method="post" class="space-y-4">
             {% csrf_token %}
             
-            {% include "components/form-group.html" with label="Código" field=form.codigo %}
-            {% include "components/form-group.html" with label="Nombre" field=form.nombre %}
-            {% include "components/form-group.html" with label="Tipo" field=form.tipo %}
-            {% include "components/form-group.html" with label="Cuenta Padre" field=form.padre %}
+            {% include "components/forms/form-group.html" with label="Código" field=form.codigo %}
+            {% include "components/forms/form-group.html" with label="Nombre" field=form.nombre %}
+            {% include "components/forms/form-group.html" with label="Tipo" field=form.tipo %}
+            {% include "components/forms/form-group.html" with label="Cuenta Padre" field=form.padre %}
             
             <div class="space-y-2">
                 <div class="flex items-center gap-2">
@@ -32,7 +32,7 @@
             </div>
             
             <div class="mt-6 flex gap-2 pt-4">
-                {% include "components/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
+                {% include "components/buttons/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
                 <a href="{% url 'contabilidad:plan_cuentas' %}" class="btn btn-ghost">
                     Cancelar
                 </a>
