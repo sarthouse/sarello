@@ -14,8 +14,9 @@
 .form-control select,
 .form-control textarea {
   @apply w-full rounded border px-3 py-2;
-  @apply text-gray-900;
+  @apply text-base-content;
   @apply border-base-300;
+  @apply bg-base-100/50;
   @apply transition-colors duration-200;
   @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
@@ -24,7 +25,7 @@
 
 .form-control input::placeholder,
 .form-control textarea::placeholder {
-  @apply text-gray-500;
+  @apply text-base-content/50;
 }
 
 .form-control textarea {

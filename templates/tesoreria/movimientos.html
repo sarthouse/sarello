@@ -3,25 +3,17 @@
 {% block title %}Movimientos de Tesorería{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-3xl font-bold text-base-content">Movimientos</h1>
-        <p class="text-base-content/60">Todos los movimientos de tesorería</p>
-    </div>
-    <div class="flex gap-2">
-        <a href="{% url 'tesoreria:ingresos' %}" class="bg-success text-white px-4 py-2 rounded hover:bg-success/90">
-            <i class="fas fa-plus mr-2"></i>Nuevo Ingreso
-        </a>
-        <a href="{% url 'tesoreria:egresos' %}" class="bg-error text-white px-4 py-2 rounded hover:bg-error/90">
-            <i class="fas fa-minus mr-2"></i>Nuevo Egreso
-        </a>
-    </div>
+{% include "components/page-header.html" with title="Movimientos" subtitle="Todos los movimientos de tesorería" %}
+<div class="mb-4">
+    <a href="{% url 'tesoreria:movimiento_create' %}" class="btn-primary">
+        <i class="fas fa-plus mr-2"></i>Nuevo Movimiento
+    </a>
 </div>
 
 <form method="get" class="mb-4 bg-base-200 p-4 rounded-lg shadow">
     <div class="flex flex-wrap items-center gap-4">
         <div>
-            <select name="cuenta" class="border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+            <select name="cuenta" class="form-select">
                 <option value="">Todas las cuentas</option>
                 {% for c in cuentas %}
                 <option value="{{ c.pk }}" {% if cuenta_filter == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
@@ -29,13 +21,23 @@
             </select>
         </div>
         <div>
-            <select name="tipo" class="border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+            <select name="tipo" class="form-select">
                 <option value="">Todos los tipos</option>
-                <option value="cobro" {% if tipo_filter == 'cobro' %}selected{% endif %}>Ingreso</option>
-                <option value="pago" {% if tipo_filter == 'pago' %}selected{% endif %}>Egreso</option>
+                <option value="cobro" {% if tipo_filter == 'cobro' %}selected{% endif %}>Cobro</option>
+                <option value="pago" {% if tipo_filter == 'pago' %}selected{% endif %}>Pago</option>
+                <option value="transferencia" {% if tipo_filter == 'transferencia' %}selected{% endif %}>Transferencia</option>
             </select>
         </div>
-        <button type="submit" class="bg-neutral text-neutral-content px-4 py-2 rounded hover:bg-neutral-focus">
+        <div>
+            <select name="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                <option value="borrador" {% if estado_filter == 'borrador' %}selected{% endif %}>Borrador</option>
+                <option value="confirmado" {% if estado_filter == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                <option value="anulado" {% if estado_filter == 'anulado' %}selected{% endif %}>Anulado</option>
+                <option value="cancelado" {% if estado_filter == 'cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-secondary">
             <i class="fas fa-search mr-2"></i>Filtrar
         </button>
     </div>
@@ -47,35 +49,57 @@
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Número</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Fecha</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Tipo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Importe</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Estado</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Importe</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Contacto</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Acciones</th>
             </tr>
         </thead>
         <tbody class="bg-base-200 divide-y divide-base-300">
             {% for m in page_obj %}
-            <tr class="hover:bg-base-300">
-                <td class="px-6 py-4 whitespace-nowrap font-mono text-base-content">{{ m.numero }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-base-content/60">{{ m.fecha }}</td>
-                <td class="px-6 py-4 text-base-content">{{ m.cuenta.nombre }}</td>
-                <td class="px-6 py-4">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if m.tipo == 'cobro' %}bg-success/20 text-success{% else %}bg-error/20 text-error{% endif %}">
-                        {{ m.get_tipo_display }}
-                    </span>
+            <tr class="hover:bg-base-300 {% if m.estado == 'anulado' %}opacity-50{% endif %}">
+                <td class="px-6 py-4 whitespace-nowrap font-mono text-base-content">
+                    <a href="{% url 'tesoreria:movimiento_detail' m.pk %}" class="text-primary hover:text-primary-focus">{{ m.numero }}</a>
                 </td>
-                <td class="px-6 py-4 font-bold {% if m.tipo == 'cobro' %}text-success{% else %}text-error{% endif %}">
-                    {{ m.importe|floatformat:2 }}
+                <td class="px-6 py-4 whitespace-nowrap text-base-content/60">{{ m.fecha }}</td>
+                <td class="px-6 py-4">
+                    {% if m.tipo == 'cobro' %}
+                    {% include "components/badges/badge.html" with label=m.get_tipo_display variant="success" %}
+                    {% elif m.tipo == 'pago' %}
+                    {% include "components/badges/badge.html" with label=m.get_tipo_display variant="error" %}
+                    {% else %}
+                    {% include "components/badges/badge.html" with label=m.get_tipo_display variant="warning" %}
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4">
+                    {% if m.estado == 'confirmado' %}
+                    {% include "components/badges/badge.html" with label=m.get_estado_display variant="success" %}
+                    {% elif m.estado == 'borrador' %}
+                    {% include "components/badges/badge.html" with label=m.get_estado_display variant="gray" %}
+                    {% elif m.estado == 'anulado' %}
+                    {% include "components/badges/badge.html" with label=m.get_estado_display variant="error" %}
+                    {% else %}
+                    {% include "components/badges/badge.html" with label=m.get_estado_display variant="gray" %}
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right font-bold text-base-content">
+                    {{ m.importe_total|floatformat:2 }}
                 </td>
                 <td class="px-6 py-4 text-base-content/60">{{ m.contacto.nombre|default:"-" }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="{% url 'tesoreria:movimiento_edit' m.pk %}" class="text-warning hover:text-warning/80 mr-2">
+                    {% if m.estado == 'confirmado' %}
+                    <a href="{% url 'tesoreria:movimiento_anular' m.pk %}" class="text-warning hover:text-warning/80 mr-2" title="Anular">
+                        <i class="fas fa-ban"></i>
+                    </a>
+                    {% elif m.estado == 'borrador' %}
+                    <a href="{% url 'tesoreria:movimiento_edit' m.pk %}" class="text-warning hover:text-warning/80 mr-2" title="Editar">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a href="{% url 'tesoreria:movimiento_delete' m.pk %}" class="text-error hover:text-error/80">
+                    <a href="{% url 'tesoreria:movimiento_delete' m.pk %}" class="text-error hover:text-error/80 mr-2" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
@@ -87,23 +111,5 @@
     </table>
 </div>
 
-{% if page_obj.has_other_pages %}
-<div class="mt-4 flex justify-center">
-    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-base-300 bg-base-200 text-base-content/60 hover:bg-base-300">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        {% endif %}
-        <span class="relative inline-flex items-center px-4 py-2 border border-base-300 bg-base-200 text-base-content text-sm font-medium">
-            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-        </span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-base-300 bg-base-200 text-base-content/60 hover:bg-base-300">
-            <i class="fas fa-chevron-right"></i>
-        </a>
-        {% endif %}
-    </nav>
-</div>
-{% endif %}
+{% include "components/pagination.html" with page_obj=page_obj %}
 {% endblock %}

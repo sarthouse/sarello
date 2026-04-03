@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Movimiento {{ movimiento.numero }}{% endblock %}
+
+{% block content %}
+{% include "components/page-header.html" with title="Movimiento "|add:movimiento.numero back_url="tesoreria:movimientos" %}
+
+<div class="max-w-4xl mx-auto">
+    <div class="bg-base-200 rounded-lg shadow p-6 mb-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <p class="text-base-content/60">{{ movimiento.get_tipo_display }} - {{ movimiento.fecha }}</p>
+            </div>
+            {% if movimiento.estado == 'confirmado' %}
+            {% include "components/badges/badge.html" with label=movimiento.get_estado_display variant="success" %}
+            {% elif movimiento.estado == 'borrador' %}
+            {% include "components/badges/badge.html" with label=movimiento.get_estado_display variant="gray" %}
+            {% elif movimiento.estado == 'anulado' %}
+            {% include "components/badges/badge.html" with label=movimiento.get_estado_display variant="error" %}
+            {% else %}
+            {% include "components/badges/badge.html" with label=movimiento.get_estado_display variant="gray" %}
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+                <p class="text-sm text-base-content/60">Observaciones</p>
+                <p class="text-base-content">{{ movimiento.observaciones|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-base-content/60">Contacto</p>
+                <p class="text-base-content">{{ movimiento.contacto.nombre|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-base-content/60">Importe Total</p>
+                <p class="text-xl font-bold text-base-content">{{ movimiento.importe_total|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        {% if movimiento.asiento_contable %}
+        <div class="mt-4 p-3 bg-base-300 rounded">
+            <p class="text-sm text-base-content/60">Asiento Contable</p>
+            <a href="{% url 'contabilidad:asiento_detail' movimiento.asiento_contable.pk %}" class="text-primary hover:text-primary-focus">
+                {{ movimiento.asiento_contable.numero }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="bg-base-200 rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-base-300">
+            <h2 class="font-semibold text-base-content">Líneas</h2>
+        </div>
+        <table class="min-w-full divide-y divide-base-300">
+            <thead class="bg-base-300">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Haber</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Contrapartida</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Descripción</th>
+                </tr>
+            </thead>
+            <tbody class="bg-base-200 divide-y divide-base-300">
+                {% for linea in movimiento.lineas.all %}
+                <tr>
+                    <td class="px-6 py-4 text-base-content">{{ linea.cuenta.nombre }}</td>
+                    <td class="px-6 py-4 text-right font-mono text-error">{% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% endif %}</td>
+                    <td class="px-6 py-4 text-right font-mono text-success">{% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% endif %}</td>
+                    <td class="px-6 py-4 text-base-content/60">{{ linea.cuenta_contrapartida|default:"-" }}</td>
+                    <td class="px-6 py-4 text-base-content/60">{{ linea.descripcion|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-base-content/60">Sin líneas</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6 flex gap-2">
+        {% if movimiento.estado == 'confirmado' %}
+        <a href="{% url 'tesoreria:movimiento_anular' movimiento.pk %}" class="btn-warning">
+            <i class="fas fa-ban mr-2"></i>Anular
+        </a>
+        {% elif movimiento.estado == 'borrador' %}
+        <a href="{% url 'tesoreria:movimiento_edit' movimiento.pk %}" class="btn-warning">
+            <i class="fas fa-edit mr-2"></i>Editar
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -4,30 +4,25 @@
 {% block title %}Plan de Cuentas{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-3xl font-bold text-base-content">Plan de Cuentas</h1>
-        <p class="text-base-content/60">Estructura jerárquica del plan contable</p>
-    </div>
-    <div class="flex gap-2">
-        <a href="{% url 'contabilidad:importar_cuentas' %}" class="bg-success text-white px-4 py-2 rounded hover:bg-success/90">
-            <i class="fas fa-file-import mr-2"></i>Importar
-        </a>
-        <a href="{% url 'contabilidad:cuenta_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
-            <i class="fas fa-plus mr-2"></i>Nueva Cuenta
-        </a>
-    </div>
+{% include "components/page-header.html" with title="Plan de Cuentas" subtitle="Estructura jerárquica del plan contable" %}
+<div class="mb-4 flex gap-2">
+    <a href="{% url 'contabilidad:importar_cuentas' %}" class="btn-success">
+        <i class="fas fa-file-import mr-2"></i>Importar
+    </a>
+    <a href="{% url 'contabilidad:cuenta_create' %}" class="btn-primary">
+        <i class="fas fa-plus mr-2"></i>Nueva Cuenta
+    </a>
 </div>
 
 <form method="GET" class="mb-4 bg-base-200 p-4 rounded-lg shadow">
     <div class="flex flex-wrap gap-4 items-end">
         <div class="flex-1 min-w-[200px]">
             <label class="block text-sm font-medium text-base-content mb-1">Buscar</label>
-            <input type="text" name="q" value="{{ q }}" placeholder="Código o nombre..." class="w-full border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+            <input type="text" name="q" value="{{ q }}" placeholder="Código o nombre..." class="form-input w-full">
         </div>
         <div class="w-40">
             <label class="block text-sm font-medium text-base-content mb-1">Tipo</label>
-            <select name="tipo" class="w-full border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+            <select name="tipo" class="form-select w-full">
                 <option value="">Todos</option>
                 <option value="activo" {% if tipo_filter == 'activo' %}selected{% endif %}>Activo</option>
                 <option value="pasivo" {% if tipo_filter == 'pasivo' %}selected{% endif %}>Pasivo</option>
@@ -38,20 +33,20 @@
         </div>
         <div class="w-40">
             <label class="block text-sm font-medium text-base-content mb-1">Movimientos</label>
-            <select name="acepta_movimientos" class="w-full border border-base-300 rounded px-3 py-2 bg-base-100 text-base-content">
+            <select name="acepta_movimientos" class="form-select w-full">
                 <option value="">Todos</option>
                 <option value="1" {% if acepta_filter == '1' %}selected{% endif %}>Sí</option>
                 <option value="0" {% if acepta_filter == '0' %}selected{% endif %}>No</option>
             </select>
         </div>
         <div class="flex items-center mb-2">
-            <input type="checkbox" name="show_inactive" value="1" id="show_inactive" {% if show_inactive %}checked{% endif %} class="rounded border-base-300">
+            <input type="checkbox" name="show_inactive" value="1" id="show_inactive" {% if show_inactive %}checked{% endif %}>
             <label for="show_inactive" class="ml-2 text-sm text-base-content">Mostrar inactivas</label>
         </div>
-        <button type="submit" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
+        <button type="submit" class="btn-primary">
             <i class="fas fa-search mr-1"></i>Buscar
         </button>
-        <a href="{% url 'contabilidad:plan_cuentas' %}" class="bg-base-content/30 text-base-content px-4 py-2 rounded hover:bg-base-content/20">
+        <a href="{% url 'contabilidad:plan_cuentas' %}" class="btn-ghost">
             Limpiar
         </a>
     </div>
@@ -61,16 +56,16 @@
     {% csrf_token %}
     <div class="mb-4 flex items-center gap-4">
         <label class="flex items-center cursor-pointer">
-            <input type="checkbox" id="select-all" class="rounded border-base-300">
+            <input type="checkbox" id="select-all">
             <span class="ml-2 text-sm text-base-content">Seleccionar todos</span>
         </label>
-        <select name="action" id="bulk-action" class="border border-base-300 rounded px-3 py-2 text-sm bg-base-100 text-base-content" disabled>
+        <select name="action" id="bulk-action" class="form-select text-sm" disabled>
             <option value="">Acción masiva...</option>
             <option value="activate">Activar</option>
             <option value="deactivate">Desactivar</option>
             <option value="delete">Eliminar</option>
         </select>
-        <button type="submit" id="bulk-submit" class="bg-error text-white px-4 py-2 rounded text-sm hover:bg-error/90 disabled:opacity-50" disabled>
+        <button type="submit" id="bulk-submit" class="btn-error btn-sm disabled:opacity-50" disabled>
             Aplicar
         </button>
     </div>
@@ -93,7 +88,7 @@
                 {% for cuenta in page_obj %}
                 <tr class="{% if cuenta.padre %}bg-base-300{% endif %}">
                     <td class="px-6 py-4">
-                        <input type="checkbox" name="cuentas" value="{{ cuenta.pk }}" class="cuenta-checkbox rounded border-base-300">
+                        <input type="checkbox" name="cuentas" value="{{ cuenta.pk }}" class="cuenta-checkbox">
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap font-mono text-base-content">{{ cuenta.codigo }}</td>
                     <td class="px-6 py-4 text-base-content">
@@ -102,20 +97,23 @@
                         {% if cuenta.padre %}</span>{% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {% if cuenta.tipo == 'activo' %}bg-primary/20 text-primary
-                            {% elif cuenta.tipo == 'pasivo' %}bg-error/20 text-error
-                            {% elif cuenta.tipo == 'patrimonio' %}bg-secondary/20 text-secondary
-                            {% elif cuenta.tipo == 'ingreso' %}bg-success/20 text-success
-                            {% else %}bg-warning/20 text-warning{% endif %}">
-                            {{ cuenta.get_tipo_display }}
-                        </span>
+                        {% if cuenta.tipo == 'activo' %}
+                        {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="primary" %}
+                        {% elif cuenta.tipo == 'pasivo' %}
+                        {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="error" %}
+                        {% elif cuenta.tipo == 'patrimonio' %}
+                        {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="secondary" %}
+                        {% elif cuenta.tipo == 'ingreso' %}
+                        {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="success" %}
+                        {% else %}
+                        {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="warning" %}
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap font-mono text-sm text-base-content/60">
                         {% if cuenta.padre %}{{ cuenta.padre.codigo }}{% else %}—{% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <button 
+                        <button
                             hx-post="{% url 'contabilidad:cuenta_toggle' cuenta.pk %}"
                             hx-swap="outerHTML"
                             class="text-sm px-2 py-1 rounded border {% if cuenta.activa %}bg-success/20 text-success border-success/30{% else %}bg-base-content/10 text-base-content/60 border-base-300{% endif %} hover:opacity-80">
@@ -126,7 +124,7 @@
                         {% if cuenta.acepta_movimientos %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-base-content/30"></i>{% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <button 
+                        <button
                             hx-get="{% url 'contabilidad:cuenta_detail' cuenta.pk %}"
                             hx-target="#modal-container"
                             hx-swap="innerHTML"
@@ -152,27 +150,7 @@
     </div>
 </form>
 
-{% if page_obj.has_other_pages %}
-<div class="mt-4 flex justify-center">
-    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-base-300 bg-base-200 text-base-content/60 hover:bg-base-300">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        {% endif %}
-        
-        <span class="relative inline-flex items-center px-4 py-2 border border-base-300 bg-base-200 text-base-content text-sm font-medium">
-            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-        </span>
-        
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-base-300 bg-base-200 text-base-content/60 hover:bg-base-300">
-            <i class="fas fa-chevron-right"></i>
-        </a>
-        {% endif %}
-    </nav>
-</div>
-{% endif %}
+{% include "components/pagination.html" with page_obj=page_obj %}
 
 <script defer src="{% static 'js/modules/utils.js' %}"></script>
 <script defer src="{% static 'js/modules/accounting/plan-cuentas.js' %}"></script>

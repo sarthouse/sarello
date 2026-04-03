@@ -3,51 +3,13 @@
 {% block title %}Tesorería{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-base-content">Tesorería</h1>
-    <p class="text-base-content/60">Gestión de cajas y bancos</p>
-</div>
+{% include "components/page-header.html" with title="Tesorería" subtitle="Gestión de cajas y bancos" %}
 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    <a href="{% url 'tesoreria:saldo_cuentas' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-base-content/60">Saldos</p>
-                <p class="text-2xl font-bold">Ver</p>
-            </div>
-            <i class="fas fa-wallet text-4xl text-primary"></i>
-        </div>
-    </a>
-
-    <a href="{% url 'tesoreria:movimientos' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-base-content/60">Movimientos</p>
-                <p class="text-2xl font-bold">Ver</p>
-            </div>
-            <i class="fas fa-exchange-alt text-4xl text-success"></i>
-        </div>
-    </a>
-
-    <a href="{% url 'tesoreria:ingresos' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-base-content/60">Ingresos</p>
-                <p class="text-2xl font-bold text-success">+</p>
-            </div>
-            <i class="fas fa-arrow-down text-4xl text-success"></i>
-        </div>
-    </a>
-
-    <a href="{% url 'tesoreria:egresos' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-base-content/60">Egresos</p>
-                <p class="text-2xl font-bold text-error">-</p>
-            </div>
-            <i class="fas fa-arrow-up text-4xl text-error"></i>
-        </div>
-    </a>
+    {% include "components/cards/stat-card.html" with title="Saldos" value="Ver" icon="fa-wallet" color="primary" url="tesoreria:saldo_cuentas" %}
+    {% include "components/cards/stat-card.html" with title="Movimientos" value="Ver" icon="fa-exchange-alt" color="success" url="tesoreria:movimientos" %}
+    {% include "components/cards/stat-card.html" with title="Nuevo Movimiento" value="+" icon="fa-plus-circle" color="primary" url="tesoreria:movimiento_create" %}
+    {% include "components/cards/stat-card.html" with title="Conciliar" value="Ver" icon="fa-balance-scale" color="warning" url="tesoreria:conciliar" %}
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,7 +18,7 @@
             <h2 class="text-xl font-semibold text-base-content">Cuentas Activas</h2>
             <a href="{% url 'tesoreria:cuentas' %}" class="text-primary hover:text-primary/80 text-sm">Ver todas</a>
         </div>
-        
+
         {% if cuentas %}
         <div class="space-y-3">
             {% for cuenta in cuentas %}
@@ -65,14 +27,14 @@
                     <p class="font-medium text-base-content">{{ cuenta.nombre }}</p>
                     <p class="text-sm text-base-content/60">{{ cuenta.get_tipo_display }} - {{ cuenta.get_moneda_display }}</p>
                 </div>
-                <p class="font-bold {% if cuenta.saldo_actual >= 0 %}text-success{% else %}text-error{% endif %}">
-                    {{ cuenta.moneda }} {{ cuenta.saldo_actual|floatformat:2 }}
+                <p class="font-bold {% if cuenta.saldo_contable >= 0 %}text-success{% else %}text-error{% endif %}">
+                    {{ cuenta.moneda }} {{ cuenta.saldo_contable|floatformat:2 }}
                 </p>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-base-content/60">No hay cuentas configuradas.</p>
+        {% include "components/empty-states/empty-state.html" with icon="fa-wallet" title="No hay cuentas configuradas" action_url="tesoreria:cuenta_create" action_label="Crear cuenta" %}
         {% endif %}
     </div>
 
@@ -80,7 +42,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-base-content">Totales por Moneda</h2>
         </div>
-        
+
         <div class="space-y-3">
             <div class="flex justify-between items-center border-b border-base-300 pb-2">
                 <span class="font-medium text-base-content">Total ARS</span>
@@ -91,9 +53,9 @@
                 <span class="font-bold text-primary">$ {{ total_usd|floatformat:2 }}</span>
             </div>
         </div>
-        
+
         <div class="mt-4">
-            <a href="{% url 'tesoreria:caja_diaria' %}" class="block text-center bg-neutral text-neutral-content px-4 py-2 rounded hover:bg-neutral-focus">
+            <a href="{% url 'tesoreria:caja_diaria' %}" class="btn-secondary btn-md">
                 <i class="fas fa-cash-register mr-2"></i>Caja Diaria
             </a>
         </div>

@@ -1,0 +1,22 @@
+{# components/buttons/action-bar.html #}
+{# Usage: {% include "components/buttons/action-bar.html" with items=action_items %} #}
+{# action_items: list of dicts with url, label, icon, variant (primary|success|error|warning|neutral|base) #}
+
+<div class="flex gap-2 flex-wrap">
+    {% for item in items %}
+    {% with variant=item.variant|default:"primary" %}
+    <a href="{{ item.url }}" class="
+        {% if variant == 'primary' %}bg-primary text-white hover:bg-primary/90
+        {% elif variant == 'success' %}bg-success text-white hover:bg-success/90
+        {% elif variant == 'error' %}bg-error text-white hover:bg-error/90
+        {% elif variant == 'warning' %}bg-warning text-white hover:bg-warning/90
+        {% elif variant == 'neutral' %}bg-neutral text-neutral-content hover:bg-neutral/90
+        {% else %}bg-base-300 text-base-content hover:bg-base-content/10{% endif %}
+        px-4 py-2 rounded text-sm font-medium transition
+    ">
+        {% if item.icon %}<i class="fas {{ item.icon }} mr-2"></i>{% endif %}
+        {{ item.label }}
+    </a>
+    {% endwith %}
+    {% endfor %}
+</div>

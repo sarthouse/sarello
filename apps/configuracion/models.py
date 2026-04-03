@@ -35,48 +35,6 @@ class ParametroSistema(TimeStampedModel):
             return default
 
 
-class MapeoContable(TimeStampedModel):
-    EVENTO_CHOICES = [
-        ('venta_gravada', 'Venta gravada'),
-        ('venta_exenta', 'Venta exenta'),
-        ('venta_iva', 'Venta IVA'),
-        ('compra_gravada', 'Compra gravada'),
-        ('compra_exenta', 'Compra exenta'),
-        ('compra_iva', 'Compra IVA'),
-        ('cobro_efectivo', 'Cobro en efectivo'),
-        ('cobro_banco', 'Cobro por banco'),
-        ('pago_efectivo', 'Pago en efectivo'),
-        ('pago_banco', 'Pago por banco'),
-        ('ajuste_stock_entrada', 'Ajuste stock entrada'),
-        ('ajuste_stock_salida', 'Ajuste stock salida'),
-        ('devolucion_venta', 'Devolución de venta'),
-        ('devolucion_compra', 'Devolución de compra'),
-    ]
-
-    evento = models.CharField(max_length=50, unique=True, choices=EVENTO_CHOICES, verbose_name='Evento')
-    cuenta_debe = models.ForeignKey(
-        'contabilidad.CuentaContable',
-        on_delete=models.PROTECT,
-        related_name='+',
-        verbose_name='Cuenta debe'
-    )
-    cuenta_haber = models.ForeignKey(
-        'contabilidad.CuentaContable',
-        on_delete=models.PROTECT,
-        related_name='+',
-        verbose_name='Cuenta haber'
-    )
-    descripcion = models.CharField(max_length=200, blank=True, verbose_name='Descripcion')
-    activo = models.BooleanField(default=True, verbose_name='Activo')
-
-    class Meta:
-        verbose_name = 'Mapeo contable'
-        verbose_name_plural = 'Mapeos contables'
-
-    def __str__(self):
-        return f"{self.get_evento_display()} -> D:{self.cuenta_debe.codigo} / H:{self.cuenta_haber.codigo}"
-
-
 class DatosEmpresa(TimeStampedModel):
     razon_social = models.CharField(max_length=200, verbose_name='Razón social')
     nombre_fantasia = models.CharField(max_length=200, blank=True, verbose_name='Nombre de fantasía')

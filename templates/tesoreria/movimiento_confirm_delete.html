@@ -3,24 +3,19 @@
 {% block title %}Eliminar Movimiento{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'tesoreria:movimientos' %}" class="text-blue-600 hover:text-blue-800">
-        <i class="fas fa-arrow-left mr-2"></i>Volver
-    </a>
-</div>
+{% include "components/page-header.html" with title="Eliminar Movimiento" back_url="tesoreria:movimientos" %}
 
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold mb-4">Eliminar Movimiento</h1>
-        <p class="text-base-content mb-4">¿Está seguro de eliminar el movimiento <strong>{{ movimiento.numero }}</strong> ({{ movimiento.get_tipo_display }} - ${{ movimiento.importe }})?</p>
-        
+    <div class="bg-base-200 rounded-lg shadow p-6">
+        <p class="text-base-content mb-4">¿Está seguro de eliminar el movimiento <strong>{{ movimiento.numero }}</strong> ({{ movimiento.get_tipo_display }} - ${{ movimiento.importe_total|floatformat:2 }})?</p>
+
         <form method="post">
             {% csrf_token %}
             <div class="flex gap-2">
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                <button type="submit" class="btn-error">
                     <i class="fas fa-trash mr-2"></i>Eliminar
                 </button>
-                <a href="{% url 'tesoreria:movimientos' %}" class="bg-gray-300 text-base-content px-4 py-2 rounded hover:bg-base-300">
+                <a href="{% url 'tesoreria:movimientos' %}" class="btn-ghost">
                     Cancelar
                 </a>
             </div>

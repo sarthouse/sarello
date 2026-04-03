@@ -33,8 +33,8 @@
             <li><a href="{% url 'tesoreria:index' %}"><i class="fas fa-tachometer-alt w-5"></i>Dashboard</a></li>
             <li><a href="{% url 'tesoreria:cuentas' %}"><i class="fas fa-wallet w-5"></i>Cuentas</a></li>
             <li><a href="{% url 'tesoreria:movimientos' %}"><i class="fas fa-exchange-alt w-5"></i>Movimientos</a></li>
-            <li><a href="{% url 'tesoreria:ingresos' %}"><i class="fas fa-arrow-down w-5"></i>Ingresos</a></li>
-            <li><a href="{% url 'tesoreria:egresos' %}"><i class="fas fa-arrow-up w-5"></i>Egresos</a></li>
+            <li><a href="{% url 'tesoreria:movimiento_create' %}?tipo=cobro"><i class="fas fa-arrow-down w-5"></i>Cobros</a></li>
+            <li><a href="{% url 'tesoreria:movimiento_create' %}?tipo=pago"><i class="fas fa-arrow-up w-5"></i>Pagos</a></li>
             <li><a href="{% url 'tesoreria:caja_diaria' %}"><i class="fas fa-cash-register w-5"></i>Caja Diaria</a></li>
 
             <!-- General -->

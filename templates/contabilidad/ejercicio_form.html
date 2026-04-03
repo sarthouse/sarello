@@ -3,29 +3,28 @@
 {% block title %}{{ action }} Ejercicio{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'contabilidad:dashboard' %}" class="text-primary hover:text-primary-focus">
-        <i class="fas fa-arrow-left mr-2"></i>Volver al dashboard
-    </a>
-</div>
+{% include "components/page-header.html" with title=action|add:" Ejercicio" back_url="contabilidad:dashboard" %}
 
 <div class="max-w-2xl mx-auto">
-    {% include "components/cards/card.html" with title=card_title %}
+    <div class="bg-base-200 rounded-lg shadow p-6">
         <form method="post" class="space-y-4">
             {% csrf_token %}
-            
+
             {% include "components/forms/form-group.html" with label="Nombre" field=form.nombre %}
             {% include "components/forms/form-group.html" with label="Fecha de inicio" field=form.fecha_inicio %}
             {% include "components/forms/form-group.html" with label="Fecha de fin" field=form.fecha_fin %}
             {% include "components/forms/form-group.html" with label="Estado" field=form.estado %}
             {% include "components/forms/form-group.html" with label="Ejercicio anterior" field=form.ejercicio_anterior %}
-            
+
             <div class="mt-6 flex gap-2 pt-4">
-                {% include "components/buttons/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
-                <a href="{% url 'contabilidad:dashboard' %}" class="btn btn-ghost">
+                <button type="submit" class="btn-success">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'contabilidad:dashboard' %}" class="btn-warning">
                     Cancelar
                 </a>
             </div>
         </form>
+    </div>
 </div>
 {% endblock %}

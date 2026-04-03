@@ -1,67 +1,84 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ action }} Movimiento{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'tesoreria:movimientos' %}" class="text-primary hover:text-primary-focus">
-        <i class="fas fa-arrow-left mr-2"></i>Volver a movimientos
-    </a>
-</div>
+{% include "components/page-header.html" with title=action|add:" Movimiento de Tesorería" back_url="tesoreria:movimientos" %}
 
-<div class="max-w-2xl mx-auto">
+<div class="max-w-5xl mx-auto">
     <div class="bg-base-200 rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold mb-6 text-base-content">{{ action }} Movimiento de Tesorería</h1>
-        
-        <form method="post">
+        <form method="post" id="movimiento-form">
             {% csrf_token %}
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Cuenta</label>
-                    {{ form.cuenta }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Tipo</label>
-                    {{ form.tipo }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Importe</label>
-                    {{ form.importe }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Fecha</label>
-                    {{ form.fecha }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Descripción</label>
-                    {{ form.descripcion }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Contacto</label>
-                    {{ form.contacto }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Observaciones</label>
-                    {{ form.observaciones }}
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {% include "components/forms/form-group.html" with field=form.tipo label=form.tipo.label %}
+                {% include "components/forms/form-group.html" with field=form.fecha label=form.fecha.label %}
+                {% include "components/forms/form-group.html" with field=form.contacto label=form.contacto.label %}
+                <div class="md:col-span-3">
+                    {% include "components/forms/form-group.html" with field=form.observaciones label=form.observaciones.label %}
                 </div>
             </div>
-            
-            <div class="mt-6 flex gap-2">
-                <button type="submit" class="bg-neutral text-neutral-content px-4 py-2 rounded hover:bg-neutral-focus">
+
+            <h2 class="text-lg font-semibold mb-4 text-base-content">Líneas del Movimiento</h2>
+
+            <div class="overflow-x-auto mb-4">
+                <table class="min-w-full border rounded-lg" id="lineas-table">
+                    <thead class="bg-base-300">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-base-content/60">Cuenta</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-base-content/60">Debe</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-base-content/60">Haber</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-base-content/60">Contrapartida</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-base-content/60">Descripción</th>
+                            <th class="px-4 py-2 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lineas-body">
+                        {% for form_linea in formset %}
+                        <tr class="linea-row border-t border-base-300">
+                            {{ form_linea.id }}
+                            <td class="px-2 py-2">{{ form_linea.cuenta }}</td>
+                            <td class="px-2 py-2">{{ form_linea.debe }}</td>
+                            <td class="px-2 py-2">{{ form_linea.haber }}</td>
+                            <td class="px-2 py-2">{{ form_linea.cuenta_contrapartida }}</td>
+                            <td class="px-2 py-2">{{ form_linea.descripcion }}</td>
+                            <td class="px-2 py-2 text-center">
+                                {% if form_linea.DELETE %}
+                                <label class="text-error cursor-pointer">{{ form_linea.DELETE }}</label>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="bg-base-300 border-t">
+                        <tr>
+                            <td class="px-4 py-2 font-medium text-right text-base-content">Totales:</td>
+                            <td class="px-4 py-2 text-right font-bold text-error" id="total-debe">0.00</td>
+                            <td class="px-4 py-2 text-right font-bold text-success" id="total-haber">0.00</td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            {{ formset.management_form }}
+
+            <button type="button" id="add-line" class="btn-ghost btn-sm mb-6">
+                <i class="fas fa-plus mr-1"></i>Agregar línea
+            </button>
+
+            <div class="flex gap-2">
+                <button type="submit" class="btn-success">
                     <i class="fas fa-save mr-2"></i>Guardar
                 </button>
-                <a href="{% url 'tesoreria:movimientos' %}" class="bg-base-300 text-base-content px-4 py-2 rounded hover:bg-base-content/20">
+                <a href="{% url 'tesoreria:movimientos' %}" class="btn-warning">
                     Cancelar
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+<script defer src="{% static 'js/modules/treasury/movimientos.js' %}"></script>
 {% endblock %}

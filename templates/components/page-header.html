@@ -1,0 +1,21 @@
+{# components/page-header.html #}
+{# Usage: {% include "components/page-header.html" with title="Movimientos" subtitle="Todos los movimientos" back_url="tesoreria:movimientos" actions_html="<a href='...'>Nuevo</a>" %} #}
+
+<div class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+    <div>
+        {% if back_url %}
+        <a href="{% url back_url %}" class="text-primary hover:text-primary-focus mb-2 inline-block text-sm">
+            <i class="fas fa-arrow-left mr-1"></i>Volver
+        </a>
+        {% endif %}
+        <h1 class="text-3xl font-bold text-base-content">{{ title }}</h1>
+        {% if subtitle %}
+        <p class="text-base-content/60 mt-1">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {% if actions_html %}
+    <div class="flex gap-2 flex-shrink-0">
+        {{ actions_html|safe }}
+    </div>
+    {% endif %}
+</div>

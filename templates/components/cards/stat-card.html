@@ -1,0 +1,14 @@
+{# components/cards/stat-card.html #}
+{# Usage: {% include "components/cards/stat-card.html" with title="Total ARS" value=total_ars|floatformat:2 icon="fa-wallet" color="success" url="tesoreria:saldo_cuentas" url_label="Ver" %} #}
+
+{% with color=color|default:"primary" %}
+<a href="{{ url }}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm text-base-content/60">{{ title }}</p>
+            <p class="text-2xl font-bold text-{{ color }}">{{ value }}</p>
+        </div>
+        <i class="fas {{ icon }} text-4xl text-{{ color }}"></i>
+    </div>
+</a>
+{% endwith %}

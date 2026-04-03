@@ -3,12 +3,9 @@
 {% block title %}Cuentas de Tesorería{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-3xl font-bold text-base-content">Cuentas de Tesorería</h1>
-        <p class="text-base-content/60">Cajas y bancos</p>
-    </div>
-    <a href="{% url 'tesoreria:cuenta_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
+{% include "components/page-header.html" with title="Cuentas de Tesorería" subtitle="Cajas y bancos" %}
+<div class="mb-4">
+    <a href="{% url 'tesoreria:cuenta_create' %}" class="btn-primary">
         <i class="fas fa-plus mr-2"></i>Nueva Cuenta
     </a>
 </div>
@@ -32,12 +29,13 @@
             <tr class="hover:bg-base-300">
                 <td class="px-6 py-4 font-medium text-base-content">{{ cuenta.nombre }}</td>
                 <td class="px-6 py-4">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        {% if cuenta.tipo == 'caja' %}bg-warning/20 text-warning
-                        {% elif cuenta.tipo == 'banco' %}bg-primary/20 text-primary
-                        {% else %}bg-secondary/20 text-secondary{% endif %}">
-                        {{ cuenta.get_tipo_display }}
-                    </span>
+                    {% if cuenta.tipo == 'caja' %}
+                    {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="warning" %}
+                    {% elif cuenta.tipo == 'banco' %}
+                    {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="primary" %}
+                    {% else %}
+                    {% include "components/badges/badge.html" with label=cuenta.get_tipo_display variant="secondary" %}
+                    {% endif %}
                 </td>
                 <td class="px-6 py-4 text-base-content">{{ cuenta.get_moneda_display }}</td>
                 <td class="px-6 py-4 text-base-content/60">{{ cuenta.cuenta_contable.codigo|default:"-" }}</td>

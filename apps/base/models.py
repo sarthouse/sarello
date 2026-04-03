@@ -16,6 +16,7 @@ class DocumentoBase(TimeStampedModel):
         ('borrador', 'Borrador'),
         ('confirmado', 'Confirmado'),
         ('cancelado', 'Cancelado'),
+        ('anulado', 'Anulado'),
     ]
 
     numero = models.CharField(max_length=20, unique=True, verbose_name='Número')

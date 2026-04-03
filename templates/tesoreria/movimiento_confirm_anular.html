@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Anular Movimiento{% endblock %}
+
+{% block content %}
+{% include "components/page-header.html" with title="Anular Movimiento" back_url="tesoreria:movimientos" %}
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-base-200 rounded-lg shadow p-6">
+        <p class="text-base-content/60 mb-4">
+            ¿Está seguro que desea anular el movimiento <strong>{{ movimiento.numero }}</strong>?
+        </p>
+
+        <div class="bg-base-300 rounded p-4 mb-6">
+            <p class="text-sm text-base-content/60">Tipo</p>
+            <p class="font-medium text-base-content">{{ movimiento.get_tipo_display }}</p>
+            <p class="text-sm text-base-content/60 mt-2">Importe Total</p>
+            <p class="font-bold text-base-content">{{ movimiento.importe_total|floatformat:2 }}</p>
+        </div>
+
+        <p class="text-sm text-warning mb-6">
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            Esta acción generará un asiento contable de anulación y no se puede deshacer.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex gap-2">
+                <button type="submit" class="btn-warning">
+                    <i class="fas fa-ban mr-2"></i>Confirmar Anulación
+                </button>
+                <a href="{% url 'tesoreria:movimientos' %}" class="btn-ghost">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

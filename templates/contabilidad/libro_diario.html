@@ -3,17 +3,22 @@
 {% block title %}Libro Diario{% endblock %}
 
 {% block content %}
-{% include "components/page-header.html" with title="Libro Diario" subtitle="Registro cronológico de asientos" action_label="Nuevo Asiento" action_url="{% url 'contabilidad:asiento_create' %}" action_icon="fa-plus" %}
+{% include "components/page-header.html" with title="Libro Diario" subtitle="Registro cronológico de asientos" %}
+<div class="mb-4">
+    <a href="{% url 'contabilidad:asiento_create' %}" class="btn-primary">
+        <i class="fas fa-plus mr-2"></i>Nuevo Asiento
+    </a>
+</div>
 
-<div class="bg-base-200 rounded-lg shadow overflow-hidden">
-    <div class="bg-base-300 px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-base-content900">Filtros</h2>
+<div class="bg-base-200 rounded-lg shadow overflow-hidden mb-6">
+    <div class="bg-base-300 px-6 py-4 border-b border-base-300">
+        <h2 class="text-lg font-semibold text-base-content">Filtros</h2>
     </div>
     <div class="px-6 py-4">
         <form method="get" class="flex items-center gap-4">
             <div>
-                <label class="block text-sm font-medium text-base-content700 mb-1">Ejercicio:</label>
-                <select name="ejercicio" class="select select-bordered">
+                <label class="block text-sm font-medium text-base-content mb-1">Ejercicio:</label>
+                <select name="ejercicio" class="form-select">
                     <option value="">Todos</option>
                     {% for ej in ejercicios %}
                     <option value="{{ ej.pk }}" {% if ejercicio_seleccionado == ej.pk|stringformat:"s" %}selected{% endif %}>
@@ -22,66 +27,66 @@
                     {% endfor %}
                 </select>
             </div>
-            {% include "components/buttons/button.html" with label="Filtrar" variant="primary" type="submit" icon="fa-filter" %}
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
+                <i class="fas fa-filter mr-2"></i>Filtrar
+            </button>
         </form>
     </div>
 </div>
 
 <div class="bg-base-200 rounded-lg shadow overflow-hidden">
-    <div class="px-6 py-4">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <table class="min-w-full divide-y divide-base-300">
+        <thead class="bg-base-300">
             <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-base-content500 uppercase">Fecha</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-base-content500 uppercase">Asiento</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-base-content500 uppercase">Cuenta</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-base-content500 uppercase">Descripción</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-base-content500 uppercase">Debe</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-base-content500 uppercase">Haber</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Fecha</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Asiento</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Descripción</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Debe</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Haber</th>
             </tr>
         </thead>
-        <tbody class="bg-base-200 divide-y divide-gray-200">
+        <tbody class="bg-base-200 divide-y divide-base-300">
             {% for asiento in asientos %}
             {% for linea in asiento.lineas.all %}
-            <tr class="{% if forloop.first %}bg-blue-50{% endif %}">
+            <tr class="{% if forloop.first %}bg-primary/5{% endif %}">
                 {% if forloop.first %}
-                <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3 text-base-content500 whitespace-nowrap">{{ asiento.fecha }}</td>
+                <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3 text-base-content/60 whitespace-nowrap">{{ asiento.fecha }}</td>
                 <td rowspan="{{ asiento.lineas.count }}" class="px-4 py-3">
-                    <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="text-blue-600 hover:text-blue-900 font-mono">
+                    <a href="{% url 'contabilidad:asiento_detail' asiento.pk %}" class="text-primary hover:text-primary-focus font-mono">
                         {{ asiento.numero }}
                     </a>
                 </td>
                 {% endif %}
                 <td class="px-4 py-2">
                     <span class="font-mono text-sm">{{ linea.cuenta.codigo }}</span>
-                    <span class="text-base-content500 text-sm ml-2">{{ linea.cuenta.nombre|truncatechars:20 }}</span>
+                    <span class="text-base-content/60 text-sm ml-2">{{ linea.cuenta.nombre|truncatechars:20 }}</span>
                 </td>
-                <td class="px-4 py-2 text-base-content500 text-sm">{{ linea.descripcion|default:"-"|truncatechars:30 }}</td>
-                <td class="px-4 py-2 text-right {% if linea.debe > 0 %}text-green-600 font-medium{% else %}text-base-content300{% endif %}">{{ linea.debe|default:"-" }}</td>
-                <td class="px-4 py-2 text-right {% if linea.haber > 0 %}text-red-600 font-medium{% else %}text-base-content300{% endif %}">{{ linea.haber|default:"-" }}</td>
+                <td class="px-4 py-2 text-base-content/60 text-sm">{{ linea.descripcion|default:"-"|truncatechars:30 }}</td>
+                <td class="px-4 py-2 text-right {% if linea.debe > 0 %}text-success font-medium{% else %}text-base-content/30{% endif %}">{{ linea.debe|default:"-" }}</td>
+                <td class="px-4 py-2 text-right {% if linea.haber > 0 %}text-error font-medium{% else %}text-base-content/30{% endif %}">{{ linea.haber|default:"-" }}</td>
             </tr>
             {% endfor %}
-            <tr class="bg-gray-100 font-semibold">
+            <tr class="bg-base-300 font-semibold">
                 <td colspan="4" class="px-4 py-2 text-right">Totales:</td>
-                <td class="px-4 py-2 text-right text-green-600">{{ asiento.total_debe }}</td>
-                <td class="px-4 py-2 text-right text-red-600">{{ asiento.total_haber }}</td>
+                <td class="px-4 py-2 text-right text-success">{{ asiento.total_debe }}</td>
+                <td class="px-4 py-2 text-right text-error">{{ asiento.total_haber }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="px-6 py-4 text-center text-base-content500">No hay asientos en el período seleccionado</td>
+                <td colspan="6" class="px-6 py-4 text-center text-base-content/60">No hay asientos en el período seleccionado</td>
             </tr>
             {% endfor %}
         </tbody>
         {% if asientos %}
-        <tfoot class="bg-slate-100 font-bold">
+        <tfoot class="bg-base-300 font-bold">
             <tr>
                 <td colspan="4" class="px-6 py-3 text-right">Totales del período:</td>
-                <td class="px-6 py-3 text-right text-green-600 text-lg">{{ total_debe }}</td>
-                <td class="px-6 py-3 text-right text-red-600 text-lg">{{ total_haber }}</td>
+                <td class="px-6 py-3 text-right text-success text-lg">{{ total_debe }}</td>
+                <td class="px-6 py-3 text-right text-error text-lg">{{ total_haber }}</td>
             </tr>
         </tfoot>
         {% endif %}
     </table>
-</div></div>
 </div>
 {% endblock %}

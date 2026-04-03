@@ -3,79 +3,53 @@
 {% block title %}Saldos de Cuentas{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <div>
-        <h1 class="text-3xl font-bold text-base-content">Saldos de Cuentas</h1>
-        <p class="text-base-content/60">Estado actual de tesorería</p>
-    </div>
-    <a href="{% url 'tesoreria:cuenta_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
+{% include "components/page-header.html" with title="Saldos de Cuentas" subtitle="Estado actual de tesorería" %}
+<div class="mb-4">
+    <a href="{% url 'tesoreria:cuenta_create' %}" class="btn-primary">
         <i class="fas fa-plus mr-2"></i>Nueva Cuenta
     </a>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    {% for cuenta in cuentas %}
+    {% for conc in conciliaciones %}
     <div class="bg-base-200 rounded-lg shadow p-6">
         <div class="flex justify-between items-start mb-4">
             <div>
-                <h2 class="text-xl font-semibold text-base-content">{{ cuenta.nombre }}</h2>
-                <p class="text-sm text-base-content/60">{{ cuenta.get_tipo_display }} - {{ cuenta.get_moneda_display }}</p>
+                <h2 class="text-xl font-semibold text-base-content">{{ conc.cuenta.nombre }}</h2>
+                <p class="text-sm text-base-content/60">{{ conc.cuenta.get_tipo_display }} - {{ conc.cuenta.get_moneda_display }}</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-sm font-semibold 
-                {% if cuenta.tipo == 'caja' %}bg-warning/20 text-warning
-                {% elif cuenta.tipo == 'banco' %}bg-primary/20 text-primary
-                {% else %}bg-secondary/20 text-secondary{% endif %}">
-                {{ cuenta.get_tipo_display }}
-            </span>
+            {% if conc.conciliado %}
+            {% include "components/badges/badge.html" with label="Conciliado" icon="fa-check" variant="success" %}
+            {% else %}
+            {% include "components/badges/badge.html" with label="Descuadrado" icon="fa-exclamation-triangle" variant="error" %}
+            {% endif %}
         </div>
-        
-        <div class="text-3xl font-bold {% if cuenta.saldo_actual >= 0 %}text-success{% else %}text-error{% endif %}">
-            {{ cuenta.moneda }} {{ cuenta.saldo_actual|floatformat:2 }}
+
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Saldo Tesorería</span>
+                <span class="font-bold text-base-content">{{ conc.cuenta.moneda }} {{ conc.saldo_tesoreria|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-base-content/60">Saldo Contable</span>
+                <span class="font-bold text-base-content">{{ conc.cuenta.moneda }} {{ conc.saldo_contable|floatformat:2 }}</span>
+            </div>
+            {% if conc.diferencia != 0 %}
+            <div class="flex justify-between border-t border-base-300 pt-2">
+                <span class="text-error">Diferencia</span>
+                <span class="font-bold text-error">{{ conc.cuenta.moneda }} {{ conc.diferencia|floatformat:2 }}</span>
+            </div>
+            {% endif %}
         </div>
-        
+
         <div class="mt-4 flex gap-2">
-            <a href="{% url 'tesoreria:ingresos' %}?cuenta={{ cuenta.pk }}" class="bg-success text-white px-3 py-1 rounded text-sm hover:bg-success/90">
-                <i class="fas fa-plus mr-1"></i>Ingreso
-            </a>
-            <a href="{% url 'tesoreria:egresos' %}?cuenta={{ cuenta.pk }}" class="bg-error text-white px-3 py-1 rounded text-sm hover:bg-error/90">
-                <i class="fas fa-minus mr-1"></i>Egreso
-            </a>
-            <a href="{% url 'tesoreria:cuenta_edit' cuenta.pk %}" class="bg-base-300 text-base-content px-3 py-1 rounded text-sm hover:bg-base-content/20">
+            <a href="{% url 'tesoreria:cuenta_edit' conc.cuenta.pk %}" class="btn-ghost btn-sm">
                 <i class="fas fa-edit"></i>
             </a>
         </div>
     </div>
     {% empty %}
-    <div class="col-span-2 bg-base-200 rounded-lg shadow p-6 text-center">
-        <p class="text-base-content/60">No hay cuentas de tesorería configuradas.</p>
-        <a href="{% url 'tesoreria:cuenta_create' %}" class="text-primary hover:text-primary/80 mt-2 inline-block">
-            Crear primera cuenta
-        </a>
-    </div>
+    {% include "components/empty-states/empty-state.html" with icon="fa-wallet" title="No hay cuentas de tesorería configuradas" action_url="tesoreria:cuenta_create" action_label="Crear primera cuenta" %}
     {% endfor %}
-</div>
-
-<div class="bg-base-200 rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4 text-base-content">Resumen Total</h2>
-    <div class="grid grid-cols-3 gap-4 text-center">
-        <div>
-            <p class="text-sm text-base-content/60">Cajas</p>
-            <p class="text-2xl font-bold text-base-content">
-                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'caja' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
-            </p>
-        </div>
-        <div>
-            <p class="text-sm text-base-content/60">Bancos</p>
-            <p class="text-2xl font-bold text-base-content">
-                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'banco' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
-            </p>
-        </div>
-        <div>
-            <p class="text-sm text-base-content/60">Digitales</p>
-            <p class="text-2xl font-bold text-base-content">
-                $ {% for cuenta in cuentas %}{% if cuenta.tipo == 'digital' %}{{ cuenta.saldo_actual|floatformat:2 }}{% endif %}{% endfor %}
-            </p>
-        </div>
-    </div>
 </div>
 {% endblock %}

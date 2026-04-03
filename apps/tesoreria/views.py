@@ -1,53 +1,30 @@
+from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django import forms
 from django.db.models import Sum
+from django.core.exceptions import ValidationError
 from .models import CuentaTesoreria, MovimientoTesoreria
-
-
-class CuentaTesoreriaForm(forms.ModelForm):
-    class Meta:
-        model = CuentaTesoreria
-        fields = ['nombre', 'tipo', 'cuenta_contable', 'moneda', 'saldo_inicial', 'activa']
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'tipo': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'cuenta_contable': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'moneda': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'saldo_inicial': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2', 'step': '0.01'}),
-            'activa': forms.CheckboxInput(attrs={'class': 'rounded'}),
-        }
-
-
-class MovimientoTesoreriaForm(forms.ModelForm):
-    class Meta:
-        model = MovimientoTesoreria
-        fields = ['cuenta', 'tipo', 'importe', 'fecha', 'contacto', 'descripcion', 'observaciones']
-        widgets = {
-            'cuenta': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'tipo': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'importe': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2', 'step': '0.01'}),
-            'fecha': forms.DateInput(attrs={'class': 'w-full border rounded px-3 py-2', 'type': 'date'}),
-            'contacto': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'descripcion': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'observaciones': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2', 'rows': 2}),
-        }
+from .forms import CuentaTesoreriaForm, MovimientoTesoreriaForm, LineaMovimientoFormSet
 
 
 @login_required
 def index(request):
-    cuentas = CuentaTesoreria.objects.filter(activa=True)
-    total_ars = sum(c.saldo_actual for c in cuentas.filter(moneda='ARS'))
-    total_usd = sum(c.saldo_actual for c in cuentas.filter(moneda='USD'))
-    
-    movimientos_hoy = MovimientoTesoreria.objects.filter(fecha__exact=request.today).order_by('-numero')[:10] if hasattr(request, 'today') else []
-    
+    cuentas = CuentaTesoreria.objects.filter(activa=True).select_related('cuenta_contable')
+    total_ars = sum(c.saldo_contable for c in cuentas.filter(moneda='ARS'))
+    total_usd = sum(c.saldo_contable for c in cuentas.filter(moneda='USD'))
+
+    conciliaciones = {}
+    for cuenta in cuentas:
+        conc = cuenta.conciliar()
+        conciliaciones[cuenta.pk] = conc['conciliado']
+
     return render(request, 'tesoreria/index.html', {
         'cuentas': cuentas,
         'total_ars': total_ars,
         'total_usd': total_usd,
+        'conciliaciones': conciliaciones,
     })
 
 
@@ -88,6 +65,9 @@ def cuenta_edit(request, pk):
 def cuenta_delete(request, pk):
     cuenta = get_object_or_404(CuentaTesoreria, pk=pk)
     if request.method == 'POST':
+        if cuenta.lineas.exists():
+            messages.error(request, 'No se puede eliminar una cuenta con movimientos')
+            return redirect('tesoreria:cuentas')
         cuenta.delete()
         messages.success(request, 'Cuenta eliminada correctamente')
         return redirect('tesoreria:cuentas')
@@ -98,195 +78,179 @@ def cuenta_delete(request, pk):
 def movimientos(request):
     cuenta_id = request.GET.get('cuenta')
     tipo = request.GET.get('tipo')
-    fechaDesde = request.GET.get('fechaDesde')
-    fechaHasta = request.GET.get('fechaHasta')
-    
-    movimientos = MovimientoTesoreria.objects.select_related('cuenta', 'contacto').order_by('-fecha', '-numero')
-    
+    estado = request.GET.get('estado')
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+
+    qs = MovimientoTesoreria.objects.select_related('contacto').prefetch_related('lineas__cuenta').order_by('-fecha', '-numero')
+
     if cuenta_id:
-        movimientos = movimientos.filter(cuenta_id=cuenta_id)
+        qs = qs.filter(lineas__cuenta_id=cuenta_id).distinct()
     if tipo:
-        movimientos = movimientos.filter(tipo=tipo)
-    if fechaDesde:
-        movimientos = movimientos.filter(fecha__gte=fechaDesde)
-    if fechaHasta:
-        movimientos = movimientos.filter(fecha__lte=fechaHasta)
-    
+        qs = qs.filter(tipo=tipo)
+    if estado:
+        qs = qs.filter(estado=estado)
+    if fecha_desde:
+        qs = qs.filter(fecha__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(fecha__lte=fecha_hasta)
+
     cuentas = CuentaTesoreria.objects.filter(activa=True)
-    
-    paginator = Paginator(movimientos, 25)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
+
+    paginator = Paginator(qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     return render(request, 'tesoreria/movimientos.html', {
         'page_obj': page_obj,
         'cuentas': cuentas,
         'cuenta_filter': cuenta_id,
         'tipo_filter': tipo,
+        'estado_filter': estado,
     })
 
 
 @login_required
-def movimiento_create(request, tipo_movimiento=None):
+def movimiento_create(request):
     if request.method == 'POST':
         form = MovimientoTesoreriaForm(request.POST)
-        if form.is_valid():
+        formset = LineaMovimientoFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid():
             movimiento = form.save(commit=False)
             movimiento.estado = 'confirmado'
             movimiento.save()
-            messages.success(request, f"{'Ingreso' if movimiento.tipo == 'cobro' else 'Egreso'} registrado correctamente")
+
+            lineas = formset.save(commit=False)
+            for linea in lineas:
+                linea.movimiento = movimiento
+                linea.save()
+
+            formset.save_m2m()
+
+            messages.success(request, f"{'Cobro' if movimiento.tipo == 'cobro' else 'Pago' if movimiento.tipo == 'pago' else 'Transferencia'} registrado correctamente")
             return redirect('tesoreria:movimientos')
     else:
         form = MovimientoTesoreriaForm()
-        if tipo_movimiento:
-            form.initial['tipo'] = tipo_movimiento
-    
+        formset = LineaMovimientoFormSet()
+
     return render(request, 'tesoreria/movimiento_form.html', {
         'form': form,
+        'formset': formset,
         'action': 'Crear',
-        'tipo_movimiento': tipo_movimiento
     })
 
 
 @login_required
 def movimiento_edit(request, pk):
     movimiento = get_object_or_404(MovimientoTesoreria, pk=pk)
+
+    if movimiento.estado not in ('borrador',):
+        messages.error(request, 'Solo se pueden editar movimientos en borrador')
+        return redirect('tesoreria:movimientos')
+
     if request.method == 'POST':
         form = MovimientoTesoreriaForm(request.POST, instance=movimiento)
-        if form.is_valid():
+        formset = LineaMovimientoFormSet(request.POST, instance=movimiento)
+
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.save()
             messages.success(request, 'Movimiento actualizado correctamente')
             return redirect('tesoreria:movimientos')
     else:
         form = MovimientoTesoreriaForm(instance=movimiento)
+        formset = LineaMovimientoFormSet(instance=movimiento)
+
     return render(request, 'tesoreria/movimiento_form.html', {
         'form': form,
+        'formset': formset,
         'movimiento': movimiento,
-        'action': 'Editar'
+        'action': 'Editar',
+    })
+
+
+@login_required
+def movimiento_anular(request, pk):
+    movimiento = get_object_or_404(MovimientoTesoreria, pk=pk)
+
+    if request.method == 'POST':
+        try:
+            movimiento.anular()
+            messages.success(request, 'Movimiento anulado correctamente')
+        except ValidationError as e:
+            messages.error(request, str(e))
+        return redirect('tesoreria:movimientos')
+
+    return render(request, 'tesoreria/movimiento_confirm_anular.html', {
+        'movimiento': movimiento,
     })
 
 
 @login_required
 def movimiento_delete(request, pk):
     movimiento = get_object_or_404(MovimientoTesoreria, pk=pk)
+
+    if movimiento.estado == 'confirmado':
+        messages.error(request, 'No se puede eliminar un movimiento confirmado. Anulelo primero.')
+        return redirect('tesoreria:movimientos')
+
     if request.method == 'POST':
         movimiento.delete()
         messages.success(request, 'Movimiento eliminado correctamente')
         return redirect('tesoreria:movimientos')
+
     return render(request, 'tesoreria/movimiento_confirm_delete.html', {'movimiento': movimiento})
 
 
 @login_required
-def ingresos(request):
-    cuenta_id = request.GET.get('cuenta')
-    
-    cuentas = CuentaTesoreria.objects.filter(activa=True)
-    
-    if request.method == 'POST':
-        form = MovimientoTesoreriaForm(request.POST)
-        if form.is_valid():
-            movimiento = form.save(commit=False)
-            movimiento.tipo = 'cobro'
-            movimiento.estado = 'confirmado'
-            movimiento.save()
-            messages.success(request, 'Ingreso registrado correctamente')
-            return redirect('tesoreria:ingresos')
-    else:
-        form = MovimientoTesoreriaForm()
-        if cuenta_id:
-            form.initial['cuenta'] = cuenta_id
-            form.initial['tipo'] = 'cobro'
-    
-    return render(request, 'tesoreria/ingresos.html', {
-        'form': form,
-        'cuentas': cuentas,
-    })
-
-
-@login_required
-def egresos(request):
-    cuenta_id = request.GET.get('cuenta')
-    
-    cuentas = CuentaTesoreria.objects.filter(activa=True)
-    
-    if request.method == 'POST':
-        form = MovimientoTesoreriaForm(request.POST)
-        if form.is_valid():
-            movimiento = form.save(commit=False)
-            movimiento.tipo = 'pago'
-            movimiento.estado = 'confirmado'
-            movimiento.save()
-            messages.success(request, 'Egreso registrado correctamente')
-            return redirect('tesoreria:egresos')
-    else:
-        form = MovimientoTesoreriaForm()
-        if cuenta_id:
-            form.initial['cuenta'] = cuenta_id
-            form.initial['tipo'] = 'pago'
-    
-    return render(request, 'tesoreria/egresos.html', {
-        'form': form,
-        'cuentas': cuentas,
+def movimiento_detail(request, pk):
+    movimiento = get_object_or_404(
+        MovimientoTesoreria.objects.prefetch_related('lineas__cuenta', 'lineas__cuenta_contrapartida'),
+        pk=pk
+    )
+    return render(request, 'tesoreria/movimiento_detail.html', {
+        'movimiento': movimiento,
     })
 
 
 @login_required
 def caja_diaria(request):
     from datetime import date
-    
+
     fecha = request.GET.get('fecha')
     if fecha:
         fecha = date.fromisoformat(fecha)
     else:
         fecha = date.today()
-    
+
     cuentas = CuentaTesoreria.objects.filter(tipo='caja', activa=True)
-    
+
     datos_caja = []
-    total_ingresos = 0
-    total_egresos = 0
-    
+    total_ingresos = Decimal('0')
+    total_egresos = Decimal('0')
+
     for cuenta in cuentas:
-        ingresos = MovimientoTesoreria.objects.filter(
-            cuenta=cuenta,
-            fecha=fecha,
-            tipo='cobro'
-        ).aggregate(total=Sum('importe'))['total'] or 0
-        
-        egresos = MovimientoTesoreria.objects.filter(
-            cuenta=cuenta,
-            fecha=fecha,
-            tipo='pago'
-        ).aggregate(total=Sum('importe'))['total'] or 0
-        
+        lineas_dia = cuenta.lineas.filter(movimiento__fecha=fecha)
+
+        ingresos = lineas_dia.aggregate(total=Sum('debe'))['total'] or Decimal('0')
+        egresos = lineas_dia.aggregate(total=Sum('haber'))['total'] or Decimal('0')
+
         datos_caja.append({
             'cuenta': cuenta,
             'ingresos': ingresos,
             'egresos': egresos,
             'saldo_dia': ingresos - egresos,
-            'saldo_acumulado': cuenta.saldo_inicial + (
-                MovimientoTesoreria.objects.filter(
-                    cuenta=cuenta,
-                    fecha__lte=fecha,
-                    tipo='cobro'
-                ).aggregate(total=Sum('importe'))['total'] or 0
-            ) - (
-                MovimientoTesoreria.objects.filter(
-                    cuenta=cuenta,
-                    fecha__lte=fecha,
-                    tipo='pago'
-                ).aggregate(total=Sum('importe'))['total'] or 0
-            )
+            'saldo_acumulado': cuenta.saldo_tesoreria,
         })
-        
+
         total_ingresos += ingresos
         total_egresos += egresos
-    
+
     movimientos_dia = MovimientoTesoreria.objects.filter(
         fecha=fecha,
-        cuenta__in=cuentas
-    ).select_related('cuenta', 'contacto').order_by('-numero')
-    
+        lineas__cuenta__in=cuentas
+    ).select_related('contacto').prefetch_related('lineas__cuenta').distinct().order_by('-numero')
+
     return render(request, 'tesoreria/caja_diaria.html', {
         'fecha': fecha,
         'datos_caja': datos_caja,
@@ -299,4 +263,29 @@ def caja_diaria(request):
 @login_required
 def saldo_cuentas(request):
     cuentas = CuentaTesoreria.objects.filter(activa=True).order_by('tipo', 'nombre')
-    return render(request, 'tesoreria/saldo_cuentas.html', {'cuentas': cuentas})
+    conciliaciones = []
+    for cuenta in cuentas:
+        conc = cuenta.conciliar()
+        conciliaciones.append({
+            'cuenta': cuenta,
+            **conc,
+        })
+    return render(request, 'tesoreria/saldo_cuentas.html', {'conciliaciones': conciliaciones})
+
+
+@login_required
+def conciliar_cuentas(request):
+    cuentas = CuentaTesoreria.objects.filter(activa=True).order_by('tipo', 'nombre')
+    resultados = []
+    for cuenta in cuentas:
+        conc = cuenta.conciliar()
+        resultados.append({
+            'cuenta': cuenta,
+            'saldo_tesoreria': conc['saldo_tesoreria'],
+            'saldo_contable': conc['saldo_contable'],
+            'diferencia': conc['diferencia'],
+            'conciliado': conc['conciliado'],
+        })
+    return render(request, 'tesoreria/conciliar.html', {
+        'resultados': resultados,
+    })

@@ -1,0 +1,83 @@
+{# components/forms/formset-table.html #}
+{# Renders an editable formset as a table with add/remove rows #}
+{# Usage: pass formset as "formset" variable, columns as "columns" list of dicts with keys: label, field, width (optional), class (optional) #}
+
+<div class="overflow-x-auto mb-4">
+    <table class="min-w-full border rounded-lg" id="{{ formset.prefix }}-table">
+        <thead class="bg-base-300">
+            <tr>
+                {% for col in columns %}
+                <th class="px-4 py-2 text-left text-sm font-medium text-base-content/60 {% if col.width %}w-{{ col.width }}{% endif %}">
+                    {{ col.label }}
+                </th>
+                {% endfor %}
+                <th class="px-4 py-2 w-12"></th>
+            </tr>
+        </thead>
+        <tbody id="{{ formset.prefix }}-body">
+            {% for form_linea in formset %}
+            <tr class="linea-row border-t border-base-300">
+                {{ form_linea.id }}
+                {% for col in columns %}
+                <td class="px-2 py-2 {% if col.class %}{{ col.class }}{% endif %}">
+                    {{ form_linea|get_item:col.field }}
+                </td>
+                {% endfor %}
+                <td class="px-2 py-2 text-center">
+                    {% if form_linea.DELETE %}
+                    <label class="text-error cursor-pointer">
+                        {{ form_linea.DELETE }}
+                    </label>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% if totals %}
+        <tfoot class="bg-base-300 border-t">
+            <tr>
+                <td class="px-4 py-2 font-medium text-right text-base-content" colspan="{{ totals.colspan|default:1 }}">Totales:</td>
+                {% for total in totals.items %}
+                <td class="px-4 py-2 text-right font-bold {{ total.class|default:'text-base-content' }}" id="{{ total.id }}">
+                    {{ total.value|default:"0.00" }}
+                </td>
+                {% endfor %}
+                <td colspan="{{ totals.trailing|default:0 }}"></td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</div>
+
+{{ formset.management_form }}
+
+<button type="button" id="{{ formset.prefix }}-add-line" class="mb-6 bg-base-300 text-base-content px-3 py-2 rounded hover:bg-base-content/10 text-sm">
+    <i class="fas fa-plus mr-1"></i>Agregar línea
+</button>
+
+<script>
+(function() {
+    const prefix = '{{ formset.prefix }}';
+    const tbody = document.getElementById(prefix + '-body');
+    const addBtn = document.getElementById(prefix + '-add-line');
+    const totalForm = document.getElementById('id_' + prefix + '-TOTAL_FORMS');
+
+    if (!addBtn || !tbody || !totalForm) return;
+
+    addBtn.addEventListener('click', function() {
+        const idx = parseInt(totalForm.value);
+        const firstRow = tbody.querySelector('tr');
+        if (!firstRow) return;
+
+        const newRow = firstRow.cloneNode(true);
+        newRow.querySelectorAll('input, select, textarea').forEach(input => {
+            input.name = input.name.replace(/-\d+-/, '-' + idx + '-');
+            input.id = input.id.replace(/-\d+-/, '-' + idx + '-');
+            if (input.type !== 'hidden') input.value = '';
+        });
+
+        tbody.appendChild(newRow);
+        totalForm.value = idx + 1;
+    });
+})();
+</script>
