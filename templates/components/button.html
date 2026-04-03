@@ -1,0 +1,19 @@
+{# Button Component #}
+{# Usage:
+  {% include "components/button.html" with label="Click me" variant="primary" size="md" %}
+  {% include "components/button.html" with label="Guardar" variant="success" icon="fa-save" %}
+#}
+
+{% load static %}
+
+{% with variant=variant|default:"primary" size=size|default:"md" disabled=disabled|default:False %}
+<button 
+    type="{{ type|default:'button' }}" 
+    class="btn btn-{{ variant }} btn-{{ size }} inline-flex items-center gap-2
+        {% if disabled %}opacity-50 cursor-not-allowed{% endif %}"
+    {% if disabled %}disabled{% endif %}
+    {% if data_action %}data-action="{{ data_action }}"{% endif %}>
+    {% if icon %}<i class="fas {{ icon }}"></i>{% endif %}
+    {{ label }}
+</button>
+{% endwith %}

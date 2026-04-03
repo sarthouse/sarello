@@ -1,0 +1,17 @@
+{# Page Header Component #}
+{# Usage:
+  {% include "components/page-header.html" with title="Asientos Contables" subtitle="Listado del libro diario" action_label="Nuevo Asiento" action_url="..." %}
+#}
+
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">{{ title }}</h1>
+        {% if subtitle %}<p class="text-gray-600">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if action_url %}
+    <a href="{{ action_url }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center gap-2">
+        {% if action_icon %}<i class="fas {{ action_icon }}"></i>{% endif %}
+        {{ action_label|default:"Agregar" }}
+    </a>
+    {% endif %}
+</div>

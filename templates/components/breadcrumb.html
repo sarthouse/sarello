@@ -1,0 +1,29 @@
+{# Breadcrumb Component #}
+{# Usage:
+  {% include "components/breadcrumb.html" with items=breadcrumb_items %}
+  where items = [{"label": "Home", "url": "/"}, {"label": "Contabilidad", "url": "/contabilidad"}, {"label": "Asientos"}]
+#}
+
+{% if items %}
+<nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex items-center gap-2 text-sm">
+        {% for item in items %}
+        <li>
+            {% if item.url %}
+            <a href="{{ item.url }}" class="text-blue-600 hover:text-blue-900">
+                {% if item.icon %}<i class="fas {{ item.icon }} mr-1"></i>{% endif %}
+                {{ item.label }}
+            </a>
+            {% else %}
+            <span class="text-gray-500">{{ item.label }}</span>
+            {% endif %}
+        </li>
+        {% if not forloop.last %}
+        <li class="text-gray-400">
+            <i class="fas fa-chevron-right"></i>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}

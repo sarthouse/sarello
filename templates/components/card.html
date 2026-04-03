@@ -1,0 +1,23 @@
+{# Card Component #}
+{# Usage:
+  {% include "components/card.html" with title="Section Title" %}
+    Content here...
+  {% endinclude %}
+#}
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    {% if title %}
+    <div class="bg-slate-50 px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
+        {% if subtitle %}<p class="text-sm text-gray-600 mt-1">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% endif %}
+    <div class="px-6 py-4">
+        {{ content }}
+    </div>
+    {% if footer %}
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        {{ footer }}
+    </div>
+    {% endif %}
+</div>

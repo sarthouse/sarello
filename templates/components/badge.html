@@ -1,0 +1,12 @@
+{# Badge/Tag Component #}
+{# Usage:
+  {% include "components/badge.html" with label="activo" variant="success" %}
+  {% include "components/badge.html" with label="Confirmado" variant="success" size="sm" %}
+#}
+
+{% with variant=variant|default:"gray" size=size|default:"md" %}
+<span class="badge badge-{{ variant }} badge-{{ size }}">
+    {% if icon %}<i class="fas {{ icon }} mr-1"></i>{% endif %}
+    {{ label }}
+</span>
+{% endwith %}

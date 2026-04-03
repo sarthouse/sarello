@@ -1,0 +1,54 @@
+{# Pagination Component #}
+{# Usage:
+  {% include "components/pagination.html" with page_obj=page_obj query_params="&tipo=activo" %}
+#}
+
+{% if page_obj.has_other_pages %}
+<nav class="mt-6 flex justify-center">
+    <div class="inline-flex rounded-lg shadow-sm border border-gray-300">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{{ query_params }}" 
+           class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 first:rounded-l-lg"
+           title="Primera página">
+            <i class="fas fa-chevron-double-left"></i>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}{{ query_params }}" 
+           class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 border-l"
+           title="Página anterior">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% else %}
+        <span class="px-3 py-2 text-sm font-medium text-gray-400 first:rounded-l-lg">
+            <i class="fas fa-chevron-double-left"></i>
+        </span>
+        <span class="px-3 py-2 text-sm font-medium text-gray-400 border-l">
+            <i class="fas fa-chevron-left"></i>
+        </span>
+        {% endif %}
+        
+        <span class="px-4 py-2 text-sm font-medium text-gray-700 border-l border-r bg-gray-50">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{{ query_params }}" 
+           class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 border-r"
+           title="Página siguiente">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{{ query_params }}" 
+           class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 last:rounded-r-lg"
+           title="Última página">
+            <i class="fas fa-chevron-double-right"></i>
+        </a>
+        {% else %}
+        <span class="px-3 py-2 text-sm font-medium text-gray-400 border-r">
+            <i class="fas fa-chevron-right"></i>
+        </span>
+        <span class="px-3 py-2 text-sm font-medium text-gray-400 last:rounded-r-lg">
+            <i class="fas fa-chevron-double-right"></i>
+        </span>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
