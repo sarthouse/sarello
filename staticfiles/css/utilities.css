@@ -8,7 +8,7 @@
 }
 
 .text-ellipsis {
-  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  @apply overflow-hidden whitespace-nowrap;
 }
 
 .text-clamp-2 {
@@ -104,14 +104,6 @@
 }
 
 /* Shadow utilities */
-.shadow-inset {
-  @apply shadow-inset;
-}
-
-.shadow-none {
-  @apply shadow-none;
-}
-
 .shadow-focus {
   @apply shadow-md ring-2 ring-primary;
 }
@@ -302,12 +294,12 @@
 
 /* Accessibility */
 .sr-only {
-  @apply absolute w-px h-px p-0 -m-px overflow-hidden clip whitespace-nowrap border-0;
+  @apply sr-only;
 }
 
 .sr-only-focusable:active,
 .sr-only-focusable:focus {
-  @apply static w-auto h-auto p-0 m-0 overflow-visible clip-auto whitespace-normal;
+  @apply not-sr-only;
 }
 
 /* Print utilities */

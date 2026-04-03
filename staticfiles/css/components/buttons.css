@@ -77,7 +77,7 @@
 /* Link button */
 .btn-link {
   @apply btn-base bg-transparent text-primary underline;
-  @apply hover:text-primary-focus;
+  @apply hover:text-primary/80;
   @apply p-0 rounded-none;
 }
 

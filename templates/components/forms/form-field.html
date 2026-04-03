@@ -13,7 +13,7 @@
         id="{{ name }}"
         value="{{ value|default:'' }}"
         placeholder="{{ placeholder|default:'' }}"
-        class="input input-bordered w-full bg-base-100 text-base-content {% if error %}input-error{% endif %}"
+        class="input input-bordered {% if error %}input-error{% endif %}"
         {% if required %}required{% endif %}
         {% if readonly %}readonly{% endif %}>
     

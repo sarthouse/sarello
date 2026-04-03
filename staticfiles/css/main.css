@@ -10,40 +10,54 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Custom properties only - what DaisyUI doesn't provide */
-@layer base {
-  :root {
-    /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-
-    /* Accounting colors (domain specific) */
-    --accounting-debe: #4caf82;
-    --accounting-haber: #e05252;
-    --accounting-saldo: #4f9eff;
-    --accounting-activo: #4f9eff;
-    --accounting-pasivo: #e05252;
-    --accounting-patrimonio: #a78bfa;
-    --accounting-ingreso: #4caf82;
-    --accounting-egreso: #f5a623;
-  }
-}
-
 /* Import custom components */
-@import './components/buttons.css';
+
 @import './components/forms.css';
+@import './components/buttons.css';
 @import './components/tables.css';
 @import './components/cards.css';
 @import './components/modals.css';
 @import './components/alerts.css';
 
+
 /* Import utilities */
-@import './utilities.css';
+/* @import './utilities.css'; */
+
+/* Tailwindcss import */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Custom properties only - what DaisyUI doesn't provide */
+:root {
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  /* Accounting colors (domain specific) */
+  --accounting-debe: #4caf82;
+  --accounting-haber: #e05252;
+  --accounting-saldo: #4f9eff;
+  --accounting-activo: #4f9eff;
+  --accounting-pasivo: #e05252;
+  --accounting-patrimonio: #a78bfa;
+  --accounting-ingreso: #4caf82;
+  --accounting-egreso: #f5a623;
+  
+  /* Component variables - mapped to DaisyUI tokens */
+  --accent: var(--fallback-a, oklch(var(--a)/1));
+  --surface: var(--fallback-b2, oklch(var(--b2)/1));
+  --surface2: var(--fallback-b3, oklch(var(--b3)/1));
+  --border: var(--fallback-b3, oklch(var(--b3)/1));
+  --text: var(--fallback-bc, oklch(var(--bc)/1));
+  --text-dim: var(--fallback-bc, oklch(var(--bc)/0.6));
+  --text-bright: var(--fallback-bc, oklch(var(--bc)/1));
+  --success: var(--fallback-su, oklch(var(--su)/1));
+  --warn: var(--fallback-wa, oklch(var(--wa)/1));
+  --danger: var(--fallback-er, oklch(var(--er)/1));
+}
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {

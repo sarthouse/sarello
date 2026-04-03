@@ -7,63 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.http import JsonResponse
-from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from .models import CuentaContable, Ejercicio, Asiento, LineaAsiento
-
-
-class CuentaForm(forms.ModelForm):
-    class Meta:
-        model = CuentaContable
-        fields = ['codigo', 'nombre', 'tipo', 'padre', 'acepta_movimientos', 'activa']
-        widgets = {
-            'codigo': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'nombre': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'tipo': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'padre': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'acepta_movimientos': forms.CheckboxInput(attrs={'class': 'rounded'}),
-            'activa': forms.CheckboxInput(attrs={'class': 'rounded'}),
-        }
-
-
-class EjercicioForm(forms.ModelForm):
-    class Meta:
-        model = Ejercicio
-        fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'estado', 'ejercicio_anterior']
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'fecha_inicio': forms.DateInput(attrs={'class': 'w-full border rounded px-3 py-2', 'type': 'date'}),
-            'fecha_fin': forms.DateInput(attrs={'class': 'w-full border rounded px-3 py-2', 'type': 'date'}),
-            'estado': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'ejercicio_anterior': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-        }
-
-
-class AsientoForm(forms.ModelForm):
-    class Meta:
-        model = Asiento
-        fields = ['ejercicio', 'numero', 'fecha', 'descripcion', 'origen', 'estado', 'observaciones']
-        widgets = {
-            'ejercicio': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'numero': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'fecha': forms.DateInput(attrs={'class': 'w-full border rounded px-3 py-2', 'type': 'date'}),
-            'descripcion': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'origen': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'estado': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'observaciones': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2', 'rows': 2}),
-        }
-
-
-class LineaAsientoForm(forms.ModelForm):
-    class Meta:
-        model = LineaAsiento
-        fields = ['cuenta', 'debe', 'haber', 'descripcion']
-        widgets = {
-            'cuenta': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'debe': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2', 'step': '0.01'}),
-            'haber': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2', 'step': '0.01'}),
-            'descripcion': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-        }
+from .forms import CuentaForm, EjercicioForm, AsientoForm, LineaAsientoForm
 
 
 @login_required

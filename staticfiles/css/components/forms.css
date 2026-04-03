@@ -2,7 +2,7 @@
  * Form Components - DaisyUI compatible
  */
 
-.form-control {
+ .form-control {
   @apply flex flex-col gap-2;
 }
 
@@ -14,69 +14,21 @@
 .form-control select,
 .form-control textarea {
   @apply w-full rounded border px-3 py-2;
-  @apply bg-base-100 text-base-content;
+  @apply text-gray-900;
   @apply border-base-300;
   @apply transition-colors duration-200;
   @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
+/* 'class': 'w-full border rounded px-3 py-2' */
 
 .form-control input::placeholder,
 .form-control textarea::placeholder {
-  @apply text-base-content/60;
+  @apply text-gray-500;
 }
 
 .form-control textarea {
-  @apply resize-vertical min-h-24;
-}
-
-/* Form group with error and help text */
-.form-group {
-  @apply flex flex-col gap-1;
-}
-
-.form-group label {
-  @apply block text-sm font-medium text-base-content;
-}
-
-.form-group.error input,
-.form-group.error select,
-.form-group.error textarea {
-  @apply border-error focus:border-error focus:ring-error;
-}
-
-.form-group .form-label {
-  @apply text-sm font-medium text-base-content;
-}
-
-.form-group .form-label.required::after {
-  content: ' *';
-  @apply text-error;
-}
-
-.form-group .form-help {
-  @apply text-xs text-base-content/60;
-}
-
-.form-group .form-error {
-  @apply text-xs text-error;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  @apply w-full rounded border px-3 py-2;
-  @apply bg-base-100 text-base-content;
-  @apply border-base-300;
-  @apply transition-colors duration-200;
-  @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
-  @apply disabled:opacity-50 disabled:cursor-not-allowed;
-}
-
-.form-group.error input,
-.form-group.error select,
-.form-group.error textarea {
-  @apply border-error focus:border-error focus:ring-error;
+  @apply resize-y min-h-24;
 }
 
 /* Input sizes */
