@@ -2,7 +2,13 @@
 
 Este documento proporciona instrucciones para agentes de código y desarrolladores que trabajan en el proyecto Django de Sarello ERP.
 
+> **Documentación completa:** [docs/index.md](docs/index.md) — Guías de inicio, assets, Docker, troubleshooting y más.
+
+---
+
 ## Comandos de Build, Lint y Testing
+
+> Referencia completa: [docs/comandos.md](docs/comandos.md)
 
 ### Ejecutar Pruebas
 
@@ -64,7 +70,11 @@ ruff check . --fix
 ruff format .
 ```
 
+---
+
 ## Guía de Estilo de Código
+
+> Referencia completa: [docs/convenciones.md](docs/convenciones.md)
 
 ### Principios Generales
 
@@ -111,16 +121,16 @@ class CuentaContable(TimeStampedModel):
         ('activo', 'Activo'),
         ('pasivo', 'Pasivo'),
     ]
-    
+
     codigo = models.CharField(max_length=20, unique=True, verbose_name='Código')
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, verbose_name='Tipo')
     saldo = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
-    
+
     class Meta:
         ordering = ['codigo']
         verbose_name = 'Cuenta contable'
         verbose_name_plural = 'Cuentas contables'
-    
+
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"
 ```
@@ -240,7 +250,11 @@ class TestCuentaContable:
 - Usar `readonly_fields` para campos computados/auto
 - Implementar `__str__` para mejor visualización
 
-### Estructura del Proyecto
+---
+
+## Estructura del Proyecto
+
+> Referencia completa: [docs/estructura.md](docs/estructura.md)
 
 ```text
 sarello/
@@ -258,13 +272,19 @@ sarello/
 │   └── integraciones/             # Integraciones (AFIP, etc)
 ├── core/                          # Configuración de Django
 ├── templates/                     # Plantillas HTML
-├── static/                        # Archivos CSS/JS/imágenes
+├── staticfiles/                   # Assets en desarrollo (fuente)
+├── static/                        # Assets compilados para producción
+├── docs/                          # Documentación del proyecto
 ├── requirements/                  # Dependencias
 │   ├── base.txt                   # Dependencias core
 │   ├── local.txt                  # Extras de desarrollo
 │   └── production.txt             # Dependencias de producción
-└── manage.py                      # CLI de Django
+├── manage.py                      # CLI de Django
+├── AGENTS.md                      # Este archivo
+└── README.md                      # Entrada principal del proyecto
 ```
+
+---
 
 ## Dependencias Clave
 
@@ -276,6 +296,8 @@ sarello/
 - **Celery 5.4**: Tareas asincrónicas
 - **Django Allauth 65.15**: Autenticación
 
+---
+
 ## Configuración del Entorno
 
 - Crear `.env` desde `.env.example`
@@ -284,6 +306,8 @@ sarello/
 - Configurar `ALLOWED_HOSTS` para deployment
 - Producción usa PostgreSQL, desarrollo usa SQLite
 
+---
+
 ## Notas Importantes
 
 - **Precisión decimal**: Todas las operaciones financieras usan Decimal con 2 decimales
@@ -291,6 +315,8 @@ sarello/
 - **Estados de documentos**: Usar DocumentoBase para facturas, comprobantes (borrador → confirmado → cancelado)
 - **Especificidades argentinas**: Soporta integración AFIP, impuestos IVA/IIBB, facturación electrónica (Fase 7)
 - **Zona horaria**: Todos los dates usan zona horaria America/Argentina/Buenos_Aires
+
+---
 
 ## Consideraciones de Rendimiento
 
