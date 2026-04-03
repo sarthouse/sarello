@@ -1,25 +1,56 @@
 # Componentes de Plantilla - Sarello ERP
 
-Esta carpeta contiene componentes reutilizables que simplifican la creación de plantillas manteniendo consistencia visual.
+Esta carpeta contiene componentes reutilizables organizados por categorías.
+
+## Estructura
+
+```
+components/
+├── README.md
+├── page-header.html    # Encabezado de página
+├── pagination.html # Paginación
+├── alerts/
+│   └── alert.html
+├── badges/
+│   └── badge.html
+├── breadcrumbs/
+│   └── breadcrumb.html
+├── buttons/
+│   └── button.html
+├── cards/
+│   └── card.html
+├── dividers/
+│   └── divider.html
+├── empty-states/
+│   └── empty-state.html
+├── forms/
+│   ├── form-field.html
+│   ├── form-group.html
+│   ├── select.html
+│   └── textarea.html
+├── modals/
+│   └── modal.html
+└── tables/
+    └── table.html
+```
 
 ## Componentes Disponibles
 
-### 1. **button.html** - Botón
+### 1. Buttons - buttons/button.html
 ```django
-{% include "components/button.html" with 
+{% include "components/buttons/button.html" with 
     label="Click me" 
     variant="primary"  # primary, success, danger, warning, info, ghost
-    size="md"          # sm, md, lg
-    type="button"      # button, submit, reset
+    size="md"         # sm, md, lg
+    type="button"     # button, submit, reset
     icon="fa-save"
     disabled=False
-    data_action="submit"
 %}
 ```
 
-### 2. **card.html** - Tarjeta
+### 2. Cards - cards/card.html
 ```django
-{% include "components/card.html" with 
+{% include "components/cards/card.html" with 
     title="Sección"
     subtitle="Descripción"
     content=content_html
@@ -27,19 +58,19 @@ Esta carpeta contiene componentes reutilizables que simplifican la creación de 
 %}
 ```
 
-### 3. **badge.html** - Insignia/Etiqueta
+### 3. Badges - badges/badge.html
 ```django
-{% include "components/badge.html" with 
+{% include "components/badges/badge.html" with 
     label="activo"
     variant="success"  # success, danger, warning, info, gray
-    size="md"          # sm, md, lg
+    size="md"         # sm, md, lg
     icon="fa-check"
 %}
 ```
 
-### 4. **alert.html** - Alerta
+### 4. Alerts - alerts/alert.html
 ```django
-{% include "components/alert.html" with 
+{% include "components/alerts/alert.html" with 
     message="Success!"
     title="Título"
     variant="success"  # success, danger, warning, info
@@ -48,18 +79,16 @@ Esta carpeta contiene componentes reutilizables que simplifican la creación de 
 %}
 ```
 
-### 5. **form-group.html** - Grupo de Formulario
+### 5. Forms - forms/form-group.html
 ```django
-{% include "components/form-group.html" with 
+{% include "components/forms/form-group.html" with 
     label="Email"
     field=form.email
     help_text="Opcional: tu email"
 %}
 ```
 
-Nota: El campo debe ser un campo de formulario Django que incluya automáticamente errores.
-
-### 6. **pagination.html** - Paginación
+### 6. Pagination - pagination.html
 ```django
 {% include "components/pagination.html" with 
     page_obj=page_obj
@@ -67,27 +96,16 @@ Nota: El campo debe ser un campo de formulario Django que incluya automáticamen
 %}
 ```
 
-### 7. **table.html** - Tabla
+### 7. Tables - tables/table.html
 ```django
-{% include "components/table.html" with 
+{% include "components/tables/table.html" with 
     columns=columns_config
     data=items
     empty_message="Sin resultados"
 %}
 ```
 
-**Configuración de columns:**
-```python
-columns = [
-    {"label": "Código", "key": "codigo"},
-    {"label": "Nombre", "key": "nombre"},
-    {"label": "Estado", "key": "estado", "type": "badge", "variant": "success"},
-    {"label": "Monto", "key": "monto", "type": "currency"},
-    {"label": "Fecha", "key": "fecha", "type": "date"},
-]
-```
-
-### 8. **page-header.html** - Encabezado de Página
+### 8. Page Header - page-header.html
 ```django
 {% include "components/page-header.html" with 
     title="Asientos Contables"
@@ -98,23 +116,14 @@ columns = [
 %}
 ```
 
-### 9. **breadcrumb.html** - Migajas de Pan
+### 9. Breadcrumbs - breadcrumbs/breadcrumb.html
 ```django
-{% include "components/breadcrumb.html" with items=breadcrumb_items %}
+{% include "components/breadcrumbs/breadcrumb.html" with items=breadcrumb_items %}
 ```
 
-**Configuración de items:**
-```python
-items = [
-    {"label": "Home", "url": "/"},
-    {"label": "Contabilidad", "url": "/contabilidad"},
-    {"label": "Asientos"},
-]
-```
-
-### 10. **modal.html** - Modal
+### 10. Modals - modals/modal.html
 ```django
-{% include "components/modal.html" with 
+{% include "components/modals/modal.html" with 
     modal_id="delete-confirm"
     title="Confirmar eliminación"
     show_actions=True
@@ -133,14 +142,14 @@ items = [
 - `info` (azul claro) - Información
 - `ghost` (transparente) - Acciones secundarias
 
-### Insignias (variant)
+### Badges (variant)
 - `success` - Estado activo/completado
 - `danger` - Estado crítico/error
 - `warning` - Atención requerida
 - `info` - Información general
 - `gray` - Estado neutral
 
-### Alertas (variant)
+### Alerts (variant)
 - `success` - Operación exitosa
 - `danger` - Error crítico
 - `warning` - Advertencia
@@ -153,7 +162,7 @@ items = [
 - `md` - Mediano (px-4 py-2)
 - `lg` - Grande (px-6 py-3)
 
-### Insignias (size)
+### Badges (size)
 - `sm` - Pequeña
 - `md` - Mediana
 - `lg` - Grande
@@ -162,15 +171,13 @@ items = [
 
 ### Ejemplo 1: Lista con Paginación
 ```django
-{% load static %}
-
 {% include "components/page-header.html" with 
     title="Asientos Contables"
     subtitle="Listado del libro diario"
     action_label="Nuevo Asiento"
     action_url="..." %}
 
-{% include "components/table.html" with 
+{% include "components/tables/table.html" with 
     columns=columns
     data=asientos
     empty_message="No hay asientos registrados" %}
@@ -180,23 +187,23 @@ items = [
 
 ### Ejemplo 2: Formulario
 ```django
-{% include "components/card.html" with title="Crear Cuenta" %}
+{% include "components/cards/card.html" with title="Crear Cuenta" %}
     <form method="post">
         {% csrf_token %}
-        {% include "components/form-group.html" with label="Código" field=form.codigo %}
-        {% include "components/form-group.html" with label="Nombre" field=form.nombre %}
-        {% include "components/form-group.html" with label="Tipo" field=form.tipo %}
+        {% include "components/forms/form-group.html" with label="Código" field=form.codigo %}
+        {% include "components/forms/form-group.html" with label="Nombre" field=form.nombre %}
+        {% include "components/forms/form-group.html" with label="Tipo" field=form.tipo %}
         
         <div class="mt-6 flex gap-2">
-            {% include "components/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
-            {% include "components/button.html" with label="Cancelar" variant="ghost" %}
+            {% include "components/buttons/button.html" with label="Guardar" variant="success" type="submit" icon="fa-save" %}
+            {% include "components/buttons/button.html" with label="Cancelar" variant="ghost" %}
         </div>
     </form>
 ```
 
 ### Ejemplo 3: Confirmación
 ```django
-{% include "components/modal.html" with 
+{% include "components/modals/modal.html" with 
     modal_id="delete-modal"
     title="Eliminar Registro"
     show_actions=True
@@ -206,20 +213,17 @@ items = [
 
 ## Notas Importantes
 
-1. **Componentes anidables**: Puedes usar componentes dentro de otros (ej: badge dentro de table)
+1. **Componentes anidables**: Puedes usar componentes dentro de otros
 2. **Flexibilidad**: Todos los parámetros con valores por defecto son opcionales
-3. **Consistencia**: Usar componentes asegura coherencia visual en toda la aplicación
+3. **Consistencia**: Usar componentes asegura coherencia visual
 4. **Mantenibilidad**: Los cambios de estilos se aplican globalmente
-5. **Accesibilidad**: Los componentes incluyen atributos ARIA y semántica HTML correcta
+5. **Accesibilidad**: Los componentes incluyen atributos ARIA
 
 ## Clases CSS Disponibles
 
-Los componentes utilizan clases CSS de Tailwind + DaisyUI. Principales:
-
+Los componentes utilizan clases CSS de Tailwind + DaisyUI:
 - `.btn` - Clase base para botones
 - `.btn-{variant}` - Variante de color
-- `.badge` - Clase base para insignias
+- `.badge` - Clase base para badges
 - `.alert` - Clase base para alertas
 - `.form-group` - Grupo de formulario
-
-Ver `staticfiles/css/` para más detalles sobre estilos.
