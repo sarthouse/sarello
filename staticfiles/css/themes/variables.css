@@ -1,41 +1,52 @@
 /**
  * CSS Custom Properties for Themes
- * Variables for colors, spacing, and other design tokens
+ * Dark theme IBM Plex para Sarello ERP
  */
 
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
 :root {
-  /* Color palette - Primary */
-  --primary: rgb(30 64 175);
-  --primary-light: rgb(59 130 246);
-  --primary-dark: rgb(15 23 42);
+  /* Background colors */
+  --bg: #0f1117;
+  --surface: #161b27;
+  --surface2: #1e2535;
+  --border: #2a3347;
+
+  /* Accent colors */
+  --accent: #4f9eff;
+  --accent2: #00d4aa;
+
+  /* State colors */
+  --warn: #f5a623;
+  --danger: #e05252;
+  --success: #4caf82;
+  --info: #4f9eff;
+
+  /* Text colors */
+  --text: #c8d3e8;
+  --text-dim: #6b7a99;
+  --text-bright: #e8edf7;
+
+  /* Typography */
+  --sans: 'IBM Plex Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+
+  /* Color palette - Primary (blue) */
+  --primary: rgb(79 158 255);
+  --primary-light: rgb(110 177 255);
+  --primary-dark: rgb(30 64 175);
   --primary-content: rgb(255 255 255);
 
-  /* Color palette - Secondary */
-  --secondary: rgb(16 185 129);
+  /* Color palette - Secondary (teal) */
+  --secondary: rgb(0 212 170);
   --secondary-light: rgb(52 211 153);
   --secondary-dark: rgb(5 122 85);
   --secondary-content: rgb(255 255 255);
 
-  /* Color palette - Accent */
-  --accent: rgb(249 115 22);
-  --accent-light: rgb(251 146 60);
-  --accent-dark: rgb(194 65 12);
-  --accent-content: rgb(255 255 255);
-
-  /* State colors */
-  --success: rgb(34 197 94);
-  --warning: rgb(245 158 11);
-  --error: rgb(239 68 68);
-  --info: rgb(14 165 233);
-
   /* Neutral */
-  --neutral-dark: rgb(15 23 42);
-  --neutral-medium: rgb(107 114 128);
-  --neutral-light: rgb(243 244 246);
-
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  --font-mono: 'Courier New', monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Source Code Pro';
+  --neutral-dark: #e8edf7;
+  --neutral-medium: #6b7a99;
+  --neutral-light: #161b27;
 
   /* Spacing scale */
   --space-0: 0;
@@ -59,10 +70,10 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -79,14 +90,14 @@
   --z-auto: auto;
 
   /* Accounting specific colors */
-  --accounting-debe: rgb(34 197 94);
-  --accounting-haber: rgb(239 68 68);
-  --accounting-saldo: rgb(14 165 233);
-  --accounting-activo: rgb(59 130 246);
-  --accounting-pasivo: rgb(239 68 68);
-  --accounting-patrimonio: rgb(139 92 246);
-  --accounting-ingreso: rgb(34 197 94);
-  --accounting-egreso: rgb(245 158 11);
+  --accounting-debe: #4caf82;
+  --accounting-haber: #e05252;
+  --accounting-saldo: #4f9eff;
+  --accounting-activo: #4f9eff;
+  --accounting-pasivo: #e05252;
+  --accounting-patrimonio: #a78bfa;
+  --accounting-ingreso: #4caf82;
+  --accounting-egreso: #f5a623;
 
   /* Opacity scale */
   --opacity-0: 0;
@@ -107,16 +118,6 @@
   --safe-area-inset-right: 0;
   --safe-area-inset-bottom: 0;
   --safe-area-inset-left: 0;
-}
-
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: rgb(59 130 246);
-    --primary-dark: rgb(30 64 175);
-    --neutral-dark: rgb(243 244 246);
-    --neutral-light: rgb(15 23 42);
-  }
 }
 
 /* High contrast mode support */
@@ -141,8 +142,11 @@
 /* Print styles */
 @media print {
   :root {
-    --primary: #000;
-    --secondary: #000;
-    --accent: #000;
+    --bg: #fff;
+    --surface: #fff;
+    --surface2: #fff;
+    --border: #ccc;
+    --text: #000;
+    --text-dim: #666;
   }
 }

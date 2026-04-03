@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sarello ERP{% endblock %}</title>
     
-    <!-- Compiled CSS (main + theme) -->
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Compiled CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme-output.css' %}">
@@ -19,11 +24,11 @@
     
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100" x-data>
+<body class="bg-[var(--bg)] text-[var(--text)] font-[var(--sans)]" x-data>
     {% if user.is_authenticated %}
         {% include 'partials/navbar.html' %}
     {% else %}
-        <nav class="bg-slate-800 text-white">
+        <nav class="bg-[var(--surface)] border-b border-[var(--border)]">
             <div class="container mx-auto px-4 h-16 flex items-center">
                 <a href="/" class="text-xl font-bold">Sarello ERP</a>
             </div>
@@ -34,7 +39,10 @@
         {% if messages %}
         <div class="mb-4">
             {% for message in messages %}
-            <div class="p-4 mb-2 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+            <div class="p-4 mb-2 rounded border
+                {% if message.tags == 'success' %}bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/30
+                {% elif message.tags == 'error' %}bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/30
+                {% else %}bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30{% endif %}">
                 {{ message }}
             </div>
             {% endfor %}
@@ -43,13 +51,5 @@
 
         {% block content %}{% endblock %}
     </main>
-
-    {% if user.is_authenticated %}
-    <footer class="bg-gray-800 text-gray-400 py-4 mt-8">
-        <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2026 Sarello ERP</p>
-        </div>
-    </footer>
-    {% endif %}
 </body>
 </html>
