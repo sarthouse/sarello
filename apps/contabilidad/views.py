@@ -349,52 +349,32 @@ def balance(request):
             fecha_consolidado_inicio = ejercicio_consolidado.fecha_inicio
             fecha_consolidado_fin = ejercicio_consolidado.fecha_fin
         
-        def get_saldo_cuenta(cuenta, fecha_inicio, fecha_fin):
-            agg = LineaAsiento.objects.filter(
-                asiento__fecha__gte=fecha_inicio,
-                asiento__fecha__lte=fecha_fin,
-                cuenta=cuenta
-            ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
-            
-            debe = agg['debe'] or 0
-            haber = agg['haber'] or 0
-            
-            if cuenta.tipo in ['activo', 'egreso']:
-                saldo = debe - haber
-            else:
-                saldo = haber - debe
-            
-            for hijo in cuenta.hijos.all():
-                saldo += get_saldo_cuenta(hijo, fecha_inicio, fecha_fin)
-            
-            return saldo
-        
         cuentas_ingreso = CuentaContable.objects.filter(activa=True, tipo='ingreso', padre__isnull=True)
         cuentas_egreso = CuentaContable.objects.filter(activa=True, tipo='egreso', padre__isnull=True)
         
-        ingreso_t_actual = sum(get_saldo_cuenta(c, fecha_t_actual_inicio, fecha_t_actual_fin) for c in cuentas_ingreso)
-        ingreso_t_anterior = sum(get_saldo_cuenta(c, fecha_t_anterior_inicio, fecha_t_anterior_fin) for c in cuentas_ingreso)
+        ingreso_t_actual = sum(c.get_saldo_con_hijos(fecha_t_actual_inicio, fecha_t_actual_fin) for c in cuentas_ingreso)
+        ingreso_t_anterior = sum(c.get_saldo_con_hijos(fecha_t_anterior_inicio, fecha_t_anterior_fin) for c in cuentas_ingreso)
         
-        egreso_t_actual = sum(get_saldo_cuenta(c, fecha_t_actual_inicio, fecha_t_actual_fin) for c in cuentas_egreso)
-        egreso_t_anterior = sum(get_saldo_cuenta(c, fecha_t_anterior_inicio, fecha_t_anterior_fin) for c in cuentas_egreso)
+        egreso_t_actual = sum(c.get_saldo_con_hijos(fecha_t_actual_inicio, fecha_t_actual_fin) for c in cuentas_egreso)
+        egreso_t_anterior = sum(c.get_saldo_con_hijos(fecha_t_anterior_inicio, fecha_t_anterior_fin) for c in cuentas_egreso)
         
         resultado_t_actual = ingreso_t_actual - egreso_t_actual
         resultado_t_anterior = ingreso_t_anterior - egreso_t_anterior
         
         if ejercicio_consolidado:
-            ingreso_consolidado = sum(get_saldo_cuenta(c, ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin) for c in cuentas_ingreso)
-            egreso_consolidado = sum(get_saldo_cuenta(c, ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin) for c in cuentas_egreso)
+            ingreso_consolidado = sum(c.get_saldo_con_hijos(ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin) for c in cuentas_ingreso)
+            egreso_consolidado = sum(c.get_saldo_con_hijos(ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin) for c in cuentas_egreso)
             resultado_consolidado = ingreso_consolidado - egreso_consolidado
         
         for cuenta in todas_cuentas:
             if not (cuenta.codigo.startswith('1') or cuenta.codigo.startswith('2') or cuenta.codigo.startswith('3')):
                 continue
             
-            saldo_t_actual = get_saldo_cuenta(cuenta, fecha_t_actual_inicio, fecha_t_actual_fin)
-            saldo_t_anterior = get_saldo_cuenta(cuenta, fecha_t_anterior_inicio, fecha_t_anterior_fin)
+            saldo_t_actual = cuenta.get_saldo_con_hijos(fecha_t_actual_inicio, fecha_t_actual_fin)
+            saldo_t_anterior = cuenta.get_saldo_con_hijos(fecha_t_anterior_inicio, fecha_t_anterior_fin)
             
             if ejercicio_consolidado:
-                saldo_consolidado = get_saldo_cuenta(cuenta, fecha_consolidado_inicio, fecha_consolidado_fin)
+                saldo_consolidado = cuenta.get_saldo_con_hijos(fecha_consolidado_inicio, fecha_consolidado_fin)
             else:
                 saldo_consolidado = 0
             
@@ -506,28 +486,12 @@ def estado_resultados(request):
         
         ejercicio_consolidado = ejercicio.ejercicio_consolidado
         
-        def get_saldo_cuenta(cuenta, fecha_inicio, fecha_fin):
-            agg = LineaAsiento.objects.filter(
-                asiento__fecha__gte=fecha_inicio,
-                asiento__fecha__lte=fecha_fin,
-                cuenta=cuenta
-            ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
-            
-            debe = agg['debe'] or 0
-            haber = agg['haber'] or 0
-            saldo = haber - debe
-            
-            for hijo in cuenta.hijos.all():
-                saldo += get_saldo_cuenta(hijo, fecha_inicio, fecha_fin)
-            
-            return saldo
-        
         for cuenta in cuentas_ingreso:
-            saldo_t_actual = get_saldo_cuenta(cuenta, fecha_t_actual_inicio, fecha_t_actual_fin)
-            saldo_t_anterior = get_saldo_cuenta(cuenta, fecha_t_anterior_inicio, fecha_t_anterior_fin)
+            saldo_t_actual = cuenta.get_saldo_con_hijos(fecha_t_actual_inicio, fecha_t_actual_fin)
+            saldo_t_anterior = cuenta.get_saldo_con_hijos(fecha_t_anterior_inicio, fecha_t_anterior_fin)
             
             if ejercicio_consolidado:
-                saldo_consolidado = get_saldo_cuenta(cuenta, ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin)
+                saldo_consolidado = cuenta.get_saldo_con_hijos(ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin)
             else:
                 saldo_consolidado = 0
             
@@ -548,11 +512,11 @@ def estado_resultados(request):
                 totales['ingreso_consolidado'] += saldo_consolidado
         
         for cuenta in cuentas_egreso:
-            saldo_t_actual = get_saldo_cuenta(cuenta, fecha_t_actual_inicio, fecha_t_actual_fin)
-            saldo_t_anterior = get_saldo_cuenta(cuenta, fecha_t_anterior_inicio, fecha_t_anterior_fin)
+            saldo_t_actual = cuenta.get_saldo_con_hijos(fecha_t_actual_inicio, fecha_t_actual_fin)
+            saldo_t_anterior = cuenta.get_saldo_con_hijos(fecha_t_anterior_inicio, fecha_t_anterior_fin)
             
             if ejercicio_consolidado:
-                saldo_consolidado = get_saldo_cuenta(cuenta, ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin)
+                saldo_consolidado = cuenta.get_saldo_con_hijos(ejercicio_consolidado.fecha_inicio, ejercicio_consolidado.fecha_fin)
             else:
                 saldo_consolidado = 0
             
@@ -1125,18 +1089,8 @@ def preview_cierre(request, pk):
     
     lineas_preview = []
     
-    def get_saldo(cuenta, ejercicio):
-        from django.db.models import Sum
-        agg = LineaAsiento.objects.filter(
-            asiento__ejercicio=ejercicio,
-            cuenta=cuenta
-        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
-        debe = agg['debe'] or 0
-        haber = agg['haber'] or 0
-        return haber - debe
-    
     for cuenta in cuentas_ingreso:
-        saldo = get_saldo(cuenta, ejercicio)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio.fecha_inicio, ejercicio.fecha_fin)
         if saldo > 0:
             lineas_preview.append({
                 'cuenta': cuenta,
@@ -1147,7 +1101,7 @@ def preview_cierre(request, pk):
             total_ingresos += saldo
     
     for cuenta in cuentas_egreso:
-        saldo = get_saldo(cuenta, ejercicio)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio.fecha_inicio, ejercicio.fecha_fin)
         if saldo > 0:
             lineas_preview.append({
                 'cuenta': cuenta,
@@ -1216,16 +1170,6 @@ def cerrar_ejercicio(request, pk):
     total_ingresos = Decimal('0')
     total_egresos = Decimal('0')
     
-    def get_saldo(cuenta, ejercicio):
-        from django.db.models import Sum
-        agg = LineaAsiento.objects.filter(
-            asiento__ejercicio=ejercicio,
-            cuenta=cuenta
-        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
-        debe = agg['debe'] or 0
-        haber = agg['haber'] or 0
-        return haber - debe
-    
     ultimo_asiento = Asiento.objects.order_by('-numero').first()
     if ultimo_asiento:
         try:
@@ -1245,7 +1189,7 @@ def cerrar_ejercicio(request, pk):
     )
     
     for cuenta in cuentas_ingreso:
-        saldo = get_saldo(cuenta, ejercicio)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio.fecha_inicio, ejercicio.fecha_fin)
         if saldo > 0:
             LineaAsiento.objects.create(
                 asiento=asiento_cierre,
@@ -1257,7 +1201,7 @@ def cerrar_ejercicio(request, pk):
             total_ingresos += saldo
     
     for cuenta in cuentas_egreso:
-        saldo = get_saldo(cuenta, ejercicio)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio.fecha_inicio, ejercicio.fecha_fin)
         if saldo > 0:
             LineaAsiento.objects.create(
                 asiento=asiento_cierre,
@@ -1311,20 +1255,10 @@ def generar_apertura(request, pk):
     cuentas_activo = CuentaContable.objects.filter(activa=True, tipo='activo').order_by('codigo')
     cuentas_pasivo = CuentaContable.objects.filter(activa=True, tipo='pasivo').order_by('codigo')
     
-    def get_saldo(cuenta, ejercicio):
-        from django.db.models import Sum
-        agg = LineaAsiento.objects.filter(
-            asiento__ejercicio=ejercicio,
-            cuenta=cuenta
-        ).aggregate(debe=Sum('debe'), haber=Sum('haber'))
-        debe = agg['debe'] or 0
-        haber = agg['haber'] or 0
-        return debe - haber
-    
     lineas_preview = []
     
     for cuenta in cuentas_activo:
-        saldo = get_saldo(cuenta, ejercicio_anterior)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio_anterior.fecha_inicio, ejercicio_anterior.fecha_fin)
         if saldo != 0:
             lineas_preview.append({
                 'cuenta': cuenta,
@@ -1333,7 +1267,7 @@ def generar_apertura(request, pk):
             })
     
     for cuenta in cuentas_pasivo:
-        saldo = get_saldo(cuenta, ejercicio_anterior)
+        saldo = cuenta.get_saldo_en_fecha(ejercicio_anterior.fecha_inicio, ejercicio_anterior.fecha_fin)
         if saldo != 0:
             lineas_preview.append({
                 'cuenta': cuenta,
