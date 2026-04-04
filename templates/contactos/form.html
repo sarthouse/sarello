@@ -3,102 +3,40 @@
 {% block title %}{{ action }} Contacto{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'contactos:lista' %}" class="text-primary hover:text-primary/80">
-        <i class="fas fa-arrow-left mr-2"></i>Volver a contactos
-    </a>
-</div>
+{% include "components/page-header.html" with title=action|add:" Contacto" back_url="contactos:lista" %}
 
 <div class="max-w-4xl mx-auto">
     <div class="bg-base-200 rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold mb-6">{{ action }} Contacto</h1>
-        
         <form method="post">
             {% csrf_token %}
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Código</label>
-                    {{ form.codigo }}
-                    {% if form.codigo.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.codigo.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Tipo</label>
-                    {{ form.tipo }}
-                </div>
-                
+                {% include "components/forms/form-group.html" with field=form.codigo label=form.codigo.label %}
+                {% include "components/forms/form-group.html" with field=form.tipo label=form.tipo.label %}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-base-content mb-1">Nombre / Razón Social</label>
-                    {{ form.nombre }}
-                    {% if form.nombre.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.nombre.errors.0 }}</p>
-                    {% endif %}
+                    {% include "components/forms/form-group.html" with field=form.nombre label=form.nombre.label %}
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">CUIT/CUIL</label>
-                    {{ form.cuil }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Condición IVA</label>
-                    {{ form.condicion_iva }}
-                </div>
-                
+                {% include "components/forms/form-group.html" with field=form.cuil label=form.cuil.label %}
+                {% include "components/forms/form-group.html" with field=form.condicion_iva label=form.condicion_iva.label %}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-base-content mb-1">Dirección</label>
-                    {{ form.direccion }}
+                    {% include "components/forms/form-group.html" with field=form.direccion label=form.direccion.label %}
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Ciudad</label>
-                    {{ form.ciudad }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Provincia</label>
-                    {{ form.provincia }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Código Postal</label>
-                    {{ form.codigo_postal }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Teléfono</label>
-                    {{ form.telefono }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Email</label>
-                    {{ form.email }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Contacto Principal</label>
-                    {{ form.contacto_principal }}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Límite de Crédito</label>
-                    {{ form.limite_credito }}
-                </div>
-                
+                {% include "components/forms/form-group.html" with field=form.ciudad label=form.ciudad.label %}
+                {% include "components/forms/form-group.html" with field=form.provincia label=form.provincia.label %}
+                {% include "components/forms/form-group.html" with field=form.codigo_postal label=form.codigo_postal.label %}
+                {% include "components/forms/form-group.html" with field=form.telefono label=form.telefono.label %}
+                {% include "components/forms/form-group.html" with field=form.email label=form.email.label %}
+                {% include "components/forms/form-group.html" with field=form.contacto_principal label=form.contacto_principal.label %}
+                {% include "components/forms/form-group.html" with field=form.limite_credito label=form.limite_credito.label %}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-base-content mb-1">Notas</label>
-                    {{ form.notas }}
+                    {% include "components/forms/form-group.html" with field=form.notas label=form.notas.label %}
                 </div>
-                
                 <div class="flex items-center gap-2">
                     {{ form.activo }}
                     <label class="text-sm text-base-content">Activo</label>
                 </div>
             </div>
-            
+
             <div class="mt-6 flex gap-2">
                 <button type="submit" class="btn-success">
                     <i class="fas fa-save mr-2"></i>Guardar

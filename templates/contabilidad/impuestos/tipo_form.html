@@ -3,63 +3,29 @@
 {% block title %}{{ action }} Tipo de Impuesto{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <a href="{% url 'contabilidad:impuestos_tipos' %}" class="text-primary hover:text-primary-focus">
-        <i class="fas fa-arrow-left mr-2"></i>Volver a tipos de impuesto
-    </a>
-</div>
+{% include "components/page-header.html" with title=action|add:" Tipo de Impuesto" back_url="contabilidad:impuestos_tipos" %}
 
 <div class="max-w-2xl mx-auto">
     <div class="bg-base-200 rounded-lg shadow p-6">
-        <h1 class="text-2xl font-bold mb-6 text-base-content">{{ action }} Tipo de Impuesto</h1>
-        
         <form method="post">
             {% csrf_token %}
-            
+
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Código</label>
-                    {{ form.codigo }}
-                    {% if form.codigo.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.codigo.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Nombre</label>
-                    {{ form.nombre }}
-                    {% if form.nombre.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.nombre.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Tipo</label>
-                    {{ form.tipo }}
-                    {% if form.tipo.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.tipo.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-base-content mb-1">Cuenta Contable</label>
-                    {{ form.cuenta_contable }}
-                    {% if form.cuenta_contable.errors %}
-                    <p class="text-error text-sm mt-1">{{ form.cuenta_contable.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
+                {% include "components/forms/form-group.html" with field=form.codigo label=form.codigo.label %}
+                {% include "components/forms/form-group.html" with field=form.nombre label=form.nombre.label %}
+                {% include "components/forms/form-group.html" with field=form.tipo label=form.tipo.label %}
+                {% include "components/forms/form-group.html" with field=form.cuenta_contable label=form.cuenta_contable.label %}
                 <div class="flex items-center gap-2">
                     {{ form.activo }}
                     <label class="text-sm text-base-content">Activo</label>
                 </div>
             </div>
-            
+
             <div class="mt-6 flex gap-2">
-                <button type="submit" class="bg-neutral text-neutral-content px-4 py-2 rounded hover:bg-neutral-focus">
+                <button type="submit" class="btn-success">
                     <i class="fas fa-save mr-2"></i>Guardar
                 </button>
-                <a href="{% url 'contabilidad:impuestos_tipos' %}" class="bg-base-300 text-base-content px-4 py-2 rounded hover:bg-base-content/20">
+                <a href="{% url 'contabilidad:impuestos_tipos' %}" class="btn-ghost">
                     Cancelar
                 </a>
             </div>
