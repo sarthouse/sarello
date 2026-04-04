@@ -25,16 +25,8 @@
                     <i class="fas fa-arrow-right mr-1"></i>Generar Apertura
                 </a>
                 {% endif %}
+                {% endif %}
                 <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="btn-primary btn-sm">
-                    <i class="fas fa-edit mr-1"></i>Editar
-                </a>
-                {% if ejercicio_actual.ejercicio_anterior %}
-                <a href="{% url 'contabilidad:generar_apertura' ejercicio_actual.pk %}" class="bg-success text-white px-3 py-1 rounded text-sm hover:bg-success/90">
-                    <i class="fas fa-arrow-right mr-1"></i>Generar Apertura
-                </a>
-                {% endif %}
-                {% endif %}
-                <a href="{% url 'contabilidad:ejercicio_edit' ejercicio_actual.pk %}" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-primary/90">
                     <i class="fas fa-edit mr-1"></i>Editar
                 </a>
             </div>

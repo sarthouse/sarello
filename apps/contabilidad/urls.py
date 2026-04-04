@@ -31,4 +31,12 @@ urlpatterns = [
     path('ejercicio/<int:pk>/preview-cierre/', views.preview_cierre, name='preview_cierre'),
     path('ejercicio/<int:pk>/cerrar/', views.cerrar_ejercicio, name='cerrar_ejercicio'),
     path('ejercicio/<int:pk>/apertura/', views.generar_apertura, name='generar_apertura'),
+    path('impuestos/tipos/', views.impuestos_tipos, name='impuestos_tipos'),
+    path('impuestos/tipos/crear/', views.impuestos_tipo_create, name='impuestos_tipo_create'),
+    path('impuestos/tipos/<int:pk>/editar/', views.impuestos_tipo_edit, name='impuestos_tipo_edit'),
+    path('impuestos/tipos/<int:pk>/eliminar/', views.impuestos_tipo_delete, name='impuestos_tipo_delete'),
+    path('impuestos/alicuotas/', views.impuestos_alicuotas, name='impuestos_alicuotas'),
+    path('impuestos/alicuotas/crear/', views.impuestos_alicuota_create, name='impuestos_alicuota_create'),
+    path('impuestos/alicuotas/<int:pk>/editar/', views.impuestos_alicuota_edit, name='impuestos_alicuota_edit'),
+    path('impuestos/alicuotas/<int:pk>/eliminar/', views.impuestos_alicuota_delete, name='impuestos_alicuota_delete'),
 ]

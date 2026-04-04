@@ -4,14 +4,14 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{% url 'contabilidad:asientos' %}" class="text-blue-600 hover:text-blue-800">
+    <a href="{% url 'contabilidad:asientos' %}" class="text-primary hover:text-primary/80">
         <i class="fas fa-arrow-left mr-2"></i>Volver
     </a>
 </div>
 
 <div class="max-w-2xl mx-auto">
     {% include "components/cards/card.html" with title="Eliminar Asiento" %}
-        <p class="text-gray-700 mb-4">¿Está seguro de eliminar el asiento <strong>{{ asiento.numero }}</strong> ({{ asiento.fecha }})?</p>
+        <p class="text-base-content mb-4">¿Está seguro de eliminar el asiento <strong>{{ asiento.numero }}</strong> ({{ asiento.fecha }})?</p>
         
         <form method="post" class="mt-6">
             {% csrf_token %}

@@ -17,10 +17,10 @@
         <form method="post">
             {% csrf_token %}
             <div class="flex gap-2">
-                <button type="submit" class="bg-error text-white px-4 py-2 rounded hover:bg-error/80">
+                <button type="submit" class="btn-error">
                     <i class="fas fa-trash mr-2"></i>Eliminar
                 </button>
-                <a href="{% url 'contactos:lista' %}" class="bg-base-300 text-base-content px-4 py-2 rounded hover:bg-base-300/80">
+                <a href="{% url 'contactos:lista' %}" class="btn-ghost">
                     Cancelar
                 </a>
             </div>

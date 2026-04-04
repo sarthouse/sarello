@@ -245,15 +245,6 @@ class MovimientoTesoreria(DocumentoBase):
 
         return asiento
 
-    def anular(self):
-        """Anula un movimiento confirmado: genera asiento inverso y cambia estado."""
-        if self.estado != 'confirmado':
-            raise ValidationError('Solo se pueden anular movimientos confirmados')
-
-        self.generar_asiento_inverso()
-        self.estado = 'anulado'
-        self.save(update_fields=['estado'])
-
     def _obtener_ejercicio(self):
         """Obtiene el ejercicio contable abierto para la fecha del movimiento."""
         from apps.contabilidad.models import Ejercicio
@@ -283,16 +274,27 @@ class MovimientoTesoreria(DocumentoBase):
         return '0001'
 
     def save(self, *args, **kwargs):
-        estado_anterior = self.pk and MovimientoTesoreria.objects.filter(pk=self.pk).values_list('estado', flat=True).first()
+        estado_anterior = None
+        if self.pk:
+            try:
+                estado_anterior = MovimientoTesoreria.objects.values_list('estado', flat=True).get(pk=self.pk)
+            except MovimientoTesoreria.DoesNotExist:
+                pass
+
+        transicion_valida = True
+        if estado_anterior == 'confirmado' and self.estado == 'cancelado':
+            transicion_valida = False
+            raise ValidationError('Un movimiento confirmado debe anularse antes de cancelarse')
+
+        super().save(*args, **kwargs)
+
+        if not transicion_valida:
+            return
 
         if estado_anterior == 'borrador' and self.estado == 'confirmado':
             self.generar_asiento()
         elif estado_anterior == 'confirmado' and self.estado == 'anulado':
             self.generar_asiento_inverso()
-        elif estado_anterior == 'confirmado' and self.estado == 'cancelado':
-            raise ValidationError('Un movimiento confirmado debe anularse antes de cancelarse')
-
-        super().save(*args, **kwargs)
 
 
 class LineaMovimientoTesoreria(models.Model):

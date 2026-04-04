@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Parámetros{% endblock %}
+
+{% block content %}
+{% include "components/page-header.html" with title="Parámetros del Sistema" subtitle="Configuración general" back_url="configuracion:index" %}
+
+<div class="bg-base-200 rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-base-300">
+        <thead class="bg-base-300">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Clave</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Valor</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Grupo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Editable</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-base-200 divide-y divide-base-300">
+            {% for p in parametros %}
+            <tr class="hover:bg-base-300">
+                <td class="px-6 py-4 font-mono text-sm text-base-content">{{ p.clave }}</td>
+                <td class="px-6 py-4 text-base-content">{{ p.valor|truncatechars:50 }}</td>
+                <td class="px-6 py-4">
+                    {% include "components/badges/badge.html" with label=p.get_grupo_display variant="primary" size="sm" %}
+                </td>
+                <td class="px-6 py-4">
+                    {% if p.editable %}
+                    {% include "components/badges/badge.html" with label="Sí" variant="success" size="sm" %}
+                    {% else %}
+                    {% include "components/badges/badge.html" with label="No" variant="gray" size="sm" %}
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4">
+                    {% if p.editable %}
+                    <a href="{% url 'configuracion:parametro_edit' p.pk %}" class="text-warning hover:text-warning/80">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-6 py-4 text-center text-base-content/60">No hay parámetros configurados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

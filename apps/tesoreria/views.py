@@ -173,9 +173,14 @@ def movimiento_edit(request, pk):
 def movimiento_anular(request, pk):
     movimiento = get_object_or_404(MovimientoTesoreria, pk=pk)
 
+    if movimiento.estado != 'confirmado':
+        messages.error(request, 'Solo se pueden anular movimientos confirmados')
+        return redirect('tesoreria:movimientos')
+
     if request.method == 'POST':
         try:
-            movimiento.anular()
+            movimiento.estado = 'anulado'
+            movimiento.save()
             messages.success(request, 'Movimiento anulado correctamente')
         except ValidationError as e:
             messages.error(request, str(e))

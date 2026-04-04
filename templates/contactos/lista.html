@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-base-content/80">Contactos</h1>
         <p class="text-base-content/60">Clientes y proveedores</p>
     </div>
-    <a href="{% url 'contactos:contacto_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/80">
+    <a href="{% url 'contactos:contacto_create' %}" class="btn-primary">
         <i class="fas fa-plus mr-2"></i>Nuevo Contacto
     </a>
 </div>
@@ -33,7 +33,7 @@
                 <option value="inactivo" {% if estado_filter == 'inactivo' %}selected{% endif %}>Inactivo</option>
             </select>
         </div>
-        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+        <button type="submit" class="btn-primary">
             <i class="fas fa-search mr-2"></i>Buscar
         </button>
     </div>

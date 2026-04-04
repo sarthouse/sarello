@@ -4,14 +4,14 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{% url 'contabilidad:plan_cuentas' %}" class="text-blue-600 hover:text-blue-800">
+    <a href="{% url 'contabilidad:plan_cuentas' %}" class="text-primary hover:text-primary/80">
         <i class="fas fa-arrow-left mr-2"></i>Volver al plan de cuentas
     </a>
 </div>
 
 <div class="max-w-2xl mx-auto">
     {% include "components/cards/card.html" with title="Eliminar Cuenta" %}
-        <p class="text-gray-700 mb-4">
+        <p class="text-base-content mb-4">
             ¿Está seguro de eliminar la cuenta <strong>{{ cuenta.codigo }} - {{ cuenta.nombre }}</strong>?
         </p>
         

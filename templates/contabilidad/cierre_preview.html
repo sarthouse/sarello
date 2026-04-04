@@ -9,21 +9,21 @@
 
 {% include "components/cards/card.html" with title="Resumen del Ejercicio" %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-sm font-medium text-gray-500 uppercase">Período</p>
+        <div class="bg-base-300 p-4 rounded-lg">
+            <p class="text-sm font-medium text-base-content/60 uppercase">Período</p>
             <p class="text-lg font-semibold">{{ ejercicio.fecha_inicio|date:"d/m/Y" }} - {{ ejercicio.fecha_fin|date:"d/m/Y" }}</p>
         </div>
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-sm font-medium text-gray-500 uppercase">Total Ingresos</p>
-            <p class="text-lg font-semibold text-green-600">{{ total_ingresos|floatformat:2 }}</p>
+        <div class="bg-base-300 p-4 rounded-lg">
+            <p class="text-sm font-medium text-base-content/60 uppercase">Total Ingresos</p>
+            <p class="text-lg font-semibold text-success">{{ total_ingresos|floatformat:2 }}</p>
         </div>
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-sm font-medium text-gray-500 uppercase">Total Egresos</p>
-            <p class="text-lg font-semibold text-red-600">{{ total_egresos|floatformat:2 }}</p>
+        <div class="bg-base-300 p-4 rounded-lg">
+            <p class="text-sm font-medium text-base-content/60 uppercase">Total Egresos</p>
+            <p class="text-lg font-semibold text-error">{{ total_egresos|floatformat:2 }}</p>
         </div>
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <p class="text-sm font-medium text-gray-500 uppercase">Resultado</p>
-            <p class="text-2xl font-bold {% if resultado >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+        <div class="bg-base-300 p-4 rounded-lg">
+            <p class="text-sm font-medium text-base-content/60 uppercase">Resultado</p>
+            <p class="text-2xl font-bold {% if resultado >= 0 %}text-success{% else %}text-error{% endif %}">
                 {% if resultado >= 0 %}{{ resultado|floatformat:2 }}{% else %}({{ resultado|floatformat:2|slice:"1:" }}){% endif %}
             </p>
         </div>
@@ -31,45 +31,45 @@
 
 {% include "components/cards/card.html" with title="Asiento de Cierre - Preview" %}
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-base-300">
+            <thead class="bg-base-300">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Tipo</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Haber</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody class="divide-y divide-base-300">
                 {% for linea in lineas %}
-                <tr class="{% if linea.tipo == 'resultado' %}bg-yellow-50 font-semibold{% endif %}">
+                <tr class="{% if linea.tipo == 'resultado' %}bg-warning/10 font-semibold{% endif %}">
                     <td class="px-6 py-3">
                         <span class="font-mono font-semibold">{{ linea.cuenta.codigo }}</span>
-                        <span class="ml-2 text-gray-700">{{ linea.cuenta.nombre }}</span>
+                        <span class="ml-2 text-base-content">{{ linea.cuenta.nombre }}</span>
                     </td>
                     <td class="px-6 py-3 text-sm">
                         {% if linea.tipo == 'cierre_ingreso' %}
-                        <span class="text-green-600">Cierre Ingreso</span>
+                        <span class="text-success">Cierre Ingreso</span>
                         {% elif linea.tipo == 'cierre_egreso' %}
-                        <span class="text-red-600">Cierre Egreso</span>
+                        <span class="text-error">Cierre Egreso</span>
                         {% elif linea.tipo == 'resultado' %}
-                        <span class="text-yellow-600 font-bold">Resultado</span>
+                        <span class="text-warning font-bold">Resultado</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-3 text-right font-mono {% if linea.debe > 0 %}text-green-600 font-semibold{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-3 text-right font-mono {% if linea.debe > 0 %}text-success font-semibold{% else %}text-base-content/30{% endif %}">
                         {% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% else %}-{% endif %}
                     </td>
-                    <td class="px-6 py-3 text-right font-mono {% if linea.haber > 0 %}text-red-600 font-semibold{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-3 text-right font-mono {% if linea.haber > 0 %}text-error font-semibold{% else %}text-base-content/30{% endif %}">
                         {% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% else %}-{% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot class="bg-gray-100 font-semibold border-t-2">
+            <tfoot class="bg-base-300 font-semibold border-t-2">
                 <tr>
                     <td colspan="2" class="px-6 py-3 text-right text-sm">TOTALES:</td>
-                    <td class="px-6 py-3 text-right text-green-600 font-mono">{{ total_ingresos|floatformat:2 }}</td>
-                    <td class="px-6 py-3 text-right text-red-600 font-mono">{{ total_egresos|floatformat:2 }}</td>
+                    <td class="px-6 py-3 text-right text-success font-mono">{{ total_ingresos|floatformat:2 }}</td>
+                    <td class="px-6 py-3 text-right text-error font-mono">{{ total_egresos|floatformat:2 }}</td>
                 </tr>
             </tfoot>
         </table>

@@ -34,7 +34,6 @@ DJANGO_APPS = [
     'apps.configuracion',
     'apps.contabilidad',
     'apps.tesoreria',
-    'apps.impuestos',
     'apps.contactos',
     'apps.inventario',
     'apps.ventas',
@@ -127,8 +126,6 @@ LOGIN_REDIRECT_URL = '/contabilidad/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-MESSAGES_TOOLBAG = 'django.contrib.messages'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

@@ -10,39 +10,39 @@
 {% include "components/cards/card.html" with title="Información del Asiento" %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
         <div>
-            <p class="text-gray-500 text-xs font-medium uppercase">Fecha</p>
+            <p class="text-base-content/60 text-xs font-medium uppercase">Fecha</p>
             <p class="font-semibold">{{ asiento.fecha }}</p>
         </div>
         <div>
-            <p class="text-gray-500 text-xs font-medium uppercase">Origen</p>
+            <p class="text-base-content/60 text-xs font-medium uppercase">Origen</p>
             <p class="font-semibold">{{ asiento.get_origen_display }}</p>
         </div>
         <div>
-            <p class="text-gray-500 text-xs font-medium uppercase">Creado</p>
+            <p class="text-base-content/60 text-xs font-medium uppercase">Creado</p>
             <p class="font-semibold text-xs">{{ asiento.creado_en|date:"d/m/Y H:i" }}</p>
         </div>
         <div>
-            <p class="text-gray-500 text-xs font-medium uppercase">Modificado</p>
+            <p class="text-base-content/60 text-xs font-medium uppercase">Modificado</p>
             <p class="font-semibold text-xs">{{ asiento.modificado_en|date:"d/m/Y H:i" }}</p>
         </div>
     </div>
     
     {% if asiento.descripcion %}
     <div class="mb-4">
-        <p class="text-gray-500 text-sm font-medium uppercase mb-1">Descripción</p>
+        <p class="text-base-content/60 text-sm font-medium uppercase mb-1">Descripción</p>
         <p class="text-base">{{ asiento.descripcion }}</p>
     </div>
     {% endif %}
     
     {% if asiento.observaciones %}
     <div class="mb-4">
-        <p class="text-gray-500 text-sm font-medium uppercase mb-1">Observaciones</p>
+        <p class="text-base-content/60 text-sm font-medium uppercase mb-1">Observaciones</p>
         <p class="text-base">{{ asiento.observaciones }}</p>
     </div>
     {% endif %}
     
     <div class="flex items-center gap-2">
-        <span class="text-gray-500 text-sm font-medium uppercase">Estado:</span>
+        <span class="text-base-content/60 text-sm font-medium uppercase">Estado:</span>
         {% if asiento.estado == 'confirmado' %}
             {% include "components/badges/badge.html" with label=asiento.get_estado_display variant="success" %}
         {% elif asiento.estado == 'cancelado' %}
@@ -55,35 +55,35 @@
 {% include "components/cards/card.html" with title="Líneas de Asiento" %}
     {% if asiento.lineas.all %}
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-base-300">
+            <thead class="bg-base-300">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cuenta</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Debe</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Haber</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Cuenta</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-base-content/60 uppercase">Descripción</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Debe</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Haber</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody class="divide-y divide-base-300">
                 {% for linea in asiento.lineas.all %}
-                <tr class="hover:bg-gray-50">
+                <tr class="hover:bg-base-300">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="font-mono text-sm font-semibold">{{ linea.cuenta.codigo }}</span>
-                        <div class="text-sm text-gray-600">{{ linea.cuenta.nombre }}</div>
+                        <div class="text-sm text-base-content/60">{{ linea.cuenta.nombre }}</div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ linea.descripcion|default:"-" }}</td>
-                    <td class="px-6 py-4 text-right font-semibold {% if linea.debe > 0 %}text-green-600{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-4 text-sm text-base-content/60">{{ linea.descripcion|default:"-" }}</td>
+                    <td class="px-6 py-4 text-right font-semibold {% if linea.debe > 0 %}text-success{% else %}text-base-content/30{% endif %}">
                         {{ linea.debe|default:"-" }}
                     </td>
-                    <td class="px-6 py-4 text-right font-semibold {% if linea.haber > 0 %}text-red-600{% else %}text-gray-400{% endif %}">
+                    <td class="px-6 py-4 text-right font-semibold {% if linea.haber > 0 %}text-error{% else %}text-base-content/30{% endif %}">
                         {{ linea.haber|default:"-" }}
                     </td>
                 </tr>
                 {% endfor %}
-                <tr class="bg-gray-50 font-semibold border-t-2">
+                <tr class="bg-base-300 font-semibold border-t-2">
                     <td colspan="2" class="px-6 py-3 text-right text-sm">Totales:</td>
-                    <td class="px-6 py-3 text-right text-green-600">{{ asiento.total_debe }}</td>
-                    <td class="px-6 py-3 text-right text-red-600">{{ asiento.total_haber }}</td>
+                    <td class="px-6 py-3 text-right text-success">{{ asiento.total_debe }}</td>
+                    <td class="px-6 py-3 text-right text-error">{{ asiento.total_haber }}</td>
                 </tr>
             </tbody>
         </table>

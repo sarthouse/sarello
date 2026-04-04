@@ -3,12 +3,27 @@
 {% block title %}Configuración{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-base-content/80">Configuración</h1>
-    <p class="text-base-content/60">Parámetros del sistema</p>
-</div>
+{% include "components/page-header.html" with title="Configuración" subtitle="Parámetros del sistema y datos de la empresa" %}
 
-<div class="bg-base-200 rounded-lg shadow p-6">
-    <p class="text-base-content/60">Módulo de configuración en desarrollo.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="{% url 'configuracion:parametros' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-base-content/60">Parámetros</p>
+                <p class="text-2xl font-bold text-base-content">Configurar</p>
+            </div>
+            <i class="fas fa-cog text-4xl text-primary"></i>
+        </div>
+    </a>
+
+    <a href="{% url 'configuracion:datos_empresa' %}" class="block p-6 bg-base-200 rounded-lg shadow hover:shadow-lg transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-base-content/60">Datos de la Empresa</p>
+                <p class="text-2xl font-bold text-base-content">Editar</p>
+            </div>
+            <i class="fas fa-building text-4xl text-success"></i>
+        </div>
+    </a>
 </div>
 {% endblock %}

@@ -1,8 +1,11 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from . import views
 
 app_name = 'configuracion'
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='configuracion/index.html'), name='index'),
+    path('', views.index, name='index'),
+    path('parametros/', views.parametros, name='parametros'),
+    path('parametros/<int:pk>/editar/', views.parametro_edit, name='parametro_edit'),
+    path('datos-empresa/', views.datos_empresa, name='datos_empresa'),
 ]

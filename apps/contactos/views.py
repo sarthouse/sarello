@@ -3,31 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import models
-from django import forms
 from .models import Contacto
-
-
-class ContactoForm(forms.ModelForm):
-    class Meta:
-        model = Contacto
-        fields = ['nombre', 'tipo', 'codigo', 'cuil', 'condicion_iva', 'direccion', 'telefono', 'email', 'ciudad', 'provincia', 'codigo_postal', 'contacto_principal', 'notas', 'activo', 'limite_credito']
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'tipo': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'codigo': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'cuil': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'condicion_iva': forms.Select(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'direccion': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'telefono': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'email': forms.EmailInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'ciudad': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'provincia': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'codigo_postal': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'contacto_principal': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'notas': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2', 'rows': 3}),
-            'activo': forms.CheckboxInput(attrs={'class': 'rounded'}),
-            'limite_credito': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2', 'step': '0.01'}),
-        }
+from .forms import ContactoForm
 
 
 @login_required
@@ -40,28 +17,28 @@ def lista(request):
     tipo_filter = request.GET.get('tipo')
     estado_filter = request.GET.get('estado')
     busqueda = request.GET.get('q')
-    
+
     contactos = Contacto.objects.all().order_by('nombre')
-    
+
     if tipo_filter:
         contactos = contactos.filter(tipo=tipo_filter)
-    
+
     if estado_filter == 'activo':
         contactos = contactos.filter(activo=True)
     elif estado_filter == 'inactivo':
         contactos = contactos.filter(activo=False)
-    
+
     if busqueda:
         contactos = contactos.filter(
-            models.Q(nombre__icontains=busqueda) | 
+            models.Q(nombre__icontains=busqueda) |
             models.Q(codigo__icontains=busqueda) |
             models.Q(cuil__icontains=busqueda)
         )
-    
+
     paginator = Paginator(contactos, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'contactos/lista.html', {
         'page_obj': page_obj,
         'tipo_filter': tipo_filter,

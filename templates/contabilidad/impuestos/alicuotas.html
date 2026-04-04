@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-base-content/80">Alícuotas</h1>
         <p class="text-base-content/60">Porcentajes de impuesto</p>
     </div>
-    <a href="{% url 'impuestos:alicuota_create' %}" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/80">
+    <a href="{% url 'contabilidad:impuestos_alicuota_create' %}" class="btn-primary">
         <i class="fas fa-plus mr-2"></i>Nueva Alícuota
     </a>
 </div>
@@ -41,10 +41,10 @@
                     {% endif %}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="{% url 'impuestos:alicuota_edit' alicuota.pk %}" class="text-warning hover:text-warning/80 mr-2">
+                    <a href="{% url 'contabilidad:impuestos_alicuota_edit' alicuota.pk %}" class="text-warning hover:text-warning/80 mr-2">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a href="{% url 'impuestos:alicuota_delete' alicuota.pk %}" class="text-error hover:text-error/80">
+                    <a href="{% url 'contabilidad:impuestos_alicuota_delete' alicuota.pk %}" class="text-error hover:text-error/80">
                         <i class="fas fa-trash"></i>
                     </a>
                 </td>

@@ -34,3 +34,6 @@ yarn-error.log
 # IDE / Editor
 .vscode/settings.json
 .idea/
+
+# Plan de trabajo temporal
+plan.md

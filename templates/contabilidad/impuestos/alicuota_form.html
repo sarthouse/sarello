@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{% url 'impuestos:alicuotas' %}" class="text-primary hover:text-primary/80">
+    <a href="{% url 'contabilidad:impuestos_alicuotas' %}" class="text-primary hover:text-primary/80">
         <i class="fas fa-arrow-left mr-2"></i>Volver a alícuotas
     </a>
 </div>
@@ -72,10 +72,10 @@
             </div>
             
             <div class="mt-6 flex gap-2">
-                <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-600">
+                <button type="submit" class="btn-success">
                     <i class="fas fa-save mr-2"></i>Guardar
                 </button>
-                <a href="{% url 'impuestos:alicuotas' %}" class="bg-base-300 text-base-content px-4 py-2 rounded hover:bg-base-300/80">
+                <a href="{% url 'contabilidad:impuestos_alicuotas' %}" class="btn-ghost">
                     Cancelar
                 </a>
             </div>

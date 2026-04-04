@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Parámetro{% endblock %}
+
+{% block content %}
+{% include "components/page-header.html" with title="Editar Parámetro" subtitle=parametro.clave back_url="configuracion:parametros" %}
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-base-200 rounded-lg shadow p-6">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                {% include "components/forms/form-group.html" with field=form.clave label=form.clave.label %}
+                {% include "components/forms/form-group.html" with field=form.valor label=form.valor.label %}
+                {% include "components/forms/form-group.html" with field=form.descripcion label=form.descripcion.label %}
+                {% include "components/forms/form-group.html" with field=form.grupo label=form.grupo.label %}
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="btn-success">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'configuracion:parametros' %}" class="btn-ghost">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,8 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="if(event.target === this) this.remove()">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
-        <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onclick="if(event.target === this) this.remove()">
+    <div class="bg-base-200 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-base-content text-white px-6 py-4 flex justify-between items-center">
             <h2 class="text-xl font-bold">Detalle del Movimiento</h2>
-            <button onclick="this.closest('.fixed').remove()" class="text-white hover:text-gray-300">
+            <button onclick="this.closest('.fixed').remove()" class="text-white hover:text-base-content/60">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -10,37 +10,37 @@
         <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                    <p class="text-sm text-gray-500">Fecha</p>
+                    <p class="text-sm text-base-content/60">Fecha</p>
                     <p class="text-lg font-medium">{{ linea.asiento.fecha|date:"d/m/Y" }}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">Asiento</p>
-                    <p class="text-lg font-mono font-semibold text-blue-600">{{ linea.asiento.numero }}</p>
+                    <p class="text-sm text-base-content/60">Asiento</p>
+                    <p class="text-lg font-mono font-semibold text-primary">{{ linea.asiento.numero }}</p>
                 </div>
                 <div class="col-span-2">
-                    <p class="text-sm text-gray-500">Descripción</p>
+                    <p class="text-sm text-base-content/60">Descripción</p>
                     <p class="text-base">{{ linea.descripcion|default:linea.asiento.descripcion }}</p>
                 </div>
                 <div class="col-span-2">
-                    <p class="text-sm text-gray-500">Cuenta</p>
+                    <p class="text-sm text-base-content/60">Cuenta</p>
                     <p class="text-lg font-mono">{{ linea.cuenta.codigo }} - {{ linea.cuenta.nombre }}</p>
                 </div>
             </div>
             
-            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="bg-base-300 rounded-lg p-4 mb-6">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="text-left text-sm text-gray-500">
+                        <tr class="text-left text-sm text-base-content/60">
                             <th class="pb-2">Debe</th>
                             <th class="pb-2 text-right">Haber</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="py-1 {% if linea.debe > 0 %}text-green-600 font-medium{% else %}text-gray-300{% endif %}">
+                            <td class="py-1 {% if linea.debe > 0 %}text-success font-medium{% else %}text-base-content/60{% endif %}">
                                 {% if linea.debe > 0 %}{{ linea.debe|floatformat:2 }}{% else %}-{% endif %}
                             </td>
-                            <td class="py-1 text-right {% if linea.haber > 0 %}text-red-600 font-medium{% else %}text-gray-300{% endif %}">
+                            <td class="py-1 text-right {% if linea.haber > 0 %}text-error font-medium{% else %}text-base-content/60{% endif %}">
                                 {% if linea.haber > 0 %}{{ linea.haber|floatformat:2 }}{% else %}-{% endif %}
                             </td>
                         </tr>
@@ -48,16 +48,16 @@
                 </table>
             </div>
             
-            <div class="bg-slate-100 rounded-lg p-4">
+            <div class="bg-base-300 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-600">Saldo anterior:</span>
-                    <span class="font-mono font-semibold {% if saldo_anterior >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                    <span class="text-base-content/60">Saldo anterior:</span>
+                    <span class="font-mono font-semibold {% if saldo_anterior >= 0 %}text-success{% else %}text-error{% endif %}">
                         {% if saldo_anterior >= 0 %}{{ saldo_anterior|floatformat:2 }}{% else %}({{ saldo_anterior|floatformat:2|slice:"1:" }}){% endif %}
                     </span>
                 </div>
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-600"> Movimiento:</span>
-                    <span class="font-mono {% if linea.cuenta.tipo in 'activo,egreso' %}{% if linea.debe > 0 %}text-green-600{% else %}text-red-600{% endif %}{% else %}{% if linea.haber > 0 %}text-green-600{% else %}text-red-600{% endif %}{% endif %}">
+                    <span class="text-base-content/60"> Movimiento:</span>
+                    <span class="font-mono {% if linea.cuenta.tipo in 'activo,egreso' %}{% if linea.debe > 0 %}text-success{% else %}text-error{% endif %}{% else %}{% if linea.haber > 0 %}text-success{% else %}text-error{% endif %}{% endif %}">
                         {% if linea.cuenta.tipo in 'activo,egreso' %}
                             {% if linea.debe > 0 %}+ {{ linea.debe|floatformat:2 }}{% else %}- {{ linea.haber|floatformat:2 }}{% endif %}
                         {% else %}
@@ -65,20 +65,20 @@
                         {% endif %}
                     </span>
                 </div>
-                <div class="border-t border-slate-300 pt-2 mt-2 flex justify-between items-center">
+                <div class="border-t border-base-content/20 pt-2 mt-2 flex justify-between items-center">
                     <span class="font-semibold">Saldo después de este movimiento:</span>
-                    <span class="font-mono text-lg font-bold {% if saldo_hasta_esta >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                    <span class="font-mono text-lg font-bold {% if saldo_hasta_esta >= 0 %}text-success{% else %}text-error{% endif %}">
                         {% if saldo_hasta_esta >= 0 %}{{ saldo_hasta_esta|floatformat:2 }}{% else %}({{ saldo_hasta_esta|floatformat:2|slice:"1:" }}){% endif %}
                     </span>
                 </div>
             </div>
         </div>
         
-        <div class="bg-gray-50 px-6 py-3 flex justify-between gap-2">
-            <a href="{% url 'contabilidad:asiento_detail' linea.asiento.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <div class="bg-base-300 px-6 py-3 flex justify-between gap-2">
+            <a href="{% url 'contabilidad:asiento_detail' linea.asiento.pk %}" class="btn-primary">
                 <i class="fas fa-eye mr-1"></i>Ver Asiento
             </a>
-            <button onclick="this.closest('.fixed').remove()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+            <button onclick="this.closest('.fixed').remove()" class="btn-ghost">
                 Cerrar
             </button>
         </div>

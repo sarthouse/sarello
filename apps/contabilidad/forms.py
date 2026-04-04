@@ -1,5 +1,5 @@
 from django import forms
-from .models import CuentaContable, Ejercicio, Asiento, LineaAsiento
+from .models import CuentaContable, Ejercicio, Asiento, LineaAsiento, TipoImpuesto, Alicuota
 
 
 class CuentaForm(forms.ModelForm):
@@ -35,4 +35,20 @@ class LineaAsientoForm(forms.ModelForm):
         widgets = {
             'debe': forms.NumberInput(attrs={'step': '0.01'}),
             'haber': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
+
+class TipoImpuestoForm(forms.ModelForm):
+    class Meta:
+        model = TipoImpuesto
+        fields = ['nombre', 'codigo', 'tipo', 'cuenta_contable', 'activo']
+
+
+class AlicuotaForm(forms.ModelForm):
+    class Meta:
+        model = Alicuota
+        fields = ['tipo_impuesto', 'nombre', 'porcentaje', 'jurisdiccion', 'fecha_desde', 'fecha_hasta', 'por_defecto']
+        widgets = {
+            'fecha_desde': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_hasta': forms.DateInput(attrs={'type': 'date'}),
         }

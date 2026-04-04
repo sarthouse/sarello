@@ -1377,3 +1377,95 @@ def generar_apertura(request, pk):
         'ejercicio_anterior': ejercicio_anterior,
         'lineas': lineas_preview,
     })
+
+
+# --- Impuestos ---
+
+from .forms import TipoImpuestoForm, AlicuotaForm
+from .models import TipoImpuesto, Alicuota, ConfiguracionImpuesto
+
+
+@login_required
+def impuestos_tipos(request):
+    tipos = TipoImpuesto.objects.all().order_by('nombre')
+    return render(request, 'contabilidad/impuestos/tipos.html', {'tipos': tipos})
+
+
+@login_required
+def impuestos_tipo_create(request):
+    if request.method == 'POST':
+        form = TipoImpuestoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tipo de impuesto creado correctamente')
+            return redirect('contabilidad:impuestos_tipos')
+    else:
+        form = TipoImpuestoForm()
+    return render(request, 'contabilidad/impuestos/tipo_form.html', {'form': form, 'action': 'Crear'})
+
+
+@login_required
+def impuestos_tipo_edit(request, pk):
+    tipo = get_object_or_404(TipoImpuesto, pk=pk)
+    if request.method == 'POST':
+        form = TipoImpuestoForm(request.POST, instance=tipo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tipo de impuesto actualizado correctamente')
+            return redirect('contabilidad:impuestos_tipos')
+    else:
+        form = TipoImpuestoForm(instance=tipo)
+    return render(request, 'contabilidad/impuestos/tipo_form.html', {'form': form, 'tipo': tipo, 'action': 'Editar'})
+
+
+@login_required
+def impuestos_tipo_delete(request, pk):
+    tipo = get_object_or_404(TipoImpuesto, pk=pk)
+    if request.method == 'POST':
+        tipo.delete()
+        messages.success(request, 'Tipo de impuesto eliminado correctamente')
+        return redirect('contabilidad:impuestos_tipos')
+    return render(request, 'contabilidad/impuestos/tipo_confirm_delete.html', {'tipo': tipo})
+
+
+@login_required
+def impuestos_alicuotas(request):
+    alicuotas = Alicuota.objects.select_related('tipo_impuesto').order_by('-fecha_desde')
+    return render(request, 'contabilidad/impuestos/alicuotas.html', {'alicuotas': alicuotas})
+
+
+@login_required
+def impuestos_alicuota_create(request):
+    if request.method == 'POST':
+        form = AlicuotaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Alícuota creada correctamente')
+            return redirect('contabilidad:impuestos_alicuotas')
+    else:
+        form = AlicuotaForm()
+    return render(request, 'contabilidad/impuestos/alicuota_form.html', {'form': form, 'action': 'Crear'})
+
+
+@login_required
+def impuestos_alicuota_edit(request, pk):
+    alicuota = get_object_or_404(Alicuota, pk=pk)
+    if request.method == 'POST':
+        form = AlicuotaForm(request.POST, instance=alicuota)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Alícuota actualizada correctamente')
+            return redirect('contabilidad:impuestos_alicuotas')
+    else:
+        form = AlicuotaForm(instance=alicuota)
+    return render(request, 'contabilidad/impuestos/alicuota_form.html', {'form': form, 'alicuota': alicuota, 'action': 'Editar'})
+
+
+@login_required
+def impuestos_alicuota_delete(request, pk):
+    alicuota = get_object_or_404(Alicuota, pk=pk)
+    if request.method == 'POST':
+        alicuota.delete()
+        messages.success(request, 'Alícuota eliminada correctamente')
+        return redirect('contabilidad:impuestos_alicuotas')
+    return render(request, 'contabilidad/impuestos/alicuota_confirm_delete.html', {'alicuota': alicuota})

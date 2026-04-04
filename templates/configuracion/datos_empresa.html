@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Datos de la Empresa{% endblock %}
+
+{% block content %}
+{% include "components/page-header.html" with title="Datos de la Empresa" subtitle="Información fiscal y de contacto" back_url="configuracion:index" %}
+
+<div class="max-w-3xl mx-auto">
+    <div class="bg-base-200 rounded-lg shadow p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                {% include "components/forms/form-group.html" with field=form.razon_social label=form.razon_social.label %}
+                {% include "components/forms/form-group.html" with field=form.nombre_fantasia label=form.nombre_fantasia.label %}
+                {% include "components/forms/form-group.html" with field=form.cuil label=form.cuil.label %}
+                {% include "components/forms/form-group.html" with field=form.condicion_iva label=form.condicion_iva.label %}
+                {% include "components/forms/form-group.html" with field=form.direccion label=form.direccion.label %}
+                {% include "components/forms/form-group.html" with field=form.telefono label=form.telefono.label %}
+                {% include "components/forms/form-group.html" with field=form.email label=form.email.label %}
+                {% include "components/forms/form-group.html" with field=form.web label=form.web.label %}
+                {% include "components/forms/form-group.html" with field=form.numero_ingresos_brutos label=form.numero_ingresos_brutos.label %}
+                {% include "components/forms/form-group.html" with field=form.inicio_actividades label=form.inicio_actividades.label %}
+                {% include "components/forms/form-group.html" with field=form.logo label=form.logo.label %}
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="btn-success">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'configuracion:index' %}" class="btn-ghost">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
