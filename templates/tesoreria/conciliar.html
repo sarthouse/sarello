@@ -14,6 +14,7 @@
                 <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Saldo Contable</th>
                 <th class="px-6 py-3 text-right text-xs font-medium text-base-content/60 uppercase">Diferencia</th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-base-content/60 uppercase">Estado</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-base-content/60 uppercase">Acciones</th>
             </tr>
         </thead>
         <tbody class="bg-base-200 divide-y divide-base-300">
@@ -35,10 +36,17 @@
                     {% include "components/badges/badge.html" with label="Descuadrado" icon="fa-exclamation-triangle" variant="error" %}
                     {% endif %}
                 </td>
+                <td class="px-6 py-4 text-center">
+                    {% if not r.conciliado %}
+                    <a href="{% url 'tesoreria:crear_ajuste_desde_conciliacion' r.cuenta.pk %}" class="btn-warning btn-sm">
+                        <i class="fas fa-plus mr-1"></i>Ajustar
+                    </a>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="px-6 py-4 text-center text-base-content/60">No hay cuentas configuradas</td>
+                <td colspan="6" class="px-6 py-4 text-center text-base-content/60">No hay cuentas configuradas</td>
             </tr>
             {% endfor %}
         </tbody>

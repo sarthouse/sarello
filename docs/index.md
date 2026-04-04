@@ -37,6 +37,13 @@ Bienvenido a la documentación del proyecto. Elegí la guía que necesitás seg�
 | DaisyUI | https://daisyui.com/ |
 | AFIP Factura Electrónica | https://www.afip.gob.ar/fe/ |
 
+## Marco normativo y cumplimiento
+
+| Guía | Descripción |
+|------|-------------|
+| [NIIF en Argentina](niif-argentina.md) | Normas contables internacionales aplicables, estado de cumplimiento y hoja de ruta |
+| [Normas ISO](normas-iso.md) | Estándares de seguridad, calidad, gestión de documentos y calidad de software |
+
 ---
 
 > **Nota para agentes de IA:** `AGENTS.md` en la raíz contiene la guía de código completa optimizada para agentes, con referencia cruzada a esta documentación.

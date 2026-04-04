@@ -294,3 +294,42 @@ def conciliar_cuentas(request):
     return render(request, 'tesoreria/conciliar.html', {
         'resultados': resultados,
     })
+
+
+@login_required
+def crear_ajuste_desde_conciliacion(request, cuenta_pk):
+    cuenta = get_object_or_404(CuentaTesoreria, pk=cuenta_pk)
+    conc = cuenta.conciliar()
+
+    if request.method == 'POST':
+        form = MovimientoTesoreriaForm(request.POST)
+        formset = LineaMovimientoFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid():
+            movimiento = form.save(commit=False)
+            movimiento.estado = 'confirmado'
+            movimiento.save()
+
+            lineas = formset.save(commit=False)
+            for linea in lineas:
+                linea.movimiento = movimiento
+                linea.save()
+
+            formset.save_m2m()
+
+            messages.success(request, 'Ajuste de saldo registrado correctamente')
+            return redirect('tesoreria:conciliar')
+    else:
+        form = MovimientoTesoreriaForm(initial={
+            'tipo': 'ajuste',
+            'observaciones': f'Ajuste por conciliación - Diferencia: {conc["diferencia"]}',
+        })
+        formset = LineaMovimientoFormSet()
+
+    return render(request, 'tesoreria/movimiento_form.html', {
+        'form': form,
+        'formset': formset,
+        'action': 'Crear Ajuste',
+        'ajuste_cuenta': cuenta,
+        'ajuste_diferencia': conc['diferencia'],
+    })

@@ -18,9 +18,12 @@ templates/
 │   ├── breadcrumbs/
 │   │   └── breadcrumb.html
 │   ├── buttons/
-│   │   └── button.html          # (vacío — placeholder)
+│   │   ├── button.html          # (vacío — usar clases btn-* de buttons.css)
+│   │   └── action-bar.html      # Grupo de botones de acción
 │   ├── cards/
-│   │   └── card.html
+│   │   ├── card.html
+│   │   └── stat-card.html       # Cards de estadísticas con icono
+│   ├── confirmations/           # (directorio preparado)
 │   ├── dividers/
 │   │   └── divider.html
 │   ├── empty-states/
@@ -28,19 +31,21 @@ templates/
 │   ├── forms/
 │   │   ├── form-field.html      # Input genérico
 │   │   ├── form-group.html      # Wrapper para Django BoundField
+│   │   ├── formset-table.html   # Tabla editable con formset inline
+│   │   ├── filter-bar.html      # Barra de filtros reutilizable
 │   │   ├── select.html          # Dropdown select
 │   │   └── textarea.html
 │   ├── modals/
 │   │   └── modal.html
 │   ├── tables/
 │   │   └── table.html
-│   ├── page-header.html         # (vacío — placeholder)
+│   ├── page-header.html         # Header de página con título, subtítulo, back link, acciones
 │   └── pagination.html
 └── partials/
     └── drawer.html              # Sidebar de navegación (autenticados)
 ```
 
-**16 archivos HTML en `components/`** (3 vacíos) + **1 en `partials/`**.
+**20 archivos HTML en `components/`** (2 vacíos) + **1 en `partials/`**.
 
 ---
 
@@ -50,6 +55,9 @@ templates/
 2. No usar filtros dentro del `with`
 3. Preparar variables en las vistas, no en plantillas
 4. Los componentes usan clases de Tailwind + DaisyUI directamente
+5. **No usar clases Tailwind hardcodeadas en botones** — usar las clases semánticas de `buttons.css`: `btn-primary`, `btn-success`, `btn-warning`, `btn-error`, `btn-ghost`, `btn-secondary`
+6. **No usar clases de color hardcodeadas** (`text-green-600`, `bg-blue-50`) — usar variables de tema DaisyUI (`text-success`, `bg-primary/10`, `text-base-content/60`)
+7. **No inline JS** — todo en `staticfiles/js/modules/`
 
 ### Preparar variables en la vista
 
@@ -67,6 +75,18 @@ def mi_vista(request):
 ---
 
 ## Componentes implementados
+
+### Page Header
+
+```html
+{% include "components/page-header.html" with title="Movimientos" subtitle="Todos los movimientos" back_url="tesoreria:movimientos" %}
+```
+
+| Variable | Tipo | Descripción |
+|----------|------|-------------|
+| `title` | string | Título principal |
+| `subtitle` | string | Subtítulo opcional |
+| `back_url` | string | URL name para el link "Volver" |
 
 ### Alerts — message.html
 
@@ -89,7 +109,7 @@ Requiere `messages` en el contexto (inyectado por Django automáticamente si `dj
 | Variable | Tipo | Default | Descripción |
 |----------|------|---------|-------------|
 | `label` | string | — | Texto del badge |
-| `variant` | string | `"gray"` | `success`, `danger`, `warning`, `info`, `gray` |
+| `variant` | string | `"gray"` | `success`, `danger`, `warning`, `info`, `gray`, `primary`, `secondary` |
 | `size` | string | `"md"` | `sm`, `md`, `lg` |
 | `icon` | string | — | Clase Font Awesome (ej: `"fa-check"`) |
 
@@ -117,6 +137,20 @@ Requiere `messages` en el contexto (inyectado por Django automáticamente si `dj
 | `subtitle` | string | Subtítulo opcional |
 | `content` | HTML | Contenido principal |
 | `footer` | HTML | Footer opcional |
+
+### Stat Card
+
+```html
+{% include "components/cards/stat-card.html" with title="Total ARS" value=total_ars icon="fa-wallet" color="success" url="tesoreria:saldo_cuentas" %}
+```
+
+| Variable | Tipo | Descripción |
+|----------|------|-------------|
+| `title` | string | Título |
+| `value` | string | Valor principal |
+| `icon` | string | Clase Font Awesome |
+| `color` | string | `primary`, `success`, `warning`, `error`, etc. |
+| `url` | string | URL name del link |
 
 ### Divider
 
@@ -174,7 +208,32 @@ Requiere `messages` en el contexto (inyectado por Django automáticamente si `dj
 | `label` | string | Etiqueta (opcional, si no se usa la del form) |
 | `field` | BoundField | Campo de Django form |
 
-Renderiza el campo con su help text y errores de validación.
+Renderiza el campo con su help text y errores de validación. El CSS estiliza automáticamente vía `.form-control`.
+
+#### formset-table.html (tabla editable con formset inline)
+
+```html
+{% include "components/forms/formset-table.html" with formset=formset columns=columns totals=totals %}
+```
+
+`columns` es una lista de dicts:
+```python
+columns = [
+    {'label': 'Cuenta', 'field': 'cuenta'},
+    {'label': 'Debe', 'field': 'debe', 'class': 'text-right'},
+    {'label': 'Haber', 'field': 'haber', 'class': 'text-right'},
+]
+```
+
+Incluye JavaScript para agregar/eliminar filas y calcular totales.
+
+#### filter-bar.html (barra de filtros)
+
+```html
+{% include "components/forms/filter-bar.html" with clear_url=request.path %}
+    {# contenido del form con campos #}
+{% endinclude %}
+```
 
 #### select.html
 
@@ -278,8 +337,33 @@ Muestra: primera, anterior, número de página, siguiente, última. Solo se rend
 | Archivo | Estado |
 |---------|--------|
 | `alerts/alert.html` | Vacío — usar `message.html` para Django messages |
-| `buttons/button.html` | Vacío — usar clases DaisyUI `btn btn-primary` directamente |
-| `page-header.html` | Vacío — usar estructura inline en templates |
+| `buttons/button.html` | Vacío — usar clases semánticas de `buttons.css` directamente |
+
+---
+
+## Botones
+
+No se usa el componente `button.html`. En su lugar, se usan clases semánticas definidas en `staticfiles/css/components/buttons.css`:
+
+| Clase | Uso |
+|-------|-----|
+| `btn-primary` | Acción principal (crear, guardar, generar) |
+| `btn-success` | Confirmar, aprobar |
+| `btn-warning` | Editar, cancelar, advertencia |
+| `btn-error` | Eliminar, anular, peligro |
+| `btn-ghost` | Acción secundaria, volver |
+| `btn-secondary` | Filtrar, buscar |
+
+Tamaños: `btn-sm`, `btn-md` (default), `btn-lg`
+
+```html
+<button type="submit" class="btn-success">
+    <i class="fas fa-save mr-2"></i>Guardar
+</button>
+<a href="{% url 'tesoreria:movimientos' %}" class="btn-ghost">
+    Cancelar
+</a>
+```
 
 ---
 
@@ -293,7 +377,7 @@ Sidebar de navegación para usuarios autenticados. Se incluye en `base.html`:
 
 **Secciones:**
 - **Contabilidad:** Dashboard, Plan de Cuentas, Asientos, Libro Diario, Mayor, Balance, Estado Resultados, Impuestos
-- **Tesorería:** Dashboard, Cuentas, Movimientos, Ingresos, Egresos, Caja Diaria
+- **Tesorería:** Dashboard, Cuentas, Movimientos, Caja Diaria, Saldos, Conciliar
 - **General:** Contactos, Configuración
 
 Muestra avatar (primera letra del username), nombre, email y botón de logout.
@@ -304,11 +388,28 @@ Muestra avatar (primera letra del username), nombre, email y botón de logout.
 
 ### Badges
 
-`success`, `danger`, `warning`, `info`, `gray`
+`success`, `danger`, `warning`, `info`, `gray`, `primary`, `secondary`
 
 ### Alerts (message.html)
 
 `success` (verde), `error` (rojo), default/accent (azul)
+
+### Variables de tema
+
+El proyecto usa variables de tema DaisyUI para respetar dark/light mode:
+
+| Hardcodeado (evitar) | Variable de tema (usar) |
+|---------------------|------------------------|
+| `text-green-600` | `text-success` |
+| `text-red-600` | `text-error` |
+| `text-blue-600` | `text-primary` |
+| `bg-green-50` | `bg-success/10` |
+| `bg-red-50` | `bg-error/10` |
+| `bg-blue-50` | `bg-primary/10` |
+| `bg-gray-50` | `bg-base-300` |
+| `text-gray-500` | `text-base-content/60` |
+| `bg-white` | `bg-base-200` |
+| `divide-gray-200` | `divide-base-300` |
 
 ---
 
@@ -316,3 +417,5 @@ Muestra avatar (primera letra del username), nombre, email y botón de logout.
 
 - [Gestión de assets](assets.md) — CSS y estructura visual
 - [Convenciones de código](convenciones.md) — Cómo escribir vistas y plantillas
+- [NIIF en Argentina](niif-argentina.md) — Normas contables aplicables
+- [Normas ISO](normas-iso.md) — Estándares de calidad y seguridad

@@ -150,7 +150,7 @@ python manage.py runserver
 # Compilar assets para producción
 npm run build
 
-# Ejecutar tests
+# Ejecutar tests (infraestructura lista, tests por escribir)
 pytest
 
 # Verificar y formatear código

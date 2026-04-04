@@ -48,7 +48,7 @@ from apps.base.models import TimeStampedModel
 - `Meta`: `abstract = True`, `default_permissions = []`
 
 **`DocumentoBase`** (abstracto, hereda TimeStampedModel):
-- `ESTADO_CHOICES` — `[('borrador','Borrador'), ('confirmado','Confirmado'), ('cancelado','Cancelado')]`
+- `ESTADO_CHOICES` — `[('borrador','Borrador'), ('confirmado','Confirmado'), ('cancelado','Cancelado'), ('anulado','Anulado')]`
 - `numero` — `CharField(max_length=20, unique=True)`
 - `fecha` — `DateField(default=timezone.now)`
 - `estado` — `CharField(max_length=20, choices=ESTADO_CHOICES, default='borrador')`
@@ -58,7 +58,7 @@ from apps.base.models import TimeStampedModel
 ### Reglas
 
 - Heredar de `TimeStampedModel` para timestamps automáticos
-- Heredar de `DocumentoBase` para facturas y comprobantes con estados
+- Heredar de `DocumentoBase` para documentos con estados
 - Usar `verbose_name` en todos los campos (en español)
 - `default_permissions = []` en Meta para permisos personalizados
 - Método `__str__` en todos los modelos
@@ -119,13 +119,25 @@ def get(cls, clave, default=None):
         return default
 ```
 
+**Máquina de estados en `save()`** (`MovimientoTesoreria`):
+```python
+def save(self, *args, **kwargs):
+    estado_anterior = self._get_estado_anterior()
+    super().save(*args, **kwargs)
+
+    if estado_anterior == 'borrador' and self.estado == 'confirmado':
+        self.generar_asiento()
+    elif estado_anterior == 'confirmado' and self.estado == 'anulado':
+        self.generar_asiento_inverso()
+```
+
 ---
 
 ## Vistas
 
-### Patrón actual: 100% Function-Based Views
+### Patrón actual: Function-Based Views
 
-**No se usan Class-Based Views ni ViewSets.** Todas las vistas son funciones decoradas con `@login_required`.
+Todas las vistas son funciones decoradas con `@login_required`. No se usan Class-Based Views.
 
 ```python
 from django.contrib.auth.decorators import login_required
@@ -139,7 +151,7 @@ def plan_cuentas(request):
     busqueda = request.GET.get('q', '')
     tipo = request.GET.get('tipo', '')
 
-    cuentas = CuentaContable.objects.all()
+    cuentas = CuentaContable.objects.select_related('padre').all()
     if busqueda:
         cuentas = cuentas.filter(
             Q(codigo__icontains=busqueda) | Q(nombre__icontains=busqueda)
@@ -170,35 +182,31 @@ def plan_cuentas(request):
 | Redirects | Con URLs namespaced: `redirect('contabilidad:plan_cuentas')` |
 | HTMX | Detección: `request.headers.get('HX-Request')` |
 | JSON responses | `JsonResponse` para endpoints AJAX |
-| CSV export | `HttpResponse(content_type='text/csv')` |
-| Formularios | `ModelForm` — algunos en `forms.py`, la mayoría inline en `views.py` |
+| Formularios | `ModelForm` en `forms.py` (todos los forms están en `forms.py`) |
+| Formsets | `inlineformset_factory` para líneas de movimiento/asiento |
 
-### Formularios inline en vistas
+### Formularios limpios
 
-```python
-@login_required
-def cuenta_create(request):
-    if request.method == 'POST':
-        form = CuentaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cuenta creada correctamente')
-            return redirect('contabilidad:plan_cuentas')
-    else:
-        form = CuentaForm()
-    return render(request, 'contabilidad/cuenta_form.html', {'form': form})
-```
-
-### Formularios con Tailwind en widgets
+Los forms **no llevan clases Tailwind en los widgets**. El CSS estiliza automáticamente vía `.form-control` en los templates:
 
 ```python
 class CuentaTesoreriaForm(forms.ModelForm):
     class Meta:
         model = CuentaTesoreria
-        fields = ['nombre', 'tipo', 'moneda', 'saldo_inicial']
+        fields = ['nombre', 'tipo', 'cuenta_contable', 'moneda', 'saldo_inicial', 'activa']
+    # Sin widgets — el CSS se encarga del styling
+```
+
+Solo se usan widgets para atributos funcionales (`type='date'`, `step='0.01'`):
+
+```python
+class EjercicioForm(forms.ModelForm):
+    class Meta:
+        model = Ejercicio
+        fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'estado', 'ejercicio_anterior']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'w-full border rounded px-3 py-2'}),
+            'fecha_inicio': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_fin': forms.DateInput(attrs={'type': 'date'}),
         }
 ```
 
@@ -244,7 +252,6 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/contabilidad/')),
     path('contabilidad/', include('apps.contabilidad.urls')),
     path('tesoreria/', include('apps.tesoreria.urls')),
-    path('impuestos/', include('apps.impuestos.urls')),
     path('contactos/', include('apps.contactos.urls')),
     path('configuracion/', include('apps.configuracion.urls')),
 ]
@@ -260,13 +267,17 @@ urlpatterns = [
 
 ## Admin
 
-**No se usa.** Todos los `admin.py` son stubs vacíos. La gestión de datos se hace a través de vistas custom.
+**Implementado.** Todos los modelos están registrados en sus respectivos `admin.py`:
+- `contabilidad/admin.py`: CuentaContable, Ejercicio, Asiento, LineaAsiento, MapeoContable, TipoImpuesto, Alicuota, ConfiguracionImpuesto
+- `tesoreria/admin.py`: CuentaTesoreria, MovimientoTesoreria, LineaMovimientoTesoreria
+- `contactos/admin.py`: Contacto
+- `configuracion/admin.py`: ParametroSistema, DatosEmpresa
 
 ---
 
 ## Testing
 
-**Stubs vacíos.** Los archivos `tests.py` usan `django.test.TestCase` pero no hay tests escritos. `pytest` y `pytest-django` están en las dependencias pero no configurados activamente.
+**Stubs vacíos.** Los archivos `tests.py` usan `django.test.TestCase` pero no hay tests escritos. `pytest` y `pytest-django` están en `local.txt` listos para usar.
 
 ---
 
@@ -300,11 +311,12 @@ def clean(self):
 
 ## Consultas a base de datos
 
-- `.select_related()` para ForeignKey (usado donde aplica)
+- `.select_related()` para ForeignKey — **aplicado sistemáticamente** en vistas críticas
 - `.prefetch_related()` para relaciones inversas y M2M
 - Evitar queries en loops (problema N+1)
 - `.exists()` en lugar de `.count()` para verificar existencia
 - `.aggregate()` para Sum, Count, Avg
+- Los métodos de cálculo de saldo están en los modelos (`CuentaContable.get_saldo_con_hijos()`, `get_saldo_en_fecha()`)
 
 ---
 
@@ -329,11 +341,10 @@ def clean(self):
 | Módulo | Estado |
 |--------|--------|
 | `base` | Modelos base implementados |
-| `contabilidad` | Completo — CRUD, reportes, HTMX, importación CSV |
-| `tesoreria` | Implementado — CRUD cuentas y movimientos |
-| `impuestos` | Implementado — tipos, alícuotas |
+| `contabilidad` | Completo — CRUD, reportes, HTMX, importación CSV, impuestos fusionados |
+| `tesoreria` | Completo — cuentas, movimientos con líneas, conciliación, asientos automáticos |
 | `contactos` | Implementado — CRUD con búsqueda |
-| `configuracion` | Stub — solo urls con TemplateView |
+| `configuracion` | Implementado — parámetros, datos de empresa |
 | `ventas` | Vacío |
 | `compras` | Vacío |
 | `manufactura` | Vacío |
@@ -347,4 +358,7 @@ def clean(self):
 - [Guía de inicio](guia-inicio.md) — Setup del entorno
 - [Comandos útiles](comandos.md) — pytest, Ruff, Django
 - [Estructura del proyecto](estructura.md) — Mapa de módulos
+- [Componentes de template](componentes.md) — Componentes reutilizables
+- [NIIF en Argentina](niif-argentina.md) — Normas contables aplicables
+- [Normas ISO](normas-iso.md) — Estándares de calidad y seguridad
 - `AGENTS.md` (raíz) — Guía completa para agentes de IA

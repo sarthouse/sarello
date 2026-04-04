@@ -18,4 +18,5 @@ urlpatterns = [
     path('caja-diaria/', views.caja_diaria, name='caja_diaria'),
     path('saldos/', views.saldo_cuentas, name='saldo_cuentas'),
     path('conciliar/', views.conciliar_cuentas, name='conciliar'),
+    path('ajuste/<int:cuenta_pk>/', views.crear_ajuste_desde_conciliacion, name='crear_ajuste_desde_conciliacion'),
 ]

@@ -4,18 +4,29 @@
 {% block title %}{{ action }} Movimiento{% endblock %}
 
 {% block content %}
+{% if ajuste_cuenta %}
+{% include "components/page-header.html" with title=action|add:" de Saldo" back_url="tesoreria:conciliar" %}
+{% else %}
 {% include "components/page-header.html" with title=action|add:" Movimiento de Tesorería" back_url="tesoreria:movimientos" %}
+{% endif %}
 
 <div class="max-w-5xl mx-auto">
     <div class="bg-base-200 rounded-lg shadow p-6">
         <form method="post" id="movimiento-form">
             {% csrf_token %}
 
+            {% if ajuste_cuenta %}
+            <div class="mb-4 bg-warning/10 border-l-4 border-warning p-4">
+                <p class="text-warning font-medium">Ajuste de saldo para {{ ajuste_cuenta.nombre }}</p>
+                <p class="text-base-content/60 text-sm">Diferencia a ajustar: <strong>{{ ajuste_diferencia|floatformat:2 }}</strong></p>
+            </div>
+            {% endif %}
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {% include "components/forms/form-group.html" with field=form.tipo label=form.tipo.label %}
                 {% include "components/forms/form-group.html" with field=form.fecha label=form.fecha.label %}
                 {% include "components/forms/form-group.html" with field=form.contacto label=form.contacto.label %}
-                <div class="md:col-span-3">
+                <div class="md:col-span-3" id="observaciones-group">
                     {% include "components/forms/form-group.html" with field=form.observaciones label=form.observaciones.label %}
                 </div>
             </div>
@@ -72,13 +83,43 @@
                 <button type="submit" class="btn-success">
                     <i class="fas fa-save mr-2"></i>Guardar
                 </button>
+                {% if ajuste_cuenta %}
+                <a href="{% url 'tesoreria:conciliar' %}" class="btn-warning">
+                    Cancelar
+                </a>
+                {% else %}
                 <a href="{% url 'tesoreria:movimientos' %}" class="btn-warning">
                     Cancelar
                 </a>
+                {% endif %}
             </div>
         </form>
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('id_tipo');
+    const obsGroup = document.getElementById('observaciones-group');
+    const obsLabel = obsGroup ? obsGroup.querySelector('label') : null;
+    const obsField = obsGroup ? obsGroup.querySelector('textarea, input') : null;
+
+    function updateObservaciones() {
+        if (!tipoSelect || !obsLabel || !obsField) return;
+        if (tipoSelect.value === 'ajuste') {
+            obsField.setAttribute('required', 'required');
+            obsLabel.innerHTML = 'Motivo del ajuste <span class="text-error">*</span>';
+        } else {
+            obsField.removeAttribute('required');
+            obsLabel.innerHTML = 'Observaciones';
+        }
+    }
+
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', updateObservaciones);
+        updateObservaciones();
+    }
+});
+</script>
 <script defer src="{% static 'js/modules/treasury/movimientos.js' %}"></script>
 {% endblock %}

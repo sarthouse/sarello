@@ -68,6 +68,7 @@ class MovimientoTesoreria(DocumentoBase):
         ('cobro', 'Cobro'),
         ('pago', 'Pago'),
         ('transferencia', 'Transferencia'),
+        ('ajuste', 'Ajuste de saldo'),
     ]
 
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, verbose_name='Tipo')
@@ -96,6 +97,13 @@ class MovimientoTesoreria(DocumentoBase):
     def __str__(self):
         return f"{self.numero} - {self.get_tipo_display()} - {self.importe_total}"
 
+    def clean(self):
+        super().clean()
+        if self.tipo == 'ajuste' and not self.observaciones:
+            raise ValidationError({
+                'observaciones': 'El motivo es obligatorio para ajustes de saldo'
+            })
+
     @property
     def importe_total(self):
         """Suma de debe + haber de todas las líneas."""
@@ -117,6 +125,9 @@ class MovimientoTesoreria(DocumentoBase):
             ('pago', 'caja'): 'pago_efectivo',
             ('pago', 'banco'): 'pago_banco',
             ('pago', 'digital'): 'pago_efectivo',
+            ('ajuste', 'caja'): 'ajuste_caja',
+            ('ajuste', 'banco'): 'ajuste_banco',
+            ('ajuste', 'digital'): 'ajuste_caja',
         }
         evento = eventos.get((self.tipo, tipo_cuenta))
         if not evento:
