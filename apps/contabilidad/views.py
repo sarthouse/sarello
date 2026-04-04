@@ -137,7 +137,7 @@ def dashboard(request):
 
 @login_required
 def plan_cuentas(request):
-    cuentas = CuentaContable.objects.all().order_by('codigo')
+    cuentas = CuentaContable.objects.select_related('padre').all().order_by('codigo')
     
     q = request.GET.get('q', '').strip()
     tipo = request.GET.get('tipo', '')
@@ -241,7 +241,7 @@ def libro_diario(request):
     else:
         ejercicios_filter = ejercicios.filter(estado='abierto')
     
-    asientos = Asiento.objects.filter(ejercicio__in=ejercicios_filter).select_related('ejercicio').order_by('-fecha', '-numero')
+    asientos = Asiento.objects.filter(ejercicio__in=ejercicios_filter).select_related('ejercicio').prefetch_related('lineas').order_by('-fecha', '-numero')
     
     total_debe = sum(a.total_debe() for a in asientos)
     total_haber = sum(a.total_haber() for a in asientos)
@@ -808,7 +808,7 @@ def asiento_agregar_linea(request, pk):
     if request.method == 'POST':
         import json
         data = json.loads(request.body)
-        
+
         asiento = get_object_or_404(Asiento, pk=pk)
         cuenta = get_object_or_404(CuentaContable, pk=data.get('cuenta_id'))
         

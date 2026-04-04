@@ -30,7 +30,7 @@ def index(request):
 
 @login_required
 def cuentas(request):
-    cuentas = CuentaTesoreria.objects.all().order_by('tipo', 'nombre')
+    cuentas = CuentaTesoreria.objects.select_related('cuenta_contable').all().order_by('tipo', 'nombre')
     return render(request, 'tesoreria/cuentas.html', {'cuentas': cuentas})
 
 
